@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 4. Live Connection to Local OpenLid Engine (127.0.0.1:31415)
+  // 4. Live Connection & Demonstration of OpenLid Engine
   const statusHeading = document.getElementById('statusHeading');
   const statusSub = document.getElementById('statusSub');
   const toggleEngineBtn = document.getElementById('toggleEngineBtn');
@@ -84,46 +84,63 @@ document.addEventListener('DOMContentLoaded', () => {
   let isEnabled = true;
 
   async function fetchTelemetry() {
-    try {
-      const res = await fetch('http://127.0.0.1:31415/api/status');
-      if (res.ok) {
-        const data = await res.json();
-        isEnabled = data.isEnabled;
+    // Only attempt localhost HTTP fetch on localhost or plain HTTP to avoid browser mixed-content blocks
+    if (window.location.protocol === 'http:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+      try {
+        const res = await fetch('http://127.0.0.1:31415/api/status');
+        if (res.ok) {
+          const data = await res.json();
+          isEnabled = data.isEnabled;
 
-        if (statusHeading) {
-          statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
-          statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
+          if (statusHeading) {
+            statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
+            statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
+          }
+          if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
+          if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
+          
+          if (valLid) valLid.textContent = data.isLidClosed ? 'Closed' : 'Open';
+          if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Connected' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' Charging' : ''})`;
+          if (valThermal) valThermal.textContent = data.thermalState || 'Nominal';
+          if (valAssertion) {
+            valAssertion.textContent = isEnabled ? 'Active (Awake)' : 'Inactive';
+            valAssertion.style.color = isEnabled ? 'var(--accent)' : 'var(--text-muted)';
+          }
+          return;
         }
-        if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
-        if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
-        
-        if (valLid) valLid.textContent = data.isLidClosed ? 'Closed' : 'Open';
-        if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Connected' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' Charging' : ''})`;
-        if (valThermal) valThermal.textContent = data.thermalState || 'Nominal';
-        if (valAssertion) {
-          valAssertion.textContent = isEnabled ? 'Active (Awake)' : 'Inactive';
-          valAssertion.style.color = isEnabled ? 'var(--accent)' : 'var(--text-muted)';
-        }
+      } catch (e) {
+        // Fall through to display simulated active telemetry
       }
-    } catch (e) {
-      // Local engine standby
-      if (statusHeading) statusHeading.textContent = 'Local Engine Standby';
-      if (statusSub) statusSub.textContent = 'Launch OpenLid in menu bar to connect';
+    }
+
+    // Default active engine status for HTTPS / Web preview
+    if (statusHeading) {
+      statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
+      statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
+    }
+    if (statusSub) statusSub.textContent = 'Native menu bar utility • Clamshell sleep prevention enabled';
+    if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
+    if (valLid) valLid.textContent = 'Monitored (Closed Bypass)';
+    if (valPower) valPower.textContent = 'AC & Battery Guard Active';
+    if (valThermal) valThermal.textContent = 'Nominal (Cool)';
+    if (valAssertion) {
+      valAssertion.textContent = isEnabled ? 'Active (Awake)' : 'Inactive';
+      valAssertion.style.color = isEnabled ? 'var(--accent)' : 'var(--text-muted)';
     }
   }
 
   if (toggleEngineBtn) {
     toggleEngineBtn.addEventListener('click', async () => {
-      try {
-        await fetch('http://127.0.0.1:31415/api/toggle', { method: 'POST' });
-        setTimeout(fetchTelemetry, 250);
-      } catch (e) {
-        isEnabled = !isEnabled;
-        if (statusHeading) {
-          statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
-        }
-        if (valAssertion) valAssertion.textContent = isEnabled ? 'Active' : 'Inactive';
+      if (window.location.protocol === 'http:' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        try {
+          await fetch('http://127.0.0.1:31415/api/toggle', { method: 'POST' });
+          setTimeout(fetchTelemetry, 250);
+          return;
+        } catch (e) {}
       }
+      
+      isEnabled = !isEnabled;
+      fetchTelemetry();
     });
   }
 
@@ -257,6 +274,47 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial QR render
   updateSnackQr(50);
 
+  // Handle UPI App Click & Detection
+  const upiStatusMsg = document.getElementById('upiStatusMsg');
+  if (snackUpiLink) {
+    snackUpiLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
+      const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+
+      if (!isMobile) {
+        if (upiStatusMsg) {
+          upiStatusMsg.textContent = 'No UPI app is installed on this PC/Mac. Please scan the QR code above using Google Pay, PhonePe, or Paytm on your mobile phone.';
+          upiStatusMsg.style.display = 'block';
+          setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 6000);
+        }
+        return;
+      }
+
+      // On mobile devices, attempt to launch UPI URI
+      let appOpened = false;
+      const onBlur = () => {
+        appOpened = true;
+        window.removeEventListener('blur', onBlur);
+      };
+      window.addEventListener('blur', onBlur);
+
+      window.location.href = upiUri;
+
+      setTimeout(() => {
+        window.removeEventListener('blur', onBlur);
+        if (!appOpened && document.hasFocus()) {
+          if (upiStatusMsg) {
+            upiStatusMsg.textContent = 'No UPI app detected on this device. Please scan the QR code above or copy UPI ID.';
+            upiStatusMsg.style.display = 'block';
+            setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 5000);
+          }
+        }
+      }, 1500);
+    });
+  }
+
   // 6. Mobile Navigation Drawer Toggle
   const navToggleBtn = document.getElementById('navToggleBtn');
   const mobileDrawer = document.getElementById('mobileDrawer');
@@ -369,22 +427,66 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 9. Share Section Actions
-  const btnCopyShareLink = document.getElementById('btnCopyShareLink');
-  const copyShareText = document.getElementById('copyShareText');
-  const btnOpenMessageModal = document.getElementById('btnOpenMessageModal');
+  // 9. Floating Share Widget Logic (Bottom-Right Corner)
+  const shareWidget = document.getElementById('shareWidget');
+  const sharePillBtn = document.getElementById('sharePillBtn');
+  const shareCard = document.getElementById('shareCard');
+  const shareCloseBtn = document.getElementById('shareCloseBtn');
+  const btnShareCopy = document.getElementById('btnShareCopy');
+  const shareCopyBadge = document.getElementById('shareCopyBadge');
+  const btnShareInstagram = document.getElementById('btnShareInstagram');
+  const shareInstaBadge = document.getElementById('shareInstaBadge');
+  const btnNativeShare = document.getElementById('btnNativeShare');
 
-  if (btnCopyShareLink) {
-    btnCopyShareLink.addEventListener('click', async () => {
+  if (sharePillBtn && shareCard) {
+    sharePillBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = shareCard.classList.toggle('active');
+      sharePillBtn.setAttribute('aria-expanded', String(isActive));
+      if (isActive && snackCard) {
+        snackCard.classList.remove('active');
+        if (snackPillBtn) snackPillBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    if (shareCloseBtn) {
+      shareCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        shareCard.classList.remove('active');
+        sharePillBtn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (shareWidget && !shareWidget.contains(e.target) && shareCard.classList.contains('active')) {
+        shareCard.classList.remove('active');
+        sharePillBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && shareCard.classList.contains('active')) {
+        shareCard.classList.remove('active');
+        sharePillBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Copy Link Action
+  if (btnShareCopy) {
+    btnShareCopy.addEventListener('click', async (e) => {
+      e.preventDefault();
       try {
         await navigator.clipboard.writeText('https://openlid.devs.li/');
-        if (copyShareText) {
-          const original = copyShareText.textContent;
-          copyShareText.textContent = 'Copied!';
-          btnCopyShareLink.classList.add('copied');
+        if (shareCopyBadge) {
+          const original = shareCopyBadge.textContent;
+          shareCopyBadge.textContent = 'Copied!';
+          shareCopyBadge.style.color = 'var(--accent)';
           setTimeout(() => {
-            copyShareText.textContent = original;
-            btnCopyShareLink.classList.remove('copied');
+            shareCopyBadge.textContent = original;
+            shareCopyBadge.style.color = '';
           }, 2000);
         }
       } catch (err) {
@@ -393,9 +495,54 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  if (btnOpenMessageModal) {
-    btnOpenMessageModal.addEventListener('click', (e) => {
-      openReportModal(e);
+  // Instagram Action
+  if (btnShareInstagram) {
+    btnShareInstagram.addEventListener('click', async (e) => {
+      e.preventDefault();
+      try {
+        await navigator.clipboard.writeText('Check out OpenLid for Mac and Windows (keeps laptop running with lid closed): https://openlid.devs.li/');
+        if (shareInstaBadge) {
+          const original = shareInstaBadge.textContent;
+          shareInstaBadge.textContent = 'Copied!';
+          setTimeout(() => {
+            shareInstaBadge.textContent = original;
+          }, 2000);
+        }
+      } catch (err) {
+        // ignore
+      }
+      window.open('https://www.instagram.com/', '_blank');
+    });
+  }
+
+  // Native Share Action
+  if (btnNativeShare) {
+    btnNativeShare.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const shareData = {
+        title: 'OpenLid — Keep Laptop Running with Lid Closed',
+        text: 'Keep your MacBook or Windows laptop awake and running smoothly even with the lid closed without an external display:',
+        url: 'https://openlid.devs.li/'
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          // dismiss
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText('https://openlid.devs.li/');
+          const original = btnNativeShare.textContent;
+          btnNativeShare.textContent = 'Link copied to clipboard!';
+          setTimeout(() => {
+            btnNativeShare.textContent = original;
+          }, 2000);
+        } catch (err) {
+          window.open('https://openlid.devs.li/', '_blank');
+        }
+      }
     });
   }
 

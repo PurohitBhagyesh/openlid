@@ -9,7 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="OpenLid">
   <meta name="theme-color" content="#0c0d10">
   <meta name="description" content="OpenLid prevents laptops from sleeping when the lid is closed. Native menu bar and system tray utility for macOS and Windows. Zero external monitors or dummy plugs required.">
-  <meta name="author" content="Bhagyesh Purohit">
+  <meta name="author" content="OpenLid Team">
   <meta name="keywords" content="openlid, keep mac awake lid closed, clamshell mode without monitor, macos sleep prevention, windows away mode, lid close sleep bypass, menu bar utility, caffeinate lid closed, keep laptop awake closed lid">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="google-site-verification" content="google5fefb455a4f252a7">
@@ -68,7 +68,7 @@
         },
         "author": {
           "@type": "Person",
-          "name": "Bhagyesh Purohit",
+          "name": "OpenLid Developer",
           "url": "https://github.com/PurohitBhagyesh"
         }
       },
@@ -77,10 +77,11 @@
         "@id": "https://openlid.devs.li/#website",
         "url": "https://openlid.devs.li/",
         "name": "OpenLid",
+        "alternateName": ["OpenLid App", "Open Lid", "OpenLid Clamshell"],
         "description": "Keep Your Laptop Running With Lid Closed (macOS & Windows)",
         "publisher": {
           "@type": "Person",
-          "name": "Bhagyesh Purohit"
+          "name": "OpenLid Developer"
         }
       }
     ]
@@ -111,10 +112,12 @@
 
       <div class="nav-menu">
         <a href="#downloads" class="nav-item">Downloads</a>
+        <a href="#topics" class="nav-item">Topics</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer" class="nav-item">Releases</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid/packages" target="_blank" rel="noopener noreferrer" class="nav-item">Packages</a>
         <a href="#architecture" class="nav-item">Architecture</a>
         <a href="#safety" class="nav-item">Safety</a>
         <a href="#cli" class="nav-item">CLI</a>
-        <a href="#share" class="nav-item">Share</a>
         <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="nav-item nav-ext">
           GitHub
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -147,12 +150,14 @@
     <!-- Mobile Navigation Drawer -->
     <div class="mobile-drawer" id="mobileDrawer">
       <a href="#downloads" class="mobile-nav-item">Downloads</a>
+      <a href="#topics" class="mobile-nav-item">Topics & Tags</a>
+      <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">Releases (v1.0.0) ↗</a>
+      <a href="https://github.com/PurohitBhagyesh/openlid/packages" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">Packages ↗</a>
       <a href="#architecture" class="mobile-nav-item">Architecture</a>
       <a href="#safety" class="mobile-nav-item">Safety</a>
       <a href="#cli" class="mobile-nav-item">CLI Reference</a>
-      <a href="#share" class="mobile-nav-item">Share & Message</a>
       <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">GitHub Repository ↗</a>
-      <a href="#report" class="mobile-nav-item" id="mobileNavReport">Report a Problem ↗</a>
+      <a href="#report" class="mobile-nav-item" id="mobileNavReport">Report an Issue ↗</a>
     </div>
   </nav>
 
@@ -445,70 +450,63 @@
     </div>
   </section>
 
-  <!-- Share & Message Section -->
-  <section class="section share-section" id="share">
+  <!-- GitHub Topics, Releases & Packages -->
+  <section class="section topics-section" id="topics">
     <div class="container">
-      <div class="share-box">
-        <div class="share-header">
-          <div class="share-pill">
+      <div class="topics-box">
+        <div class="topics-header">
+          <div class="topics-pill">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
             </svg>
-            <span>Message & Share</span>
+            <span>GitHub Repository</span>
           </div>
-          <h2 class="share-title">Send OpenLid via Message or Reach Out</h2>
-          <p class="share-subtitle">Know someone who needs their laptop running with the lid closed? Send them OpenLid in one tap, or message developer Bhagyesh Purohit directly.</p>
+          <h2 class="topics-title">Topics, Releases & Packages</h2>
+          <p class="topics-subtitle">OpenLid is distributed openly under the MIT License on GitHub.</p>
         </div>
 
-        <div class="share-actions-grid">
-          <!-- Share via WhatsApp -->
-          <a href="https://api.whatsapp.com/send?text=Check%20out%20OpenLid%20%E2%80%94%20keep%20your%20laptop%20running%20with%20the%20lid%20closed%20safely%20on%20macOS%20%26%20Windows!%20No%20external%20display%20needed%3A%20https%3A%2F%2Fopenlid.devs.li" target="_blank" rel="noopener noreferrer" class="share-btn share-whatsapp" aria-label="Share via WhatsApp">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.301-.776.978-.952 1.178-.175.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.799-1.5-1.786-1.676-2.087-.175-.301-.019-.464.132-.614.136-.135.301-.351.451-.527.15-.176.2-.301.3-.502.101-.2.051-.376-.025-.526-.075-.15-.676-1.63-.926-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.527.075-.803.376s-1.053 1.028-1.053 2.508 1.078 2.91 1.229 3.111c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.38.197 1.9.12.58-.087 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.126-.275-.201-.576-.351zM12.04 2C6.536 2 2.072 6.46 2.072 11.96c0 1.986.582 3.84 1.59 5.405L2 22l4.802-1.579a9.92 9.92 0 0 0 5.238 1.499h.004c5.503 0 9.967-4.461 9.967-9.96c0-2.66-1.036-5.161-2.92-7.043C17.207 3.036 14.704 2 12.04 2z"/>
-            </svg>
-            <span>WhatsApp</span>
+        <div class="topics-tags-grid">
+          <a href="https://github.com/topics/macos" target="_blank" rel="noopener noreferrer" class="topic-tag">#macos</a>
+          <a href="https://github.com/topics/windows" target="_blank" rel="noopener noreferrer" class="topic-tag">#windows</a>
+          <a href="https://github.com/topics/clamshell-mode" target="_blank" rel="noopener noreferrer" class="topic-tag">#clamshell-mode</a>
+          <a href="https://github.com/topics/sleep-prevention" target="_blank" rel="noopener noreferrer" class="topic-tag">#sleep-prevention</a>
+          <a href="https://github.com/topics/menu-bar-app" target="_blank" rel="noopener noreferrer" class="topic-tag">#menu-bar-app</a>
+          <a href="https://github.com/topics/swift" target="_blank" rel="noopener noreferrer" class="topic-tag">#swift-6</a>
+          <a href="https://github.com/topics/csharp" target="_blank" rel="noopener noreferrer" class="topic-tag">#csharp</a>
+          <a href="https://github.com/topics/caffeinate" target="_blank" rel="noopener noreferrer" class="topic-tag">#caffeinate</a>
+          <a href="https://github.com/topics/powershell" target="_blank" rel="noopener noreferrer" class="topic-tag">#powershell</a>
+        </div>
+
+        <div class="topics-links-row">
+          <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer" class="topic-link-card">
+            <div class="topic-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+            </div>
+            <div class="topic-card-content">
+              <div class="topic-card-title">GitHub Releases (v1.0.0) ↗</div>
+              <div class="topic-card-desc">Download signed Universal, Apple Silicon, Intel & Windows release ZIPs</div>
+            </div>
           </a>
 
-          <!-- Share via iMessage / SMS -->
-          <a href="sms:?&body=Check%20out%20OpenLid%20for%20macOS%20and%20Windows%20(keep%20your%20laptop%20running%20with%20lid%20closed)%3A%20https%3A%2F%2Fopenlid.devs.li" class="share-btn share-imessage" aria-label="Send via iMessage or SMS">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
-            </svg>
-            <span>iMessage / SMS</span>
+          <a href="https://github.com/PurohitBhagyesh/openlid/packages" target="_blank" rel="noopener noreferrer" class="topic-link-card">
+            <div class="topic-card-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="m7.5 4.27 9 5.15"/>
+                <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+                <path d="m3.3 7 8.7 5 8.7-5"/>
+                <path d="M12 22V12"/>
+              </svg>
+            </div>
+            <div class="topic-card-content">
+              <div class="topic-card-title">GitHub Packages ↗</div>
+              <div class="topic-card-desc">Prebuilt distribution archives and package manifests</div>
+            </div>
           </a>
-
-          <!-- Share on Telegram -->
-          <a href="https://t.me/share/url?url=https%3A%2F%2Fopenlid.devs.li&text=OpenLid%20%E2%80%94%20Keep%20laptop%20awake%20with%20lid%20closed%20safely" target="_blank" rel="noopener noreferrer" class="share-btn share-telegram" aria-label="Share on Telegram">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
-            </svg>
-            <span>Telegram</span>
-          </a>
-
-          <!-- Share on X -->
-          <a href="https://twitter.com/intent/tweet?text=OpenLid%20%E2%80%94%20Keep%20your%20laptop%20awake%20with%20the%20lid%20closed%20safely%20without%20an%20external%20display%20(macOS%20%26%20Windows)&url=https%3A%2F%2Fopenlid.devs.li" target="_blank" rel="noopener noreferrer" class="share-btn share-x" aria-label="Share on X">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
-            </svg>
-            <span>Post on X</span>
-          </a>
-
-          <!-- Copy Link -->
-          <button type="button" class="share-btn share-copy" id="btnCopyShareLink" aria-label="Copy website link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
-              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
-            </svg>
-            <span id="copyShareText">Copy Link</span>
-          </button>
-
-          <!-- Direct Message Developer -->
-          <button type="button" class="share-btn share-message-dev" id="btnOpenMessageModal" aria-label="Message Developer directly">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
-            </svg>
-            <span>Message Developer</span>
-          </button>
         </div>
       </div>
     </div>
@@ -519,13 +517,14 @@
     <div class="footer-inner container">
       <div class="footer-info">
         <span>OpenLid is distributed under the MIT License.</span>
-        <span class="footer-dev-credit">• Developed by <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer">Bhagyesh Purohit</a></span>
       </div>
       <div class="footer-links">
         <a href="https://openlid.devs.li">openlid.devs.li</a>
         <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="#topics">Topics</a>
         <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer">Releases</a>
-        <button type="button" class="footer-link-btn" id="btnFooterReport">Report a Problem</button>
+        <a href="https://github.com/PurohitBhagyesh/openlid/packages" target="_blank" rel="noopener noreferrer">Packages</a>
+        <button type="button" class="footer-link-btn" id="btnFooterReport">Report an Issue</button>
         <a href="https://github.com/PurohitBhagyesh/openlid/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
       </div>
     </div>
@@ -583,13 +582,106 @@
           Pay via UPI App
         </a>
 
+        <!-- UPI Status / Fallback Notice -->
+        <div id="upiStatusMsg" class="upi-status-banner" style="display:none;"></div>
+
         <p class="snack-sub">Every coffee fuels continuous development.</p>
 
         <div class="snack-report-footer">
           <button type="button" class="snack-report-trigger" id="btnCoffeeReport">
-            Report a problem or bug ↗
+            Report an issue or bug ↗
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Share Widget (Bottom-Right Corner) -->
+  <div class="share-widget" id="shareWidget">
+    <button class="share-pill" id="sharePillBtn" aria-label="Share OpenLid" aria-expanded="false">
+      <svg class="share-pill-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="18" cy="5" r="3"/>
+        <circle cx="6" cy="12" r="3"/>
+        <circle cx="18" cy="19" r="3"/>
+        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+      </svg>
+      <span>Share</span>
+    </button>
+
+    <div class="share-card" id="shareCard" role="dialog" aria-modal="false" aria-label="Share OpenLid">
+      <div class="share-card-header">
+        <div class="share-card-title-group">
+          <h3 class="share-card-title">Share OpenLid</h3>
+          <p class="share-card-sub">Share with friends or on social media</p>
+        </div>
+        <button class="share-close-btn" id="shareCloseBtn" type="button" aria-label="Close share popup">&times;</button>
+      </div>
+
+      <div class="share-card-body">
+        <!-- 1. Copy Link -->
+        <button type="button" class="share-line-item" id="btnShareCopy">
+          <div class="share-item-icon link-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">Copy Link</span>
+            <span class="share-item-desc">openlid.devs.li</span>
+          </div>
+          <span class="share-item-action" id="shareCopyBadge">Copy</span>
+        </button>
+
+        <!-- 2. Messages (iMessage / SMS) -->
+        <a href="sms:?&body=Check%20out%20OpenLid%20for%20macOS%20and%20Windows%20(keep%20your%20laptop%20running%20with%20lid%20closed)%3A%20https%3A%2F%2Fopenlid.devs.li" class="share-line-item">
+          <div class="share-item-icon msg-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">Messages</span>
+            <span class="share-item-desc">Send in iMessage or SMS</span>
+          </div>
+          <span class="share-item-action">Open ↗</span>
+        </a>
+
+        <!-- 3. Instagram -->
+        <button type="button" class="share-line-item" id="btnShareInstagram">
+          <div class="share-item-icon insta-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect width="20" height="20" x="2" y="2" rx="5" ry="5"/>
+              <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+              <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">Instagram</span>
+            <span class="share-item-desc">Share on Story, DM, or Bio</span>
+          </div>
+          <span class="share-item-action" id="shareInstaBadge">Share ↗</span>
+        </button>
+
+        <!-- 4. WhatsApp -->
+        <a href="https://api.whatsapp.com/send?text=Check%20out%20OpenLid%20%E2%80%94%20keep%20your%20laptop%20running%20with%20lid%20closed%20safely%20on%20macOS%20%26%20Windows!%20https%3A%2F%2Fopenlid.devs.li" target="_blank" rel="noopener noreferrer" class="share-line-item">
+          <div class="share-item-icon wa-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.301-.776.978-.952 1.178-.175.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.799-1.5-1.786-1.676-2.087-.175-.301-.019-.464.132-.614.136-.135.301-.351.451-.527.15-.176.2-.301.3-.502.101-.2.051-.376-.025-.526-.075-.15-.676-1.63-.926-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.527.075-.803.376s-1.053 1.028-1.053 2.508 1.078 2.91 1.229 3.111c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.38.197 1.9.12.58-.087 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.126-.275-.201-.576-.351zM12.04 2C6.536 2 2.072 6.46 2.072 11.96c0 1.986.582 3.84 1.59 5.405L2 22l4.802-1.579a9.92 9.92 0 0 0 5.238 1.499h.004c5.503 0 9.967-4.461 9.967-9.96c0-2.66-1.036-5.161-2.92-7.043C17.207 3.036 14.704 2 12.04 2z"/>
+            </svg>
+          </div>
+          <div class="share-item-text">
+            <span class="share-item-title">WhatsApp</span>
+            <span class="share-item-desc">Send to contacts or chats</span>
+          </div>
+          <span class="share-item-action">Send ↗</span>
+        </a>
+
+        <!-- 5. Native Share Sheet for iPhone / Android -->
+        <button type="button" class="btn btn-sm btn-outline btn-block native-share-btn" id="btnNativeShare">
+          More Sharing Options (AirDrop, Apps) ↗
+        </button>
       </div>
     </div>
   </div>
@@ -607,8 +699,8 @@
             </svg>
           </div>
           <div>
-            <h3 class="modal-title" id="reportModalTitle">Report a Problem & Contact</h3>
-            <p class="modal-desc">Direct support from creator Bhagyesh Purohit</p>
+            <h3 class="modal-title" id="reportModalTitle">Report an Issue & Feedback</h3>
+            <p class="modal-desc">Submit bugs or feedback directly to the developer</p>
           </div>
         </div>
         <button type="button" class="modal-close" id="btnCloseReportModal" aria-label="Close modal">&times;</button>
@@ -616,20 +708,6 @@
 
       <div class="modal-body">
         <div class="report-options">
-          <!-- WhatsApp Message -->
-          <a href="https://api.whatsapp.com/send?text=Hi%20Bhagyesh%2C%20I%20have%20a%20question%2Ffeedback%20regarding%20OpenLid%3A%20" target="_blank" rel="noopener noreferrer" class="report-option-card">
-            <div class="option-icon whatsapp-icon">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.301-.776.978-.952 1.178-.175.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.799-1.5-1.786-1.676-2.087-.175-.301-.019-.464.132-.614.136-.135.301-.351.451-.527.15-.176.2-.301.3-.502.101-.2.051-.376-.025-.526-.075-.15-.676-1.63-.926-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.527.075-.803.376s-1.053 1.028-1.053 2.508 1.078 2.91 1.229 3.111c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.38.197 1.9.12.58-.087 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.126-.275-.201-.576-.351zM12.04 2C6.536 2 2.072 6.46 2.072 11.96c0 1.986.582 3.84 1.59 5.405L2 22l4.802-1.579a9.92 9.92 0 0 0 5.238 1.499h.004c5.503 0 9.967-4.461 9.967-9.96c0-2.66-1.036-5.161-2.92-7.043C17.207 3.036 14.704 2 12.04 2z"/>
-              </svg>
-            </div>
-            <div class="option-content">
-              <div class="option-title">Message via WhatsApp</div>
-              <div class="option-sub">Direct message to creator Bhagyesh Purohit</div>
-            </div>
-            <span class="option-badge">Chat ↗</span>
-          </a>
-
           <!-- GitHub Issues -->
           <a href="https://github.com/PurohitBhagyesh/openlid/issues/new" target="_blank" rel="noopener noreferrer" class="report-option-card">
             <div class="option-icon github-icon">
@@ -639,13 +717,13 @@
             </div>
             <div class="option-content">
               <div class="option-title">Open GitHub Issue</div>
-              <div class="option-sub">Report bugs, submit crash logs, or request features</div>
+              <div class="option-sub">Report bugs, submit logs, or request features</div>
             </div>
             <span class="option-badge">GitHub ↗</span>
           </a>
 
           <!-- Direct Email -->
-          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi%20Bhagyesh,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device%20(Mac/Windows):%0D%0A-%20OS%20Version:%0D%0A-%20Description%20of%20what%20happened:%0D%0A" class="report-option-card">
+          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device%20(Mac/Windows):%0D%0A-%20OS%20Version:%0D%0A-%20Description%20of%20what%20happened:%0D%0A" class="report-option-card">
             <div class="option-icon email-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="20" height="16" x="2" y="4" rx="2"/>
@@ -662,7 +740,7 @@
 
         <div class="developer-credit-box">
           <div class="dev-info">
-            <div class="dev-name">Bhagyesh Purohit</div>
+            <div class="dev-name">OpenLid Developer</div>
             <div class="dev-tag">Developer & Maintainer • @PurohitBhagyesh</div>
           </div>
           <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">

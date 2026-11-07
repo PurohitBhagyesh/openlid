@@ -204,4 +204,6 @@ If you encounter any problem, bug, or have a feature request:
 
 ## License
 
-Distributed under the [MIT License](LICENSE). Copyright (c) 2026 Bhagyesh Purohit.
+Distributed under the [MIT License](LICENSE). Copyright (c) 2026 OpenLid Contributors.
+
+• Developed by [Bhagyesh Purohit](https://github.com/PurohitBhagyesh)

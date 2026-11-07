@@ -259,7 +259,7 @@ struct MenuBarView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "person.circle.fill")
                             .foregroundColor(.accentColor)
-                        Text("Bhagyesh Purohit")
+                        Text("OpenLid Developer")
                             .font(.system(size: 10, weight: .medium))
                     }
                 }

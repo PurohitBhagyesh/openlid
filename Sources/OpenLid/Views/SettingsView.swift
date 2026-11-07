@@ -155,7 +155,7 @@ struct SettingsView: View {
                             
                             VStack(alignment: .leading, spacing: 2) {
                                 HStack(spacing: 6) {
-                                    Text("Bhagyesh Purohit")
+                                    Text("OpenLid Developer")
                                         .font(.system(size: 14, weight: .bold))
                                     Text("Creator")
                                         .font(.system(size: 9, weight: .heavy))
@@ -210,7 +210,7 @@ struct SettingsView: View {
                         .buttonStyle(.plain)
 
                         // Report a Problem / Email Option
-                        Link(destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi%20Bhagyesh,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device:%20MacBook%0D%0A-%20macOS%20Version:%0D%0A-%20Description:%20%0D%0A")!) {
+                        Link(destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device:%20MacBook%0D%0A-%20macOS%20Version:%0D%0A-%20Description:%20%0D%0A")!) {
                             ContactOptionRow(
                                 iconName: "envelope.fill",
                                 iconColor: .green,
