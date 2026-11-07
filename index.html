@@ -100,6 +100,7 @@
       <a href="#safety" class="mobile-nav-item">Safety</a>
       <a href="#cli" class="mobile-nav-item">CLI Reference</a>
       <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">GitHub Repository ↗</a>
+      <a href="#report" class="mobile-nav-item" id="mobileNavReport">Report a Problem ↗</a>
     </div>
   </nav>
 
@@ -107,7 +108,7 @@
   <header class="hero container">
     <div class="hero-label">
       <span class="dot"></span>
-      macOS & Windows • Native System Status Bar
+      macOS & Windows • Ultra-lightweight (&lt; 2.5 MB)
     </div>
 
     <h1 class="hero-h1">Keep your laptop running with the lid closed</h1>
@@ -405,6 +406,7 @@
         <a href="https://openlid.devs.li">openlid.devs.li</a>
         <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer">GitHub</a>
         <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+        <button type="button" class="footer-link-btn" id="btnFooterReport">Report a Problem</button>
         <a href="https://github.com/PurohitBhagyesh/openlid/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
       </div>
     </div>
@@ -463,6 +465,77 @@
         </a>
 
         <p class="snack-sub">Every coffee fuels continuous development.</p>
+
+        <div class="snack-report-footer">
+          <button type="button" class="snack-report-trigger" id="btnCoffeeReport">
+            Report a problem or bug ↗
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Report a Problem Modal -->
+  <div class="modal-backdrop" id="reportModal" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div class="modal-header-left">
+          <div class="modal-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="modal-title" id="reportModalTitle">Report a Problem & Contact</h3>
+            <p class="modal-desc">Direct support from creator Bhagyesh Purohit</p>
+          </div>
+        </div>
+        <button type="button" class="modal-close" id="btnCloseReportModal" aria-label="Close modal">&times;</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="report-options">
+          <!-- GitHub Issues -->
+          <a href="https://github.com/PurohitBhagyesh/openlid/issues/new" target="_blank" rel="noopener noreferrer" class="report-option-card">
+            <div class="option-icon github-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title">Open GitHub Issue</div>
+              <div class="option-sub">Report bugs, submit crash logs, or request features</div>
+            </div>
+            <span class="option-badge">GitHub ↗</span>
+          </a>
+
+          <!-- Direct Email -->
+          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi%20Bhagyesh,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device%20(Mac/Windows):%0D%0A-%20OS%20Version:%0D%0A-%20Description%20of%20what%20happened:%0D%0A" class="report-option-card">
+            <div class="option-icon email-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title">Email Developer Directly</div>
+              <div class="option-sub">purohitunofficialbhagyesh@gmail.com</div>
+            </div>
+            <span class="option-badge">Send Email ↗</span>
+          </a>
+        </div>
+
+        <div class="developer-credit-box">
+          <div class="dev-info">
+            <div class="dev-name">Bhagyesh Purohit</div>
+            <div class="dev-tag">Developer & Maintainer • @PurohitBhagyesh</div>
+          </div>
+          <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline">
+            GitHub Profile ↗
+          </a>
+        </div>
       </div>
     </div>
   </div>

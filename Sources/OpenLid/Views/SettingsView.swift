@@ -122,7 +122,7 @@ struct SettingsView: View {
                                 Text(helperInstalled ? "Installed (Passwordless instant toggling enabled)" : "Not installed (macOS prompts for admin password each toggle)")
                                     .font(.caption)
                                     .foregroundColor(helperInstalled ? .green : .orange)
-                        }
+                            }
                             Spacer()
                             if isProcessingHelper {
                                 ProgressView()
@@ -141,6 +141,84 @@ struct SettingsView: View {
                         }
                     }
                 }
+
+                // Contact & Developer Support Section
+                Section(header: Text("Contact Developer").font(.headline)) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack {
+                            Image(systemName: "person.crop.circle.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.system(size: 16))
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text("Bhagyesh Purohit")
+                                    .font(.system(size: 13, weight: .semibold))
+                                Text("Lead Developer & Creator")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                            Spacer()
+                            Text("@PurohitBhagyesh")
+                                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(Color.secondary.opacity(0.12))
+                                .cornerRadius(4)
+                        }
+                        .padding(.vertical, 2)
+                        
+                        Divider()
+
+                        // GitHub Link
+                        Link(destination: URL(string: "https://github.com/PurohitBhagyesh")!) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "chevron.left.forwardslash.chevron.right")
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(.primary)
+                                    .frame(width: 18)
+                                Text("GitHub: @PurohitBhagyesh")
+                                    .font(.system(size: 12))
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        // Website Link
+                        Link(destination: URL(string: "https://openlid.devs.li")!) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "globe")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.blue)
+                                    .frame(width: 18)
+                                Text("Website: openlid.devs.li")
+                                    .font(.system(size: 12))
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+
+                        // Report a Problem / Email
+                        Link(destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi%20Bhagyesh,%0D%0A%0D%0AI%20would%20like%20to%20report%20an%20issue%20with%20OpenLid:%0D%0A")!) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "envelope.fill")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.green)
+                                    .frame(width: 18)
+                                Text("Report a Problem: purohitunofficialbhagyesh@gmail.com")
+                                    .font(.system(size: 12))
+                                    .lineLimit(1)
+                                Spacer()
+                                Image(systemName: "arrow.up.right")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
+                    .padding(.vertical, 4)
+                }
                 
                 Section(header: Text("Hardware Guidelines").font(.headline)) {
                     VStack(alignment: .leading, spacing: 6) {
@@ -156,7 +234,7 @@ struct SettingsView: View {
             }
             .formStyle(.grouped)
         }
-        .frame(width: 360, height: 480)
+        .frame(width: 370, height: 520)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
         }

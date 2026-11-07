@@ -17,7 +17,7 @@ struct MenuBarView: View {
                 mainView
             }
         }
-        .frame(width: showSettings ? 360 : 320)
+        .frame(width: showSettings ? 370 : 350)
         .animation(.easeInOut(duration: 0.18), value: showSettings)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
@@ -131,7 +131,7 @@ struct MenuBarView: View {
                 .padding(.horizontal, 14)
             }
             
-            // Session Preset Duration Selector
+            // Session Preset Duration Selector (No truncation!)
             VStack(alignment: .leading, spacing: 6) {
                 Text("Session Duration")
                     .font(.system(size: 11, weight: .medium))
@@ -145,14 +145,21 @@ struct MenuBarView: View {
                                 powerManager.timer.start(preset: preset)
                             }
                         }) {
-                            Text(presetShortTitle(preset))
-                                .font(.system(size: 11, weight: selectedPreset == preset ? .bold : .regular))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 5)
-                                .frame(maxWidth: .infinity)
-                                .background(selectedPreset == preset ? Color.accentColor : Color.secondary.opacity(0.12))
-                                .foregroundColor(selectedPreset == preset ? .white : .primary)
-                                .cornerRadius(6)
+                            HStack(spacing: 3) {
+                                if preset == .indefinite {
+                                    Image(systemName: "infinity")
+                                        .font(.system(size: 9, weight: .bold))
+                                }
+                                Text(presetShortTitle(preset))
+                                    .font(.system(size: 11, weight: selectedPreset == preset ? .bold : .medium))
+                                    .lineLimit(1)
+                            }
+                            .padding(.horizontal, 4)
+                            .padding(.vertical, 6)
+                            .frame(maxWidth: .infinity)
+                            .background(selectedPreset == preset ? Color.accentColor : Color.secondary.opacity(0.12))
+                            .foregroundColor(selectedPreset == preset ? .white : .primary)
+                            .cornerRadius(6)
                         }
                         .buttonStyle(.plain)
                     }
@@ -256,6 +263,29 @@ struct MenuBarView: View {
             Divider()
                 .padding(.horizontal, 10)
             
+            // Developer Tagline Row
+            HStack(spacing: 6) {
+                Link(destination: URL(string: "https://github.com/PurohitBhagyesh")!) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "person.circle.fill")
+                            .foregroundColor(.accentColor)
+                        Text("Bhagyesh Purohit")
+                            .font(.system(size: 10, weight: .medium))
+                    }
+                }
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Link(destination: URL(string: "https://openlid.devs.li")!) {
+                    Text("openlid.devs.li ↗")
+                        .font(.system(size: 10, weight: .medium))
+                        .foregroundColor(.secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 14)
+            
             // Footer Controls
             HStack {
                 Button(action: {
@@ -281,7 +311,7 @@ struct MenuBarView: View {
             .padding(.horizontal, 14)
             .padding(.bottom, 12)
         }
-        .frame(width: 320)
+        .frame(width: 350)
     }
     
     private func presetShortTitle(_ preset: SessionPreset) -> String {
@@ -346,4 +376,3 @@ struct TelemetryCard: View {
         .cornerRadius(6)
     }
 }
-

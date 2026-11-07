@@ -326,6 +326,49 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 8. Report a Problem Modal Logic
+  const reportModal = document.getElementById('reportModal');
+  const btnCloseReportModal = document.getElementById('btnCloseReportModal');
+  const btnFooterReport = document.getElementById('btnFooterReport');
+  const btnCoffeeReport = document.getElementById('btnCoffeeReport');
+  const mobileNavReport = document.getElementById('mobileNavReport');
+
+  function openReportModal(e) {
+    if (e) e.preventDefault();
+    if (reportModal) {
+      reportModal.classList.add('open');
+      reportModal.style.display = 'flex';
+    }
+  }
+
+  function closeReportModal() {
+    if (reportModal) {
+      reportModal.classList.remove('open');
+      reportModal.style.display = 'none';
+    }
+  }
+
+  if (btnFooterReport) btnFooterReport.addEventListener('click', openReportModal);
+  if (btnCoffeeReport) btnCoffeeReport.addEventListener('click', openReportModal);
+  if (mobileNavReport) {
+    mobileNavReport.addEventListener('click', (e) => {
+      openReportModal(e);
+      if (mobileDrawer) mobileDrawer.classList.remove('open');
+    });
+  }
+  if (btnCloseReportModal) btnCloseReportModal.addEventListener('click', closeReportModal);
+
+  if (reportModal) {
+    reportModal.addEventListener('click', (e) => {
+      if (e.target === reportModal) closeReportModal();
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && reportModal.classList.contains('open')) {
+        closeReportModal();
+      }
+    });
+  }
+
   fetchTelemetry();
   setInterval(fetchTelemetry, 2000);
 });

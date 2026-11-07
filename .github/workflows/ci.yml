@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-test:
     name: Build & Test on macOS
@@ -21,5 +25,8 @@ jobs:
       - name: Run Test Suite
         run: swift test --verbose
 
-      - name: Build Release Bundle
+      - name: Build Native Release
+        run: swift build -c release
+
+      - name: Assemble Release Bundle
         run: ./scripts/bundle.sh

@@ -15,18 +15,21 @@
 
 [![Platform](https://img.shields.io/badge/Platforms-macOS%2013%2B%20%7C%20Windows%2011%2F10-black?style=for-the-badge&logo=apple&logoColor=white)](https://openlid.devs.li)
 [![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
-[![Windows](https://img.shields.io/badge/.NET%20%2F%20PowerShell-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://microsoft.com/windows)
+[![Size](https://img.shields.io/badge/Size-%3C%202.5%20MB%20(Universal)-10b981?style=for-the-badge)](https://openlid.devs.li)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-openlid.devs.li-06b6d4?style=for-the-badge)](https://openlid.devs.li)
-[![Domain by devs.li](https://devs.li/badge.svg)](https://openlid.devs.li)
+[![Domain by devs.li](assets/devs-badge.svg)](https://openlid.devs.li)
+
+Developed with precision by **[Bhagyesh Purohit](https://github.com/PurohitBhagyesh)**
 
 <p align="center">
   <a href="#downloads">Downloads</a> •
   <a href="#overview">Overview</a> •
+  <a href="#features">Features</a> •
   <a href="#status-bar-indicators">Status Bar</a> •
   <a href="#cli-usage">CLI</a> •
   <a href="#architecture">Architecture</a> •
-  <a href="#hardware-safety-advisory">Safety</a>
+  <a href="#contact--support">Contact & Support</a>
 </p>
 
 ---
@@ -49,17 +52,31 @@ If you are:
 
 ---
 
+## Features
+
+- **Ultra-Lightweight Footprint:** Under **2.5 MB** compiled Universal 2 Mach-O binary (< 700 KB compressed archive); uses less than **20 MB** of system RAM.
+- **Native Menu Bar & Tray:** High-contrast template icons that automatically adapt to light/dark wallpaper themes.
+- **Session Presets:** Choose between `∞ Always`, `15m`, `30m`, `1h`, and `2h` countdown timers without accidental truncation.
+- **Hardware Sentinels:** 
+  - **Thermal Sentinel:** Automatically drops sleep bypass if internal temperatures reach serious/critical thresholds.
+  - **Battery Cutoff Floor:** Configurable minimum battery margin (default: 15%) so you never drain your laptop to zero when unplugged.
+- **Instant Passwordless Elevation:** Touch ID-authorized scoped `/etc/sudoers.d/openlid` rule to toggle power states instantly without password prompts.
+- **Local Telemetry REST API:** Runs on `127.0.0.1:31415` for instant status inspection from terminal, scripts, or the OpenLid web dashboard.
+- **Cross-Platform:** Native Swift for macOS; zero-install C# and PowerShell for Windows 11/10 (x64 and Snapdragon ARM64).
+
+---
+
 ## Downloads
 
-Standalone portable ZIP archives compiled natively for each platform architecture:
+Standalone portable ZIP archives compiled natively for each platform architecture (Zero DMG requirement):
 
-### macOS
+### macOS (13.0 Ventura+)
 
 | Architecture | Portable ZIP Archive | Target Hardware | Contents |
 | :--- | :---: | :--- | :--- |
 | **Apple Silicon** | [Download `.zip`](downloads/OpenLid-AppleSilicon.zip) | Apple Silicon (M1, M2, M3, M4 series) | `OpenLid.app` + `openlid` CLI |
 | **Intel Processor** | [Download `.zip`](downloads/OpenLid-Intel.zip) | Intel MacBooks (Core i5, i7, i9) | `OpenLid.app` + `openlid` CLI |
-| **Universal Binary** | [Download `.zip`](downloads/OpenLid-Universal.zip) | All MacBooks (Universal 2 Mach-O) | `OpenLid.app` + `openlid` CLI |
+| **Universal Binary** | [Download `.zip`](downloads/OpenLid-Universal.zip) | All MacBooks (Universal 2 Fat Mach-O) | `OpenLid.app` + `openlid` CLI |
 
 ```bash
 # Homebrew Cask (macOS)
@@ -164,6 +181,18 @@ openlid/
     ├── bundle.sh                    # Universal lipo compilation & ZIP packaging
     └── install.sh                   # System-wide installation
 ```
+
+---
+
+## Contact & Support
+
+If you encounter any problem, bug, or have a feature request:
+
+- **Lead Developer:** Bhagyesh Purohit
+- **GitHub Profile:** [@PurohitBhagyesh](https://github.com/PurohitBhagyesh)
+- **Email Directly:** [purohitunofficialbhagyesh@gmail.com](mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20%2F%20Issue%20Report)
+- **Issue Tracker:** [GitHub Issues](https://github.com/PurohitBhagyesh/openlid/issues)
+- **Official Website:** [openlid.devs.li](https://openlid.devs.li)
 
 ---
 
