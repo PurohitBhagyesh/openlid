@@ -4,46 +4,69 @@ set -e
 DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$DIR"
 
-echo "🚀 Building OpenLid in Release mode..."
-swift build -c release
+echo "🚀 Building OpenLid for Apple Silicon (arm64)..."
+swift build -c release --triple arm64-apple-macosx
+ARM64_APP_BIN="$DIR/.build/out/Products/Release/OpenLid"
+ARM64_CLI_BIN="$DIR/.build/out/Products/Release/OpenLidCLI"
+mkdir -p "$DIR/.build/bin_arm64"
+cp "$ARM64_APP_BIN" "$DIR/.build/bin_arm64/OpenLid"
+cp "$ARM64_CLI_BIN" "$DIR/.build/bin_arm64/openlid"
 
-APP_NAME="OpenLid.app"
+echo "🚀 Building OpenLid for Intel Macs (x86_64)..."
+swift build -c release --triple x86_64-apple-macosx
+X86_APP_BIN="$DIR/.build/out/Products/Release/OpenLid"
+X86_CLI_BIN="$DIR/.build/out/Products/Release/OpenLidCLI"
+mkdir -p "$DIR/.build/bin_x86"
+cp "$X86_APP_BIN" "$DIR/.build/bin_x86/OpenLid"
+cp "$X86_CLI_BIN" "$DIR/.build/bin_x86/openlid"
+
 DIST_DIR="$DIR/dist"
-APP_DIR="$DIST_DIR/$APP_NAME"
-CONTENTS_DIR="$APP_DIR/Contents"
-MACOS_DIR="$CONTENTS_DIR/MacOS"
-RESOURCES_DIR="$CONTENTS_DIR/Resources"
+rm -rf "$DIST_DIR"
+mkdir -p "$DIST_DIR"
 
-echo "📦 Assembling $APP_NAME bundle..."
-rm -rf "$APP_DIR"
-mkdir -p "$MACOS_DIR"
-mkdir -p "$RESOURCES_DIR"
+echo "🧬 Creating Universal 2 Mach-O binaries with lipo..."
+lipo -create "$DIR/.build/bin_arm64/OpenLid" "$DIR/.build/bin_x86/OpenLid" -output "$DIST_DIR/OpenLid-Universal-bin"
+lipo -create "$DIR/.build/bin_arm64/openlid" "$DIR/.build/bin_x86/openlid" -output "$DIST_DIR/openlid"
+chmod +x "$DIST_DIR/openlid"
 
-# Copy main executable
-cp "$DIR/.build/release/OpenLid" "$MACOS_DIR/OpenLid"
+# Function to assemble an app bundle
+bundle_app() {
+    local target_bin="$1"
+    local app_path="$2"
+    local contents="$app_path/Contents"
+    local macos="$contents/MacOS"
+    local res="$contents/Resources"
 
-# Copy CLI executable
-cp "$DIR/.build/release/OpenLidCLI" "$DIST_DIR/openlid"
+    rm -rf "$app_path"
+    mkdir -p "$macos" "$res"
+    cp "$target_bin" "$macos/OpenLid"
+    chmod +x "$macos/OpenLid"
+    cp "$DIR/Resources/Info.plist" "$contents/Info.plist"
 
-# Copy Info.plist
-cp "$DIR/Resources/Info.plist" "$CONTENTS_DIR/Info.plist"
+    if [ -f "$DIR/Resources/AppIcon.icns" ]; then
+        cp "$DIR/Resources/AppIcon.icns" "$res/AppIcon.icns"
+    fi
 
-# Copy AppIcon if available
-if [ -f "$DIR/Resources/AppIcon.icns" ]; then
-    cp "$DIR/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
-fi
+    codesign --force --deep --sign - "$app_path" > /dev/null 2>&1
+}
 
-# Ad-hoc code sign the bundle
-echo "🔏 Signing application bundle..."
-codesign --force --deep --sign - "$APP_DIR"
+echo "📦 Assembling Universal OpenLid.app..."
+bundle_app "$DIST_DIR/OpenLid-Universal-bin" "$DIST_DIR/OpenLid.app"
+rm -f "$DIST_DIR/OpenLid-Universal-bin"
 
-echo "✅ Build Complete!"
-echo "📍 Application: $APP_DIR"
-echo "📍 CLI Tool:    $DIST_DIR/openlid"
-echo ""
-echo "To run the app right now:"
-echo "  open \"$APP_DIR\""
-echo ""
-echo "To install to /Applications and /usr/local/bin:"
-echo "  ./scripts/install.sh"
+echo "📦 Assembling Apple Silicon OpenLid-AppleSilicon.app..."
+bundle_app "$DIR/.build/bin_arm64/OpenLid" "$DIST_DIR/OpenLid-AppleSilicon.app"
 
+echo "📦 Assembling Intel OpenLid-Intel.app..."
+bundle_app "$DIR/.build/bin_x86/OpenLid" "$DIST_DIR/OpenLid-Intel.app"
+
+echo "🗜 Creating release archives..."
+(cd "$DIST_DIR" && zip -rq "OpenLid-AppleSilicon.zip" "OpenLid-AppleSilicon.app")
+(cd "$DIST_DIR" && zip -rq "OpenLid-Intel.zip" "OpenLid-Intel.app")
+(cd "$DIST_DIR" && zip -rq "OpenLid-Universal.zip" "OpenLid.app")
+
+echo "✅ Dual Architecture Build Complete!"
+echo "📍 Universal App:      $DIST_DIR/OpenLid.app"
+echo "📍 Apple Silicon App:  $DIST_DIR/OpenLid-AppleSilicon.app"
+echo "📍 Intel Mac App:      $DIST_DIR/OpenLid-Intel.app"
+echo "📍 Universal CLI:      $DIST_DIR/openlid"
