@@ -5,14 +5,15 @@ struct MenuBarView: View {
     @ObservedObject var powerManager = PowerManager.shared
     @State private var selectedPreset: SessionPreset = .indefinite
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
+    @State private var isRefreshingHardware: Bool = false
+    @State private var hardwareRefreshedJustNow: Bool = false
     
     var body: some View {
         mainView
-            .frame(width: 350)
+            .frame(width: 360)
             .onAppear {
                 helperInstalled = PrivilegeManager.shared.isHelperInstalled()
-                powerManager.clamshell.updateLidState()
-                powerManager.battery.updateBatteryState()
+                refreshHardwareMonitors()
             }
     }
     
@@ -66,13 +67,15 @@ struct MenuBarView: View {
                             }
                         }
                         
-                        VStack(alignment: .leading, spacing: 2) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text(powerManager.isEnabled ? "Mac is Awake (Eye Vigilant)" : "Keep Awake with Lid Closed")
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(.primary)
                             Text(powerManager.isEnabled ? "Mac continues running even if lid is closed" : "Click to keep Mac awake when closing lid")
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
+                                .lineLimit(2)
+                                .fixedSize(horizontal: false, vertical: true)
                         }
                         
                         Spacer()
@@ -89,38 +92,72 @@ struct MenuBarView: View {
             }
             .padding(.horizontal, 14)
             
-            // Timer Countdown banner (if running)
-            if powerManager.isEnabled && powerManager.timer.isTimerRunning {
-                HStack {
-                    Image(systemName: "timer")
-                        .foregroundColor(.orange)
-                    Text("Session ends in:")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    Text(powerManager.timer.formattedRemainingTime)
-                        .font(.system(size: 12, weight: .bold, design: .monospaced))
-                        .foregroundColor(.orange)
-                    Spacer()
-                    Button("Stop Timer") {
-                        powerManager.timer.stop()
+            // Real-Time Live Timer Banner (Always updates every second)
+            if powerManager.isEnabled {
+                if powerManager.timer.isTimerRunning {
+                    HStack(spacing: 8) {
+                        Image(systemName: "timer")
+                            .font(.system(size: 13, weight: .semibold))
+                            .foregroundColor(.orange)
+                        Text("Session ends in:")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        Text(powerManager.timer.formattedRemainingTime)
+                            .font(.system(size: 13, weight: .bold, design: .monospaced))
+                            .foregroundColor(.orange)
+                        
+                        Spacer()
+                        
+                        Button("Stop") {
+                            powerManager.timer.stop()
+                        }
+                        .font(.system(size: 11, weight: .semibold))
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
                     }
-                    .font(.caption)
-                    .buttonStyle(.borderless)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.orange.opacity(0.12))
+                    .cornerRadius(8)
+                    .padding(.horizontal, 14)
+                } else {
+                    // Indefinite / Always mode: real-time active elapsed timer
+                    HStack(spacing: 8) {
+                        Circle()
+                            .fill(Color.green)
+                            .frame(width: 8, height: 8)
+                        Text("Active Vigilant Session:")
+                            .font(.system(size: 11, weight: .medium))
+                            .foregroundColor(.secondary)
+                        Text(powerManager.timer.formattedElapsedTime)
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .foregroundColor(.green)
+                        
+                        Spacer()
+                        
+                        Text("Always")
+                            .font(.system(size: 10, weight: .semibold))
+                            .padding(.horizontal, 6)
+                            .padding(.vertical, 2)
+                            .background(Color.green.opacity(0.15))
+                            .foregroundColor(.green)
+                            .cornerRadius(4)
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(Color.green.opacity(0.08))
+                    .cornerRadius(8)
+                    .padding(.horizontal, 14)
                 }
-                .padding(.horizontal, 10)
-                .padding(.vertical, 6)
-                .background(Color.orange.opacity(0.1))
-                .cornerRadius(8)
-                .padding(.horizontal, 14)
             }
             
-            // Session Preset Duration Selector (No truncation!)
+            // Session Preset Duration Selector (Zero truncation!)
             VStack(alignment: .leading, spacing: 6) {
                 Text("Session Duration")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(.secondary)
                 
-                HStack(spacing: 5) {
+                HStack(spacing: 6) {
                     ForEach([SessionPreset.indefinite, .min15, .min30, .hour1, .hour2], id: \.self) { preset in
                         Button(action: {
                             selectedPreset = preset
@@ -128,27 +165,46 @@ struct MenuBarView: View {
                                 powerManager.timer.start(preset: preset)
                             }
                         }) {
-                            HStack(spacing: 3) {
-                                if preset == .indefinite {
-                                    Image(systemName: "infinity")
-                                        .font(.system(size: 9, weight: .bold))
-                                }
-                                Text(presetShortTitle(preset))
-                                    .font(.system(size: 11, weight: selectedPreset == preset ? .bold : .medium))
-                                    .lineLimit(1)
-                            }
-                            .padding(.horizontal, 4)
-                            .padding(.vertical, 6)
-                            .frame(maxWidth: .infinity)
-                            .background(selectedPreset == preset ? Color.accentColor : Color.secondary.opacity(0.12))
-                            .foregroundColor(selectedPreset == preset ? .white : .primary)
-                            .cornerRadius(6)
+                            Text(presetShortTitle(preset))
+                                .font(.system(size: 11, weight: selectedPreset == preset ? .bold : .medium))
+                                .lineLimit(1)
+                                .minimumScaleFactor(0.85)
+                                .padding(.horizontal, 4)
+                                .padding(.vertical, 6)
+                                .frame(maxWidth: .infinity)
+                                .background(selectedPreset == preset ? Color.accentColor : Color.secondary.opacity(0.12))
+                                .foregroundColor(selectedPreset == preset ? .white : .primary)
+                                .cornerRadius(6)
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
             .padding(.horizontal, 14)
+            
+            // Hardware Telemetry Header with Instant Refresh Action
+            HStack {
+                Text("HARDWARE MONITORS")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(.secondary)
+                
+                Spacer()
+                
+                Button(action: refreshHardwareMonitors) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 9, weight: .bold))
+                            .rotationEffect(.degrees(isRefreshingHardware ? 360 : 0))
+                            .animation(isRefreshingHardware ? Animation.linear(duration: 0.6).repeatForever(autoreverses: false) : .default, value: isRefreshingHardware)
+                        Text(hardwareRefreshedJustNow ? "Synced" : "Refresh")
+                            .font(.system(size: 10, weight: .medium))
+                    }
+                    .foregroundColor(hardwareRefreshedJustNow ? .green : .secondary)
+                }
+                .buttonStyle(.plain)
+            }
+            .padding(.horizontal, 14)
+            .padding(.top, 2)
             
             // Hardware Telemetry Strip
             HStack(spacing: 8) {
@@ -246,30 +302,7 @@ struct MenuBarView: View {
             Divider()
                 .padding(.horizontal, 10)
             
-            // Developer Tagline Row
-            HStack(spacing: 6) {
-                Link(destination: URL(string: "https://github.com/PurohitBhagyesh")!) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "person.circle.fill")
-                            .foregroundColor(.accentColor)
-                        Text("OpenLid Developer")
-                            .font(.system(size: 10, weight: .medium))
-                    }
-                }
-                .buttonStyle(.plain)
-                
-                Spacer()
-                
-                Link(destination: URL(string: "https://openlid.devs.li")!) {
-                    Text("openlid.devs.li ↗")
-                        .font(.system(size: 10, weight: .medium))
-                        .foregroundColor(.secondary)
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 14)
-            
-            // Footer Controls
+            // Footer Controls (Clean, spacious, zero personal exposure)
             HStack {
                 Button(action: {
                     SettingsWindowManager.shared.showSettings()
@@ -305,7 +338,7 @@ struct MenuBarView: View {
             .padding(.horizontal, 14)
             .padding(.bottom, 12)
         }
-        .frame(width: 350)
+        .frame(width: 360)
     }
     
     private func presetShortTitle(_ preset: SessionPreset) -> String {
@@ -320,11 +353,30 @@ struct MenuBarView: View {
     
     private func thermalShortTitle(_ state: ProcessInfo.ThermalState) -> String {
         switch state {
-        case .nominal: return "Cool"
+        case .nominal: return "Nominal"
         case .fair: return "Fair"
-        case .serious: return "Hot"
-        case .critical: return "Danger"
+        case .serious: return "Warm"
+        case .critical: return "Hot"
         @unknown default: return "OK"
+        }
+    }
+    
+    private func refreshHardwareMonitors() {
+        isRefreshingHardware = true
+        hardwareRefreshedJustNow = false
+        
+        DispatchQueue.global(qos: .userInitiated).async {
+            self.powerManager.clamshell.updateLidState()
+            self.powerManager.battery.updateBatteryState()
+            self.powerManager.thermal.updateThermalState()
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+                self.isRefreshingHardware = false
+                self.hardwareRefreshedJustNow = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
+                    self.hardwareRefreshedJustNow = false
+                }
+            }
         }
     }
     
@@ -337,13 +389,14 @@ struct MenuBarView: View {
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.powerManager.lastError = "Helper install: \(error.localizedDescription)"
+                    self.powerManager.lastError = "Helper install failed: \(error.localizedDescription)"
                 }
             }
         }
     }
 }
 
+// Reusable Telemetry Card
 struct TelemetryCard: View {
     let icon: String
     let title: String
@@ -351,22 +404,24 @@ struct TelemetryCard: View {
     let color: Color
     
     var body: some View {
-        VStack(spacing: 3) {
+        VStack(spacing: 4) {
             HStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.system(size: 10))
+                    .font(.system(size: 11, weight: .bold))
                     .foregroundColor(color)
                 Text(title)
-                    .font(.system(size: 9))
+                    .font(.system(size: 10, weight: .medium))
                     .foregroundColor(.secondary)
             }
             Text(value)
-                .font(.system(size: 12, weight: .bold))
+                .font(.system(size: 13, weight: .bold))
                 .foregroundColor(.primary)
+                .lineLimit(1)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
+        .padding(.horizontal, 4)
         .background(Color.secondary.opacity(0.08))
-        .cornerRadius(6)
+        .cornerRadius(8)
     }
 }

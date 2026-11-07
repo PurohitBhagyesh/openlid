@@ -10,17 +10,17 @@ public enum AppPresentationMode: String, CaseIterable, Identifiable {
     
     public var title: String {
         switch self {
-        case .menuBarOnly: return "Menu Bar (Taskbar) Only"
-        case .windowedApp: return "Windowed App (Dock)"
-        case .both: return "Both (Menu Bar + Windowed App)"
+        case .menuBarOnly: return "Menu Bar Icon Only"
+        case .windowedApp: return "Application Window Only"
+        case .both: return "Menu Bar + App Window (Recommended)"
         }
     }
     
     public var subtitle: String {
         switch self {
-        case .menuBarOnly: return "Discreet icon in the macOS menu bar; hidden from Dock."
+        case .menuBarOnly: return "Discreet icon in the macOS menu bar; runs silently in the background."
         case .windowedApp: return "Standard application window with Dock icon."
-        case .both: return "Menu bar icon for quick toggles plus a full application window."
+        case .both: return "Full access: menu bar icon for quick toggles plus a standalone app window."
         }
     }
 }
@@ -74,4 +74,3 @@ public final class AppPreferences: ObservableObject {
         hasCompletedOnboarding = false
     }
 }
-

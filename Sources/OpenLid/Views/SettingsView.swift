@@ -169,59 +169,18 @@ struct SettingsView: View {
                     }
                 }
 
-                // Contact Developer Section
-                Section(header: Text("Contact Developer").font(.headline)) {
+                // Support & Resources Section
+                Section(header: Text("Support & Community").font(.headline)) {
                     VStack(alignment: .leading, spacing: 10) {
-                        // Developer Info Row
-                        HStack(spacing: 12) {
-                            ZStack {
-                                Circle()
-                                    .fill(Color.green.opacity(0.18))
-                                    .frame(width: 42, height: 42)
-                                Image(systemName: "person.crop.circle.fill")
-                                    .font(.system(size: 26))
-                                    .foregroundColor(.green)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                HStack(spacing: 6) {
-                                    Text("OpenLid Developer")
-                                        .font(.system(size: 14, weight: .bold))
-                                    Text("Creator")
-                                        .font(.system(size: 9, weight: .heavy))
-                                        .padding(.horizontal, 6)
-                                        .padding(.vertical, 2)
-                                        .background(Color.green.opacity(0.15))
-                                        .foregroundColor(.green)
-                                        .clipShape(Capsule())
-                                }
-                                Text("Lead Developer & Maintainer")
-                                    .font(.system(size: 11))
-                                    .foregroundColor(.secondary)
-                            }
-                            
-                            Spacer()
-                            
-                            Text("@PurohitBhagyesh")
-                                .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(Color.secondary.opacity(0.12))
-                                .cornerRadius(6)
-                        }
-                        .padding(.vertical, 4)
-                        
-                        Divider()
-
                         // GitHub Link Option
-                        Link(destination: URL(string: "https://github.com/PurohitBhagyesh")!) {
+                        Link(destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!) {
                             ContactOptionRow(
                                 iconName: "chevron.left.forwardslash.chevron.right",
                                 iconColor: .primary,
                                 iconBg: Color.primary.opacity(0.08),
-                                title: "GitHub Profile",
-                                detail: "github.com/PurohitBhagyesh",
-                                actionBadge: "GitHub ↗"
+                                title: "GitHub Repository",
+                                detail: "Report bugs, star project, or view source code",
+                                actionBadge: "GitHub"
                             )
                         }
                         .buttonStyle(.plain)
@@ -233,8 +192,8 @@ struct SettingsView: View {
                                 iconColor: .blue,
                                 iconBg: Color.blue.opacity(0.12),
                                 title: "Official Website",
-                                detail: "openlid.devs.li",
-                                actionBadge: "Website ↗"
+                                detail: "Documentation, web preview & downloads",
+                                actionBadge: "Website"
                             )
                         }
                         .buttonStyle(.plain)
@@ -246,8 +205,8 @@ struct SettingsView: View {
                                 iconColor: .green,
                                 iconBg: Color.green.opacity(0.12),
                                 title: "Report a Problem",
-                                detail: "purohitunofficialbhagyesh@gmail.com",
-                                actionBadge: "Email ↗"
+                                detail: "Send crash logs, hardware specs & issue reports",
+                                actionBadge: "Email"
                             )
                         }
                         .buttonStyle(.plain)
@@ -269,7 +228,7 @@ struct SettingsView: View {
             }
             .formStyle(.grouped)
         }
-        .frame(minWidth: 500, idealWidth: 540, maxWidth: 650, minHeight: 540, idealHeight: 640, maxHeight: 850)
+        .frame(width: 560, height: 680)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
         }

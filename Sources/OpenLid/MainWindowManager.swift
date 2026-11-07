@@ -39,8 +39,8 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: mainView)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 560, height: 660),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            contentRect: NSRect(x: 0, y: 0, width: 580, height: 680),
+            styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
@@ -50,7 +50,10 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         window.titlebarAppearsTransparent = false
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 520, height: 580)
+        window.showsResizeIndicator = false
+        // Strictly disable macOS fullscreen space & zoom
+        window.collectionBehavior = [.fullScreenNone]
+        window.standardWindowButton(.zoomButton)?.isEnabled = false
         window.delegate = self
         window.center()
         
@@ -67,7 +70,6 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
     }
     
     public func windowWillClose(_ notification: Notification) {
-        // If the user closed the window and mode is windowedApp only, keep menu bar available or re-open on click
+        // Window closed
     }
 }
-

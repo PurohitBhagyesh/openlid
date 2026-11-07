@@ -78,14 +78,14 @@ namespace OpenLid
             TrayMenu.Items.Add(durationMenu);
 
             TrayMenu.Items.Add(new ToolStripSeparator());
-            var contactMenu = new ToolStripMenuItem("Contact Developer");
-            contactMenu.DropDownItems.Add("GitHub: @PurohitBhagyesh", null, (s, e) => {
-                try { Process.Start(new ProcessStartInfo("https://github.com/PurohitBhagyesh") { UseShellExecute = true }); } catch {}
+            var contactMenu = new ToolStripMenuItem("Support & Community");
+            contactMenu.DropDownItems.Add("GitHub Repository ↗", null, (s, e) => {
+                try { Process.Start(new ProcessStartInfo("https://github.com/PurohitBhagyesh/openlid") { UseShellExecute = true }); } catch {}
             });
-            contactMenu.DropDownItems.Add("Website: openlid.devs.li", null, (s, e) => {
+            contactMenu.DropDownItems.Add("Official Website ↗", null, (s, e) => {
                 try { Process.Start(new ProcessStartInfo("https://openlid.devs.li") { UseShellExecute = true }); } catch {}
             });
-            contactMenu.DropDownItems.Add("Report Problem: purohitunofficialbhagyesh@gmail.com", null, (s, e) => {
+            contactMenu.DropDownItems.Add("Report an Issue (Email) ↗", null, (s, e) => {
                 try { Process.Start(new ProcessStartInfo("mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(Windows)") { UseShellExecute = true }); } catch {}
             });
             TrayMenu.Items.Add(contactMenu);

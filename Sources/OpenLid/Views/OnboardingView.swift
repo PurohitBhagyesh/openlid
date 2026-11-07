@@ -264,11 +264,9 @@ public struct OnboardingView: View {
                             
                             Spacer()
                             
-                            if preferences.presentationMode == mode {
-                                Image(systemName: "checkmark.circle.fill")
-                                    .font(.system(size: 18))
-                                    .foregroundColor(.green)
-                            }
+                            Image(systemName: preferences.presentationMode == mode ? "checkmark.circle.fill" : "circle")
+                                .font(.system(size: 20))
+                                .foregroundColor(preferences.presentationMode == mode ? .green : Color.white.opacity(0.25))
                         }
                         .padding(14)
                         .background(preferences.presentationMode == mode ? Color.green.opacity(0.08) : Color.white.opacity(0.03))

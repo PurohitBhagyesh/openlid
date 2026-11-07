@@ -25,8 +25,8 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: settingsView)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 540, height: 640),
-            styleMask: [.titled, .closable, .miniaturizable, .resizable],
+            contentRect: NSRect(x: 0, y: 0, width: 560, height: 680),
+            styleMask: [.titled, .closable, .miniaturizable],
             backing: .buffered,
             defer: false
         )
@@ -36,7 +36,10 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         window.titlebarAppearsTransparent = false
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
-        window.minSize = NSSize(width: 480, height: 520)
+        window.showsResizeIndicator = false
+        // Strictly disable fullscreen
+        window.collectionBehavior = [.fullScreenNone]
+        window.standardWindowButton(.zoomButton)?.isEnabled = false
         window.delegate = self
         window.center()
         
@@ -56,4 +59,3 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         // Keep window controller available for reopening
     }
 }
-
