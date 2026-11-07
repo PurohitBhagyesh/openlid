@@ -2,15 +2,15 @@ cask "openlid" do
   version "1.0.0"
   sha256 :no_check
 
-  url "https://github.com/PurohitBhagyesh/openlid/releases/download/v#{version}/OpenLid-Universal.dmg"
+  url "https://github.com/PurohitBhagyesh/openlid/releases/download/v#{version}/OpenLid-Universal.zip"
   name "OpenLid"
-  desc "Keep your MacBook running with the lid closed without an external display"
-  homepage "https://github.com/PurohitBhagyesh/openlid"
+  desc "Keep your laptop running with the lid closed (macOS & Windows)"
+  homepage "https://openlid.devs.li"
 
   depends_on macos: ">= :ventura"
 
   app "OpenLid.app"
-  binary "#{appdir}/OpenLid.app/Contents/MacOS/OpenLid", target: "openlid"
+  binary "openlid"
 
   zap trash: [
     "~/Library/Preferences/com.openlid.app.plist",

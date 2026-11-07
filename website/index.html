@@ -5,456 +5,361 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenLid — Keep Your Laptop Running With Lid Closed (macOS & Windows)</title>
 
-  <!-- Taskbar, PWA & Browser Identity -->
   <meta name="application-name" content="OpenLid">
   <meta name="apple-mobile-web-app-title" content="OpenLid">
-  <meta name="theme-color" content="#060709">
-  <meta name="description" content="OpenLid keeps your MacBook and Windows laptop running with the lid closed. Native menu bar and system tray utility with kernel sleep assertions and thermal safety breakers.">
+  <meta name="theme-color" content="#0c0d10">
+  <meta name="description" content="OpenLid prevents laptops from sleeping when the lid is closed. Native menu bar and system tray utility for macOS and Windows.">
 
-  <!-- Open Graph & Social Cards -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="OpenLid">
   <meta property="og:title" content="OpenLid — Keep Your Laptop Running With Lid Closed">
-  <meta property="og:description" content="Native closed-lid sleep prevention for macOS (Apple Silicon & Intel) and Windows (x64 & ARM64). Zero external displays or dummy plugs required.">
+  <meta property="og:description" content="Native closed-lid sleep prevention for macOS and Windows. Zero external monitors or dummy plugs required.">
   <meta property="og:url" content="https://openlid.devs.li/">
   <link rel="canonical" href="https://openlid.devs.li/">
 
-  <!-- Google Structured Data (Schema.org) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
     "name": "OpenLid",
-    "alternateName": "OpenLid Clamshell Awakener",
-    "applicationCategory": "UtilitiesApplication",
     "operatingSystem": "macOS 13+, Windows 10, Windows 11",
-    "url": "https://openlid.devs.li/",
+    "applicationCategory": "UtilitiesApplication",
     "offers": {
       "@type": "Offer",
       "price": "0",
       "priceCurrency": "USD"
     },
-    "description": "Keep your laptop running with the lid closed on macOS and Windows without an external monitor."
+    "url": "https://openlid.devs.li/"
   }
   </script>
 
-  <!-- Vector Favicon with Unsleeping Eye -->
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2.2'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3' fill='%2310b981'/></svg>">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3' fill='%2310b981'/></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <!-- Top Scroll Progress Bar -->
-  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
-  <div class="ambient-glow"></div>
+  <div class="scroll-line" id="scrollLine"></div>
 
-  <!-- Sticky Glass Navigation -->
-  <nav class="navbar container">
-    <a href="#" class="logo">
-      <div class="logo-icon">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-inner container">
+      <a href="#" class="brand">
+        <svg class="brand-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
           <circle cx="12" cy="12" r="3" fill="currentColor"/>
         </svg>
+        <span class="brand-name">OpenLid</span>
+        <span class="brand-version">1.0.0</span>
+      </a>
+
+      <div class="nav-menu">
+        <a href="#downloads" class="nav-item">Downloads</a>
+        <a href="#architecture" class="nav-item">Architecture</a>
+        <a href="#safety" class="nav-item">Safety</a>
+        <a href="#cli" class="nav-item">CLI</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="nav-item nav-ext">
+          GitHub
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M7 17L17 7M17 7H7M17 7V17"/>
+          </svg>
+        </a>
       </div>
-      <span class="logo-text">OpenLid</span>
-      <span class="version-tag">v1.0.0</span>
-    </a>
 
-    <div class="nav-links">
-      <a href="#downloads" class="nav-link">Downloads</a>
-      <a href="#architecture" class="nav-link">Architecture</a>
-      <a href="#safety" class="nav-link">Safety</a>
-      <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="nav-link nav-github">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
-        </svg>
-        GitHub
-      </a>
-    </div>
+      <div class="nav-end">
+        <button class="theme-toggle" id="themeToggleBtn" aria-label="Toggle theme">
+          <svg class="theme-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+            <circle class="theme-pupil" cx="12" cy="12" r="3" fill="currentColor"/>
+          </svg>
+          <span id="themeLabel">Dark</span>
+        </button>
 
-    <div class="nav-actions">
-      <!-- Signature Eye Theme Switcher (Dark / Light Mode) -->
-      <button class="theme-toggle-eye" id="themeToggleBtn" aria-label="Toggle Theme" title="Click to toggle Awake Theme (Dark / Light)">
-        <svg class="theme-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-          <circle class="theme-eye-pupil" cx="12" cy="12" r="3" fill="currentColor"/>
-        </svg>
-        <span class="theme-label" id="themeLabel">Dark Mode</span>
-      </button>
-
-      <a href="#downloads" class="btn-primary">
-        Get OpenLid
-      </a>
+        <a href="#downloads" class="btn btn-sm btn-primary">Download</a>
+      </div>
     </div>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <header class="hero container">
-    <div class="hero-badge">
-      <span class="status-indicator"></span>
-      Universal Release • Native macOS (Apple Silicon & Intel) & Windows (11/10)
+    <div class="hero-label">
+      <span class="dot"></span>
+      macOS & Windows • Native System Status Bar
     </div>
 
-    <h1 class="hero-title">
-      Keep your laptop running<br>
-      <span class="gradient-text">with the lid closed.</span>
-    </h1>
+    <h1 class="hero-h1">Keep your laptop running with the lid closed</h1>
 
-    <p class="hero-lead">
-      No external monitors, power adapters, or dummy HDMI plugs required. OpenLid controls kernel sleep assertions from your status bar with automatic thermal overheating breakers and smart battery floor cutoffs.
+    <p class="hero-sub">
+      Controls kernel sleep assertions on macOS and Windows so tasks, audio, downloads, and servers continue uninterrupted when the display is folded. No external display, dummy HDMI plug, or power adapter required.
     </p>
 
-    <div class="hero-cta-group">
-      <a href="#downloads" class="btn-hero-primary">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+    <div class="hero-actions">
+      <a href="#downloads" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
           <polyline points="7 10 12 15 17 10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        Download OpenLid
+        Download for macOS & Windows
       </a>
-      <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="btn-hero-secondary">
-        View on GitHub →
-      </a>
+      <a href="#architecture" class="btn btn-secondary">Technical Architecture</a>
     </div>
 
-    <!-- Live Telemetry & Awake Controller -->
-    <div class="live-controller-card" id="liveController">
-      <div class="ctrl-header">
-        <div class="ctrl-identity">
-          <div class="ctrl-eye-bubble">
-            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-              <circle cx="12" cy="12" r="3" fill="currentColor"/>
-            </svg>
-          </div>
+    <!-- Live Telemetry Monitor -->
+    <div class="monitor">
+      <div class="monitor-top">
+        <div class="monitor-info">
+          <div class="monitor-dot"></div>
           <div>
-            <div class="ctrl-title" id="statusHeading">Engine Active: Awake</div>
-            <div class="ctrl-sub" id="statusSub">Connected to local OpenLid menu bar app</div>
+            <div class="monitor-title" id="statusHeading">Engine Active: Awake</div>
+            <div class="monitor-desc" id="statusSub">Connected to local OpenLid process on 127.0.0.1:31415</div>
           </div>
         </div>
-        <button class="btn-toggle-telemetry" id="toggleEngineBtn">Toggle Sleep Bypass</button>
+        <button class="btn btn-sm btn-outline" id="toggleEngineBtn">Toggle State</button>
       </div>
 
-      <div class="telemetry-row">
-        <div class="telemetry-box">
-          <span class="telemetry-label">CLAMSHELL SENSOR</span>
-          <span class="telemetry-val" id="valLid">Open 📖</span>
+      <div class="monitor-grid">
+        <div class="monitor-cell">
+          <div class="cell-label">Lid Sensor</div>
+          <div class="cell-val" id="valLid">Open</div>
         </div>
-        <div class="telemetry-box">
-          <span class="telemetry-label">POWER SOURCE</span>
-          <span class="telemetry-val" id="valPower">Battery (42%)</span>
+        <div class="monitor-cell">
+          <div class="cell-label">Power Source</div>
+          <div class="cell-val" id="valPower">Battery (42%)</div>
         </div>
-        <div class="telemetry-box">
-          <span class="telemetry-label">THERMAL PRESSURE</span>
-          <span class="telemetry-val" id="valThermal">Fair (Warm)</span>
+        <div class="monitor-cell">
+          <div class="cell-label">Thermal State</div>
+          <div class="cell-val" id="valThermal">Fair (Warm)</div>
         </div>
-        <div class="telemetry-box">
-          <span class="telemetry-label">ASSERTION STATE</span>
-          <span class="telemetry-val" id="valAssertion" style="color: var(--accent-emerald)">Active (Awake)</span>
+        <div class="monitor-cell">
+          <div class="cell-label">Assertion</div>
+          <div class="cell-val cell-accent" id="valAssertion">Active</div>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- =====================================================================
-       DOWNLOADS SECTION (CROSS-PLATFORM: macOS & WINDOWS)
-       ===================================================================== -->
+  <!-- Downloads Section -->
   <section id="downloads" class="section container">
-    <div class="section-title-wrap">
-      <h2 class="section-heading">Download OpenLid</h2>
-      <p class="section-subheading">Choose your platform for standalone installers and portable archives.</p>
+    <div class="section-head">
+      <h2 class="section-title">Downloads</h2>
+      <p class="section-desc">Standalone portable ZIP archives compiled natively for each target architecture.</p>
     </div>
 
-    <!-- OS Switcher Tabs -->
-    <div class="os-switcher">
-      <div class="os-tab-group">
-        <button class="os-tab-btn active" id="btnTabMac">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 4.16c.64-.78 1.08-1.86.96-2.94-.93.04-2.07.62-2.73 1.4-.58.67-1.1 1.76-.96 2.82 1.04.08 2.1-.5 2.73-1.28z"/>
-          </svg>
-          macOS
-        </button>
-        <button class="os-tab-btn" id="btnTabWin">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/>
-          </svg>
-          Windows
-        </button>
-      </div>
+    <div class="os-tabs">
+      <button class="os-btn active" id="btnTabMac">macOS</button>
+      <button class="os-btn" id="btnTabWin">Windows</button>
     </div>
 
-    <!-- macOS Panel -->
-    <div class="download-panel active" id="panelMac">
-      <div class="download-grid">
-        <!-- Apple Silicon -->
-        <div class="download-card featured">
-          <div class="card-badge">RECOMMENDED FOR APPLE SILICON</div>
-          <div class="arch-header">
-            <div class="arch-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="4" width="16" height="16" rx="2"/>
-                <rect x="9" y="9" width="6" height="6"/>
-                <line x1="9" y1="1" x2="9" y2="4"/>
-                <line x1="15" y1="1" x2="15" y2="4"/>
-                <line x1="9" y1="20" x2="9" y2="23"/>
-                <line x1="15" y1="20" x2="15" y2="23"/>
-                <line x1="20" y1="9" x2="23" y2="9"/>
-                <line x1="20" y1="14" x2="23" y2="14"/>
-                <line x1="1" y1="9" x2="4" y2="9"/>
-                <line x1="1" y1="14" x2="4" y2="14"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="arch-name">Apple Silicon</h3>
-              <span class="arch-target">arm64 • M1, M2, M3, M4, Pro, Max, Ultra</span>
-            </div>
-          </div>
-
-          <p class="arch-desc">
-            Compiled natively for Apple Silicon efficiency cores. Instantaneous wake, zero Rosetta translation, and negligible RAM footprint.
+    <!-- macOS Downloads -->
+    <div class="os-panel active" id="panelMac">
+      <div class="cards-grid">
+        <div class="card card-featured">
+          <div class="card-badge">Apple Silicon</div>
+          <h3 class="card-title">Apple Silicon Mac</h3>
+          <p class="card-meta">arm64 • M1, M2, M3, M4 series</p>
+          <p class="card-desc">
+            Compiled natively for Apple Silicon efficiency cores. Instantaneous wake, negligible RAM overhead, and native power assertion handles.
           </p>
-
-          <div class="download-action-group">
-            <a href="downloads/OpenLid-AppleSilicon.dmg" download class="btn-download">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="card-actions">
+            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn btn-primary btn-block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download DMG (Installer)
-            </a>
-            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn-download btn-secondary-download">
               Download ZIP (.zip)
             </a>
-            <span class="meta-tag">Includes Move-to-Applications Helper</span>
+            <span class="card-note">Includes OpenLid.app + CLI binary</span>
           </div>
         </div>
 
-        <!-- Intel Mac -->
-        <div class="download-card">
-          <div class="arch-header">
-            <div class="arch-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
-                <line x1="8" y1="21" x2="16" y2="21"/>
-                <line x1="12" y1="17" x2="12" y2="21"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="arch-name">Intel Processor</h3>
-              <span class="arch-target">x86_64 • Core i5, i7, i9 MacBooks</span>
-            </div>
-          </div>
-
-          <p class="arch-desc">
-            Engineered for legacy Intel MacBook Pro and MacBook Air models with direct SMC power assertions and dedicated thermal safeguards.
+        <div class="card">
+          <div class="card-badge">Intel</div>
+          <h3 class="card-title">Intel Processor Mac</h3>
+          <p class="card-meta">x86_64 • Core i5, i7, i9 MacBooks</p>
+          <p class="card-desc">
+            Optimized for legacy Intel MacBook Pro and MacBook Air hardware with direct SMC sleep modulation and thermal monitoring.
           </p>
-
-          <div class="download-action-group">
-            <a href="downloads/OpenLid-Intel.dmg" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #ffffff;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="card-actions">
+            <a href="downloads/OpenLid-Intel.zip" download class="btn btn-secondary btn-block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download DMG (Installer)
-            </a>
-            <a href="downloads/OpenLid-Intel.zip" download class="btn-download btn-secondary-download">
               Download ZIP (.zip)
             </a>
-            <span class="meta-tag">Includes Move-to-Applications Helper</span>
+            <span class="card-note">Includes OpenLid.app + CLI binary</span>
           </div>
         </div>
       </div>
 
-      <!-- Homebrew Box -->
-      <div class="terminal-install-box">
-        <div class="cli-tab-bar">
-          <span class="tab-label">Homebrew Cask</span>
-        </div>
-        <div class="command-row">
-          <code>brew install --cask openlid</code>
-          <button class="btn-copy" onclick="navigator.clipboard.writeText('brew install --cask openlid'); this.innerText='Copied!'">Copy</button>
-        </div>
+      <div class="code-box">
+        <span class="code-label">Homebrew Cask</span>
+        <code>brew install --cask openlid</code>
+        <button class="code-copy" onclick="navigator.clipboard.writeText('brew install --cask openlid'); this.innerText='Copied'">Copy</button>
       </div>
     </div>
 
-    <!-- Windows Panel -->
-    <div class="download-panel" id="panelWin">
-      <div class="download-grid">
-        <!-- Windows x64 -->
-        <div class="download-card featured">
-          <div class="card-badge">RECOMMENDED FOR WINDOWS PC</div>
-          <div class="arch-header">
-            <div class="arch-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.901-1.8"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="arch-name">Windows 11 / 10 (x64)</h3>
-              <span class="arch-target">64-bit • Intel Core & AMD Ryzen Laptops</span>
-            </div>
-          </div>
-
-          <p class="arch-desc">
-            Controls Windows Power Scheme and <code>SetThreadExecutionState</code> AwayMode. Lives in the Windows System Tray with the vigilant eye icon.
+    <!-- Windows Downloads -->
+    <div class="os-panel" id="panelWin">
+      <div class="cards-grid">
+        <div class="card card-featured">
+          <div class="card-badge">Windows x64</div>
+          <h3 class="card-title">Windows 11 / 10 (x64)</h3>
+          <p class="card-meta">64-bit • Intel Core & AMD Ryzen Laptops</p>
+          <p class="card-desc">
+            Manages Windows Power Schemes and engages Win32 SetThreadExecutionState AwayMode. Lives in the taskbar notification area.
           </p>
-
-          <div class="download-action-group">
-            <a href="downloads/OpenLid-Windows-x64.zip" download class="btn-download">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="card-actions">
+            <a href="downloads/OpenLid-Windows-x64.zip" download class="btn btn-primary btn-block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download for Windows x64 (.zip)
+              Download ZIP (.zip)
             </a>
-            <span class="meta-tag">Includes System Tray Daemon + PowerShell CLI</span>
+            <span class="card-note">Includes OpenLidTray.exe + PowerShell scripts</span>
           </div>
         </div>
 
-        <!-- Windows ARM64 -->
-        <div class="download-card">
-          <div class="arch-header">
-            <div class="arch-icon">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="4" width="16" height="16" rx="2"/>
-                <rect x="9" y="9" width="6" height="6"/>
-                <line x1="9" y1="1" x2="9" y2="4"/>
-                <line x1="15" y1="1" x2="15" y2="4"/>
-                <line x1="9" y1="20" x2="9" y2="23"/>
-                <line x1="15" y1="20" x2="15" y2="23"/>
-                <line x1="20" y1="9" x2="23" y2="9"/>
-                <line x1="20" y1="14" x2="23" y2="14"/>
-                <line x1="1" y1="9" x2="4" y2="9"/>
-                <line x1="1" y1="14" x2="4" y2="14"/>
-              </svg>
-            </div>
-            <div>
-              <h3 class="arch-name">Windows ARM64</h3>
-              <span class="arch-target">Snapdragon X Elite, Surface Pro ARM</span>
-            </div>
-          </div>
-
-          <p class="arch-desc">
-            Optimized for modern ARM-powered Windows copilot+ PCs. Zero translation overhead, instant sleep bypass, and continuous background execution.
+        <div class="card">
+          <div class="card-badge">Windows ARM64</div>
+          <h3 class="card-title">Windows ARM64</h3>
+          <p class="card-meta">Snapdragon X Elite, Surface Pro ARM</p>
+          <p class="card-desc">
+            Native compilation for modern ARM-based Windows devices. Direct power management with zero emulation layer.
           </p>
-
-          <div class="download-action-group">
-            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #ffffff;">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <div class="card-actions">
+            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn btn-secondary btn-block">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download for Windows ARM64 (.zip)
+              Download ZIP (.zip)
             </a>
-            <span class="meta-tag">Native Snapdragon & Surface Pro Build</span>
+            <span class="card-note">Native Snapdragon ARM64 binary</span>
           </div>
         </div>
       </div>
 
-      <!-- Windows PowerShell Box -->
-      <div class="terminal-install-box">
-        <div class="cli-tab-bar">
-          <span class="tab-label">Windows PowerShell (Zero-Install)</span>
-        </div>
-        <div class="command-row">
-          <code>powershell -Command ".\OpenLid.ps1 -On"</code>
-          <button class="btn-copy" onclick="navigator.clipboard.writeText('powershell -Command &quot;.\\OpenLid.ps1 -On&quot;'); this.innerText='Copied!'">Copy</button>
-        </div>
+      <div class="code-box">
+        <span class="code-label">PowerShell</span>
+        <code>powershell -Command ".\OpenLid.ps1 -On"</code>
+        <button class="code-copy" onclick="navigator.clipboard.writeText('powershell -Command &quot;.\\OpenLid.ps1 -On&quot;'); this.innerText='Copied'">Copy</button>
       </div>
     </div>
   </section>
 
-  <!-- =====================================================================
-       ARCHITECTURE SECTION
-       ===================================================================== -->
+  <!-- Architecture -->
   <section id="architecture" class="section container">
-    <div class="section-title-wrap">
-      <h2 class="section-heading">How OpenLid Works</h2>
-      <p class="section-subheading">Standard user-space tools fail when the clamshell closes. OpenLid intercepts OS-level power assertions cleanly.</p>
+    <div class="section-head">
+      <h2 class="section-title">Architecture</h2>
+      <p class="section-desc">How OpenLid handles clamshell state without interfering with display sleep.</p>
     </div>
 
-    <div class="spec-grid">
-      <div class="spec-card">
-        <div class="spec-num">01 / macOS KERNEL</div>
-        <h3 class="spec-title">IOPMrootDomain Assertion</h3>
-        <p class="spec-body">
-          On macOS, lid closure triggers an interrupt that bypasses user-space assertions. OpenLid modulates <code>pmset -a disablesleep 1</code> alongside an active <code>kIOPMAssertionTypePreventSystemSleep</code> token so CPUs and disks operate while the LCD backlight rests.
+    <div class="specs-grid">
+      <div class="spec-col">
+        <div class="spec-num">01</div>
+        <h3 class="spec-heading">IOPMrootDomain Assertion</h3>
+        <p class="spec-text">
+          On macOS, lid closure triggers an interrupt directly into IOPMrootDomain. OpenLid modulates <code>pmset -a disablesleep 1</code> alongside an active <code>kIOPMAssertionTypePreventSystemSleep</code> token.
         </p>
       </div>
 
-      <div class="spec-card">
-        <div class="spec-num">02 / WINDOWS SUBSYSTEM</div>
-        <h3 class="spec-title">SetThreadExecutionState & AwayMode</h3>
-        <p class="spec-body">
-          On Windows, OpenLid engages Win32 <code>ES_AWAYMODE_REQUIRED</code> and configures <code>powercfg LIDACTION 0</code>, allowing display standby while preserving full CPU scheduling, network streams, and audio playback.
+      <div class="spec-col">
+        <div class="spec-num">02</div>
+        <h3 class="spec-heading">Win32 Away Mode</h3>
+        <p class="spec-body spec-text">
+          On Windows, OpenLid engages <code>ES_AWAYMODE_REQUIRED</code> and configures <code>powercfg LIDACTION 0</code>, turning off the LCD panel while preserving CPU execution and audio streams.
         </p>
       </div>
 
-      <div class="spec-card">
-        <div class="spec-num">03 / SECURITY</div>
-        <h3 class="spec-title">Zero-Popup Authentication</h3>
-        <p class="spec-body">
-          Elevated power management modifications require privilege. OpenLid sets up a scoped sudoers entry (<code>/etc/sudoers.d/openlid</code>) via Touch ID once, permitting sub-30ms toggles with zero subsequent passwords or popups.
+      <div class="spec-col">
+        <div class="spec-num">03</div>
+        <h3 class="spec-heading">Scoped Elevation</h3>
+        <p class="spec-text">
+          Elevated power management modifications require privilege. OpenLid writes a scoped sudoers configuration (<code>/etc/sudoers.d/openlid</code>) via Touch ID once, avoiding subsequent password prompts.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- =====================================================================
-       HARDWARE SAFETY GUARDS
-       ===================================================================== -->
+  <!-- Safety -->
   <section id="safety" class="section container">
-    <div class="safety-banner">
-      <h2 class="safety-title">Hardware Safety by Design</h2>
-      <p class="safety-desc">
-        Running laptops with the lid closed can trap heat if airflow is obstructed. OpenLid implements automated fail-safes to protect your silicon:
-      </p>
+    <div class="section-head">
+      <h2 class="section-title">Hardware Safety</h2>
+      <p class="section-desc">Automated fail-safes prevent battery drain and thermal accumulation.</p>
+    </div>
 
-      <div class="safety-features">
-        <div class="safety-item">
-          <span class="safety-icon">🌡️</span>
-          <strong>Thermal Overheating Breaker</strong>
-          <p>
-            Continuously monitors system thermal pressure. If temperatures escalate to critical levels, OpenLid drops assertions immediately and allows the machine to sleep safely.
-          </p>
-        </div>
-
-        <div class="safety-item">
-          <span class="safety-icon">🔋</span>
-          <strong>Configurable Battery Floor</strong>
-          <p>
-            Avoid waking up to an empty battery. OpenLid tracks battery levels and disengages sleep bypass when battery drops below your chosen margin (default 15%).
-          </p>
-        </div>
-
-        <div class="safety-item">
-          <span class="safety-icon">🛡️</span>
-          <strong>Signal Trap Cleanups</strong>
-          <p>
-            Hooks into process signals (<code>SIGINT</code>, <code>SIGTERM</code>, Windows shutdown) to guarantee power settings are cleanly restored to default on exit.
-          </p>
-        </div>
+    <div class="safety-grid">
+      <div class="safety-card">
+        <h3 class="safety-head">Thermal Sentinel</h3>
+        <p class="safety-text">
+          Monitors <code>ProcessInfo.processInfo.thermalState</code> continuously. If thermal pressure reaches critical levels, OpenLid drops assertions immediately and permits normal sleep.
+        </p>
       </div>
+
+      <div class="safety-card">
+        <h3 class="safety-head">Battery Cutoff Floor</h3>
+        <p class="safety-text">
+          When running on battery, sleep prevention halts automatically if charge drops below 15%, preventing unexpected shutdowns while unplugged.
+        </p>
+      </div>
+
+      <div class="safety-card">
+        <h3 class="safety-head">Signal Trap Teardown</h3>
+        <p class="safety-text">
+          Traps <code>SIGINT</code>, <code>SIGTERM</code>, and unhandled exits to guarantee power settings are restored to default state upon termination.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI -->
+  <section id="cli" class="section container">
+    <div class="section-head">
+      <h2 class="section-title">Command-Line Interface</h2>
+      <p class="section-desc">Scriptable control for terminal workflows, shortcuts, and SSH sessions.</p>
+    </div>
+
+    <div class="code-box-large">
+      <div class="code-row">
+        <span class="code-muted">$</span> <code>openlid on --duration 30m</code>
+      </div>
+      <div class="code-output">Enabling OpenLid (duration: 30 minutes). Clamshell bypass active.</div>
+
+      <div class="code-row">
+        <span class="code-muted">$</span> <code>openlid status</code>
+      </div>
+      <div class="code-output">Lid: Closed | Power: AC Connected (94%) | Thermal: Nominal | State: Active</div>
+
+      <div class="code-row">
+        <span class="code-muted">$</span> <code>openlid off</code>
+      </div>
+      <div class="code-output">Default macOS sleep behavior restored.</div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="footer container">
-    <div class="footer-row">
-      <div class="footer-left">
-        <strong>OpenLid</strong> — Open-source clamshell sleep prevention utility distributed under the MIT License.
+  <footer class="footer">
+    <div class="footer-inner container">
+      <div class="footer-info">
+        <span>OpenLid is distributed under the MIT License.</span>
+        <a href="https://openlid.devs.li" target="_blank" rel="noopener noreferrer" class="footer-badge" style="display:inline-flex; align-items:center; margin-left:12px;">
+          <img src="https://devs.li/badge.svg" alt="Domain by devs.li" height="20" style="vertical-align:middle;">
+        </a>
       </div>
       <div class="footer-links">
         <a href="https://openlid.devs.li">openlid.devs.li</a>
-        <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank">Source Code</a>
-        <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank">Releases</a>
-        <a href="https://github.com/PurohitBhagyesh/openlid/blob/main/LICENSE" target="_blank">MIT License</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank" rel="noopener noreferrer">Releases</a>
+        <a href="https://github.com/PurohitBhagyesh/openlid/blob/main/LICENSE" target="_blank" rel="noopener noreferrer">License</a>
       </div>
     </div>
   </footer>

@@ -9,7 +9,7 @@
    ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝╚═════╝ 
 ```
 
-### 👁️ The Unsleeping Eye for macOS & Windows
+### The Unsleeping Eye for macOS & Windows
 
 **Keep your laptop awake, running, and vigilant — even when the lid is closed.**
 
@@ -18,29 +18,30 @@
 [![Windows](https://img.shields.io/badge/.NET%20%2F%20PowerShell-0078D4?style=for-the-badge&logo=windows&logoColor=white)](https://microsoft.com/windows)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-openlid.devs.li-06b6d4?style=for-the-badge)](https://openlid.devs.li)
+[![Domain by devs.li](https://devs.li/badge.svg)](https://openlid.devs.li)
 
 <p align="center">
-  <a href="#-downloads">Downloads</a> •
-  <a href="#-features">Features</a> •
-  <a href="#-macos-menu-bar">macOS Menu Bar</a> •
-  <a href="#-windows-system-tray">Windows Tray</a> •
-  <a href="#-cli-usage">CLI</a> •
-  <a href="#-architecture">Architecture</a>
+  <a href="#downloads">Downloads</a> •
+  <a href="#overview">Overview</a> •
+  <a href="#status-bar-indicators">Status Bar</a> •
+  <a href="#cli-usage">CLI</a> •
+  <a href="#architecture">Architecture</a> •
+  <a href="#hardware-safety-advisory">Safety</a>
 </p>
 
 ---
 
 </div>
 
-## 🌌 Overview
+## Overview
 
 By default, closing your laptop lid puts macOS or Windows to sleep immediately unless plugged into AC power with an external monitor attached.
 
 If you are:
-- 🤖 **Running long local AI inference or coding agents** (Claude Code, Ollama, DeepSeek, OpenDevin)
-- 🎧 **Streaming music or podcasts** to AirPods, Bluetooth speakers, or Sonos
-- 🚀 **Hosting local dev servers, Docker containers, or Vite/Next.js builds**
-- 📦 **Downloading massive datasets, game assets, or syncing background backups**
+- **Running local AI inference or coding agents** (Claude Code, Ollama, DeepSeek, OpenDevin)
+- **Streaming audio or podcasts** to Bluetooth headphones or external speakers
+- **Hosting local development servers, Docker containers, or builds**
+- **Downloading large datasets or syncing background backups**
 
 ...closing the lid interrupts everything. Standard user-space utilities fail because the operating system treats lid closure as a low-level hardware interrupt.
 
@@ -48,27 +49,29 @@ If you are:
 
 ---
 
-## 💾 Downloads
+## Downloads
 
-Download standalone, notarization-ready packages compiled natively for each platform architecture:
+Standalone portable ZIP archives compiled natively for each platform architecture:
 
-### 🍎 macOS
-| Architecture | DMG Installer (Drag to Apps) | Portable ZIP Archive | Target Hardware |
-| :--- | :---: | :---: | :--- |
-| **Apple Silicon** | [Download `.dmg`](downloads/OpenLid-AppleSilicon.dmg) | [Download `.zip`](downloads/OpenLid-AppleSilicon.zip) | M1, M2, M3, M4, Pro, Max, Ultra |
-| **Intel Processor** | [Download `.dmg`](downloads/OpenLid-Intel.dmg) | [Download `.zip`](downloads/OpenLid-Intel.zip) | Core i5, i7, i9 MacBooks |
-| **Universal Binary** | [Download `.dmg`](downloads/OpenLid-Universal.dmg) | [Download `.zip`](downloads/OpenLid-Universal.zip) | Fat Mach-O (both architectures) |
+### macOS
+
+| Architecture | Portable ZIP Archive | Target Hardware | Contents |
+| :--- | :---: | :--- | :--- |
+| **Apple Silicon** | [Download `.zip`](downloads/OpenLid-AppleSilicon.zip) | Apple Silicon (M1, M2, M3, M4 series) | `OpenLid.app` + `openlid` CLI |
+| **Intel Processor** | [Download `.zip`](downloads/OpenLid-Intel.zip) | Intel MacBooks (Core i5, i7, i9) | `OpenLid.app` + `openlid` CLI |
+| **Universal Binary** | [Download `.zip`](downloads/OpenLid-Universal.zip) | All MacBooks (Universal 2 Mach-O) | `OpenLid.app` + `openlid` CLI |
 
 ```bash
 # Homebrew Cask (macOS)
 brew install --cask openlid
 ```
 
-### 🪟 Windows (11 / 10)
-| Architecture | Standalone Package | Target Hardware |
-| :--- | :---: | :--- |
-| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops |
-| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM |
+### Windows (11 / 10)
+
+| Architecture | Standalone Archive | Target Hardware | Contents |
+| :--- | :---: | :--- | :--- |
+| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `OpenLidTray.exe` + PowerShell Scripts |
+| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `OpenLidTray.exe` + PowerShell Scripts |
 
 ```powershell
 # Windows PowerShell Quick-Launch (Zero-Install)
@@ -77,21 +80,22 @@ powershell -Command ".\windows\OpenLid.ps1 -On"
 
 ---
 
-## 👁️ macOS Menu Bar & Windows System Tray
+## Status Bar Indicators
 
 OpenLid lives natively in your status bar with an adaptive Unsleeping Eye symbol:
 
 | State | macOS Menu Bar | Windows System Tray | Meaning |
 | :--- | :---: | :---: | :--- |
-| **Vigilant & Awake** | `👁️` (`eye.fill`) | 🟢 Glowing Eye | OpenLid is ACTIVE. Your laptop continues running with the lid closed. |
-| **Clamshell Running** | `👁️‍🗨️` (`eye.circle.fill`) | 🟢 Pulse Dot | Lid is physically closed; display backlight is off, but CPU and network operate at full speed. |
-| **Default Sleep** | `🚫` (`eye.slash`) | ⚪ Dimmed Eye | Sleep assertions disengaged. Closing the lid will sleep your laptop normally. |
+| **Vigilant & Awake** | `eye.fill` (Open Eye) | Green Eye | OpenLid is ACTIVE. Your laptop continues running with the lid closed. |
+| **Clamshell Running** | `eye.circle.fill` | Green Pulse Dot | Lid is physically closed; display backlight is off, but CPU and network operate at full speed. |
+| **Default Sleep** | `eye.slash` (Closed Eye) | Dimmed Eye | Sleep assertions disengaged. Closing the lid will sleep your laptop normally. |
 
 ---
 
-## 💻 CLI Usage
+## CLI Usage
 
 ### macOS (`openlid`)
+
 ```bash
 # Enable closed-lid sleep prevention
 openlid on
@@ -114,6 +118,7 @@ openlid helper install
 ```
 
 ### Windows (`OpenLid.ps1` / `openlid.cmd`)
+
 ```cmd
 :: Enable closed-lid sleep prevention
 openlid.cmd on
@@ -127,7 +132,7 @@ openlid.cmd status
 
 ---
 
-## 🏗 Architecture
+## Architecture
 
 ```text
 openlid/
@@ -151,27 +156,24 @@ openlid/
 │   ├── OpenLidTray.cs               # Native C# System Tray app with AwayMode
 │   ├── OpenLid.ps1                  # Zero-install PowerShell engine
 │   └── openlid.cmd                  # Windows batch launcher
-├── website/                         # WebGL 3D site & product showcase
-│   ├── index.html                   # High-DPI SEO, OS switcher & 3D stage
-│   ├── style.css                    # Dark glassmorphic theme & kinetic scroll
-│   ├── app.js                       # Aesthetic scroll observer & OS switcher
-│   └── 3d-viewer.js                 # Three.js 3D laptop physics engine
-├── downloads/                       # Direct distribution builds (.dmg, .zip)
+├── index.html                       # Product landing site with Eye theme switcher
+├── style.css                        # Universal responsive design system
+├── app.js                           # State manager & live telemetry client
+├── downloads/                       # Direct distribution builds (.zip only)
 └── scripts/
-    ├── bundle.sh                    # Universal lipo compilation & DMG creation
-    ├── create_dmg.sh                # Drag-to-Applications disk image builder
+    ├── bundle.sh                    # Universal lipo compilation & ZIP packaging
     └── install.sh                   # System-wide installation
 ```
 
 ---
 
-## ⚠️ Hardware Safety Advisory
+## Hardware Safety Advisory
 
 > [!CAUTION]
 > Laptops dissipate a portion of heat through the keyboard and display hinge assembly. **Never** leave your laptop running intensive compute workloads with the lid closed inside a sealed backpack or sleeve without airflow. OpenLid incorporates automated thermal shutdowns, but physical ventilation is always required.
 
 ---
 
-## 📜 License
+## License
 
 Distributed under the [MIT License](LICENSE). Copyright (c) 2026 Bhagyesh Purohit.

@@ -64,13 +64,28 @@ bundle_app "$DIR/.build/bin_arm64_app/OpenLid" "$DIST_DIR/OpenLid-AppleSilicon.a
 echo "📦 Assembling Intel OpenLid-Intel.app..."
 bundle_app "$DIR/.build/bin_x86_app/OpenLid" "$DIST_DIR/OpenLid-Intel.app"
 
-echo "🗜 Creating release archives (each containing OpenLid.app)..."
+echo "🗜 Creating release archives (each containing OpenLid.app and openlid CLI)..."
 # Each archive contains the app bundle and CLI
 cd "$DIST_DIR"
 tar -czf "$DIST_DIR/OpenLid-Universal.tar.gz" OpenLid.app openlid
 zip -rq "$DIST_DIR/OpenLid-Universal.zip" OpenLid.app openlid
-zip -rq "$DIST_DIR/OpenLid-AppleSilicon.zip" OpenLid-AppleSilicon.app openlid
-zip -rq "$DIST_DIR/OpenLid-Intel.zip" OpenLid-Intel.app openlid
+
+# Package Apple Silicon zip
+TMP_ARM="$DIR/.build/tmp_pkg_arm"
+rm -rf "$TMP_ARM" && mkdir -p "$TMP_ARM"
+cp -R "$DIST_DIR/OpenLid-AppleSilicon.app" "$TMP_ARM/OpenLid.app"
+cp "$DIST_DIR/openlid" "$TMP_ARM/openlid"
+(cd "$TMP_ARM" && zip -rq "$DIST_DIR/OpenLid-AppleSilicon.zip" OpenLid.app openlid)
+rm -rf "$TMP_ARM"
+
+# Package Intel zip
+TMP_X86="$DIR/.build/tmp_pkg_x86"
+rm -rf "$TMP_X86" && mkdir -p "$TMP_X86"
+cp -R "$DIST_DIR/OpenLid-Intel.app" "$TMP_X86/OpenLid.app"
+cp "$DIST_DIR/openlid" "$TMP_X86/openlid"
+(cd "$TMP_X86" && zip -rq "$DIST_DIR/OpenLid-Intel.zip" OpenLid.app openlid)
+rm -rf "$TMP_X86"
+
 cd "$DIR"
 
 echo "✅ Dual Architecture Build Complete!"
