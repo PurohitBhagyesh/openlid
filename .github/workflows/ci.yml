@@ -25,3 +25,4 @@ jobs:
 
       - name: Build Release Bundle
         run: ./scripts/bundle.sh
+

@@ -47,3 +47,4 @@ We follow Conventional Commits:
 
 ## ⚖️ License
 By contributing to OpenLid, you agree that your contributions will be licensed under the MIT License.
+

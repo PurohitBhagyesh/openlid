@@ -28,3 +28,4 @@ Output of `openlid status`:
 ```text
 (paste here)
 ```
+

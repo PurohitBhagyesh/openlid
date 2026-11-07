@@ -12,3 +12,4 @@ Please include a summary of the changes and the related issue/feature.
 - [ ] `swift test` passes locally
 - [ ] Tested on physical MacBook with lid open and closed
 - [ ] Verified `openlid status` output
+

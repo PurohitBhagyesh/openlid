@@ -20,3 +20,4 @@ This Code of Conduct applies within all community spaces, including the project 
 ## Enforcement
 
 Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the project team. All complaints will be reviewed and investigated promptly and fairly.
+

@@ -8,3 +8,4 @@ echo "🌐 Starting OpenLid aesthetic web server on http://localhost:$PORT..."
 echo "Press Ctrl+C to stop."
 cd "$DIR/website"
 python3 -m http.server "$PORT"
+

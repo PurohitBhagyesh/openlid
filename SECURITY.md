@@ -17,3 +17,4 @@ OpenLid interfaces with low-level macOS power management assertions and privileg
 ## Reporting a Vulnerability
 
 If you discover a security vulnerability within OpenLid, please do NOT file a public issue. Instead, report it privately via GitHub Security Advisories or email the maintainers directly.
+

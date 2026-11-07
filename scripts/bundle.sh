@@ -28,6 +28,11 @@ cp "$DIR/.build/release/OpenLidCLI" "$DIST_DIR/openlid"
 # Copy Info.plist
 cp "$DIR/Resources/Info.plist" "$CONTENTS_DIR/Info.plist"
 
+# Copy AppIcon if available
+if [ -f "$DIR/Resources/AppIcon.icns" ]; then
+    cp "$DIR/Resources/AppIcon.icns" "$RESOURCES_DIR/AppIcon.icns"
+fi
+
 # Ad-hoc code sign the bundle
 echo "🔏 Signing application bundle..."
 codesign --force --deep --sign - "$APP_DIR"
