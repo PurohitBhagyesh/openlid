@@ -277,73 +277,78 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial QR render
   updateSnackQr(50);
 
-  // Handle UPI App Clicks & Direct App Launching
-  const upiStatusMsg = document.getElementById('upiStatusMsg');
-  const upiAppsGrid = document.getElementById('upiAppsGrid');
+  // Handle Single Direct UPI Payment
+  const btnPayViaUpi = document.getElementById('btnPayViaUpi');
+  const noUpiAlert = document.getElementById('noUpiAlert');
+  const noUpiDesc = document.getElementById('noUpiDesc');
+  const btnCloseNoUpi = document.getElementById('btnCloseNoUpi');
 
-  const upiAppUrls = {
-    gpay: (amt) => `tez://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
-    phonepe: (amt) => `phonepe://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
-    paytm: (amt) => `paytmmp://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
-    fampay: (amt) => `fampay://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
-    amazon: (amt) => `amazonpay://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
-    bhim: (amt) => `bhim://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`
-  };
+  if (btnCloseNoUpi && noUpiAlert) {
+    btnCloseNoUpi.addEventListener('click', () => {
+      noUpiAlert.style.display = 'none';
+    });
+  }
 
-  const upiAppNames = {
-    gpay: 'Google Pay',
-    phonepe: 'PhonePe',
-    paytm: 'Paytm',
-    fampay: 'FamPay',
-    amazon: 'Amazon Pay',
-    bhim: 'BHIM UPI'
-  };
-
-  function launchUpiApp(appKey) {
+  function launchDirectUpi() {
     const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
-    const appName = upiAppNames[appKey] || 'UPI App';
+    const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+
+    if (noUpiAlert) noUpiAlert.style.display = 'none';
+
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
 
     if (!isMobile) {
-      if (upiStatusMsg) {
-        upiStatusMsg.textContent = `No mobile UPI app on desktop. Please scan the QR code above with ${appName} on your phone or copy UPI ID.`;
-        upiStatusMsg.style.display = 'block';
-        setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 6000);
+      if (noUpiAlert && noUpiDesc) {
+        noUpiDesc.textContent = 'No UPI payment app is installed on this computer. Please scan the QR code above with Google Pay, PhonePe, or Paytm on your mobile phone, or copy the UPI ID.';
+        noUpiAlert.style.display = 'flex';
+        noUpiAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
       return;
     }
 
-    const targetUri = upiAppUrls[appKey] ? upiAppUrls[appKey](amt) : `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
-
+    // On mobile devices (Android / iOS):
+    // Triggering upi:// allows the OS to detect and present all installed UPI apps!
     let appOpened = false;
-    const onBlur = () => {
+    let fallbackTimer = null;
+
+    const onAppOpen = () => {
       appOpened = true;
-      window.removeEventListener('blur', onBlur);
+      clearTimeout(fallbackTimer);
+      window.removeEventListener('blur', onAppOpen);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+      window.removeEventListener('pagehide', onAppOpen);
     };
-    window.addEventListener('blur', onBlur);
 
-    // Direct app launch avoiding WhatsApp default hijack
-    window.location.href = targetUri;
+    const onVisibilityChange = () => {
+      if (document.hidden) {
+        onAppOpen();
+      }
+    };
 
-    setTimeout(() => {
-      window.removeEventListener('blur', onBlur);
-      if (!appOpened && document.hasFocus()) {
-        if (upiStatusMsg) {
-          upiStatusMsg.textContent = `${appName} is not installed or did not open. You can try PhonePe, Paytm, or scan the QR code above.`;
-          upiStatusMsg.style.display = 'block';
-          setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 5500);
+    window.addEventListener('blur', onAppOpen);
+    window.addEventListener('pagehide', onAppOpen);
+    document.addEventListener('visibilitychange', onVisibilityChange);
+
+    // Trigger system intent
+    window.location.href = upiUri;
+
+    fallbackTimer = setTimeout(() => {
+      window.removeEventListener('blur', onAppOpen);
+      window.removeEventListener('pagehide', onAppOpen);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
+
+      if (!appOpened && !document.hidden && document.hasFocus()) {
+        if (noUpiAlert && noUpiDesc) {
+          noUpiDesc.textContent = 'No UPI app is installed on your phone. Please install a UPI app (Google Pay, PhonePe, Paytm, or BHIM) to pay directly, or scan the QR code above.';
+          noUpiAlert.style.display = 'flex';
+          noUpiAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
       }
-    }, 1500);
+    }, 1800);
   }
 
-  if (upiAppsGrid) {
-    upiAppsGrid.addEventListener('click', (e) => {
-      const btn = e.target.closest('.upi-app-btn');
-      if (!btn) return;
-      const appKey = btn.getAttribute('data-app');
-      if (appKey) launchUpiApp(appKey);
-    });
+  if (btnPayViaUpi) {
+    btnPayViaUpi.addEventListener('click', launchDirectUpi);
   }
 
   // 6. Mobile Navigation Drawer Toggle
