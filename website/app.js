@@ -35,7 +35,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 2. Top Scroll Progress Bar
-  const progressBar = document.getElementById('scrollProgressBar');
+  const progressBar = document.getElementById('scrollLine') || document.getElementById('scrollProgressBar');
   window.addEventListener('scroll', () => {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
     const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -97,12 +97,12 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
         if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
         
-        if (valLid) valLid.textContent = data.isLidClosed ? 'Closed 🔒' : 'Open 📖';
-        if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Connected' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' ⚡️' : ''})`;
+        if (valLid) valLid.textContent = data.isLidClosed ? 'Closed' : 'Open';
+        if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Connected' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' Charging' : ''})`;
         if (valThermal) valThermal.textContent = data.thermalState || 'Nominal';
         if (valAssertion) {
           valAssertion.textContent = isEnabled ? 'Active (Awake)' : 'Inactive';
-          valAssertion.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-muted)';
+          valAssertion.style.color = isEnabled ? 'var(--accent)' : 'var(--text-muted)';
         }
       }
     } catch (e) {
@@ -126,6 +126,110 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   }
+
+  // 5. Buy a Snack / Support Widget Logic (Bottom-Left Corner)
+  const snackWidget = document.getElementById('snackWidget');
+  const snackPillBtn = document.getElementById('snackPillBtn');
+  const snackCard = document.getElementById('snackCard');
+  const snackCloseBtn = document.getElementById('snackCloseBtn');
+  const snackAmountInput = document.getElementById('snackAmountInput');
+  const snackPresets = document.getElementById('snackPresets');
+  const snackQrImg = document.getElementById('snackQrImg');
+  const snackUpiLink = document.getElementById('snackUpiLink');
+  const snackUpiCopyBtn = document.getElementById('snackUpiCopyBtn');
+  const snackUpiText = document.getElementById('snackUpiText');
+
+  const UPI_ID = 'Purohit2009@fam';
+  const PAYEE_NAME = 'Shivam';
+
+  function updateSnackQr(amount) {
+    const amt = Math.max(1, parseInt(amount, 10) || 50);
+    const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+    if (snackQrImg) {
+      snackQrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&format=svg&data=${encodeURIComponent(upiUri)}`;
+    }
+    if (snackUpiLink) {
+      snackUpiLink.href = upiUri;
+    }
+  }
+
+  if (snackPillBtn && snackCard) {
+    snackPillBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = snackCard.classList.toggle('active');
+      snackPillBtn.setAttribute('aria-expanded', String(isActive));
+      if (isActive && snackAmountInput) {
+        updateSnackQr(snackAmountInput.value || 50);
+      }
+    });
+
+    if (snackCloseBtn) {
+      snackCloseBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        snackCard.classList.remove('active');
+        snackPillBtn.setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    // Close when clicking outside
+    document.addEventListener('click', (e) => {
+      if (snackWidget && !snackWidget.contains(e.target) && snackCard.classList.contains('active')) {
+        snackCard.classList.remove('active');
+        snackPillBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && snackCard.classList.contains('active')) {
+        snackCard.classList.remove('active');
+        snackPillBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // Quick Preset Chips
+  if (snackPresets && snackAmountInput) {
+    snackPresets.addEventListener('click', (e) => {
+      const chip = e.target.closest('.preset-chip');
+      if (!chip) return;
+      const amt = chip.getAttribute('data-amt');
+      snackAmountInput.value = amt;
+      snackPresets.querySelectorAll('.preset-chip').forEach(b => b.classList.remove('active'));
+      chip.classList.add('active');
+      updateSnackQr(amt);
+    });
+
+    snackAmountInput.addEventListener('input', () => {
+      const currentVal = snackAmountInput.value;
+      if (snackPresets) {
+        snackPresets.querySelectorAll('.preset-chip').forEach(b => {
+          b.classList.toggle('active', b.getAttribute('data-amt') === currentVal);
+        });
+      }
+      updateSnackQr(currentVal);
+    });
+  }
+
+  // Copy UPI ID
+  if (snackUpiCopyBtn && snackUpiText) {
+    snackUpiCopyBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        await navigator.clipboard.writeText(UPI_ID);
+        const originalText = snackUpiText.textContent;
+        snackUpiText.textContent = 'Copied!';
+        setTimeout(() => {
+          snackUpiText.textContent = originalText;
+        }, 1500);
+      } catch (err) {
+        console.error('Clipboard copy failed:', err);
+      }
+    });
+  }
+
+  // Initial QR render
+  updateSnackQr(50);
 
   fetchTelemetry();
   setInterval(fetchTelemetry, 2000);

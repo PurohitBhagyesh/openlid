@@ -364,6 +364,63 @@
     </div>
   </footer>
 
+  <!-- Buy a Snack / Support Widget (Bottom-Left Corner) -->
+  <div class="snack-widget" id="snackWidget">
+    <button class="snack-pill" id="snackPillBtn" aria-label="Buy a Snack" aria-expanded="false">
+      <svg class="snack-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
+        <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
+        <line x1="6" y1="1" x2="6" y2="4"/>
+        <line x1="10" y1="1" x2="10" y2="4"/>
+        <line x1="14" y1="1" x2="14" y2="4"/>
+      </svg>
+      <span>Buy a Snack</span>
+    </button>
+
+    <div class="snack-card" id="snackCard" role="dialog" aria-modal="false" aria-label="Support Shivam">
+      <div class="snack-card-header">
+        <div class="snack-header-text">
+          <h3 class="snack-title">Support Shivam</h3>
+          <button class="snack-upi-copy" id="snackUpiCopyBtn" type="button" title="Click to copy UPI ID">
+            <code id="snackUpiText">Purohit2009@fam</code>
+            <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+          </button>
+        </div>
+        <button class="snack-close-btn" id="snackCloseBtn" type="button" aria-label="Close snack popup">&times;</button>
+      </div>
+
+      <div class="snack-card-body">
+        <div class="snack-qr-wrapper">
+          <div class="snack-qr-pad" id="snackQrPad">
+            <img id="snackQrImg" src="" alt="UPI QR Code" width="140" height="140">
+          </div>
+          <span class="snack-qr-caption">Scan with any UPI App (GPay, PhonePe, Paytm)</span>
+        </div>
+
+        <div class="snack-input-wrap">
+          <span class="currency-symbol">&#8377;</span>
+          <input type="number" id="snackAmountInput" min="1" max="100000" placeholder="Enter amount" value="50">
+        </div>
+
+        <div class="snack-presets" id="snackPresets">
+          <button type="button" class="preset-chip" data-amt="20">&#8377;20</button>
+          <button type="button" class="preset-chip active" data-amt="50">&#8377;50</button>
+          <button type="button" class="preset-chip" data-amt="100">&#8377;100</button>
+          <button type="button" class="preset-chip" data-amt="200">&#8377;200</button>
+        </div>
+
+        <a id="snackUpiLink" href="upi://pay?pa=Purohit2009@fam&pn=Shivam&am=50&cu=INR" class="btn btn-sm btn-primary btn-block snack-pay-btn">
+          Pay via UPI App
+        </a>
+
+        <p class="snack-sub">Every snack fuels Shivam's creativity.</p>
+      </div>
+    </div>
+  </div>
+
   <script src="app.js"></script>
 </body>
 </html>

@@ -653,6 +653,254 @@ body {
   color: var(--text);
 }
 
+/* Floating Snack / Support Widget (Bottom-Left Corner) */
+.snack-widget {
+  position: fixed;
+  bottom: 24px;
+  left: 24px;
+  z-index: 9000;
+  font-family: inherit;
+}
+
+.snack-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background-color: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border-strong);
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.snack-pill:hover {
+  background-color: var(--surface-alt);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.snack-icon {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+/* Expanded Card */
+.snack-card {
+  position: absolute;
+  bottom: 48px;
+  left: 0;
+  width: 320px;
+  background-color: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+  animation: snackPop 0.18s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.snack-card.active {
+  display: flex;
+}
+
+@keyframes snackPop {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.snack-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 10px;
+}
+
+.snack-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.snack-upi-copy {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.snack-upi-copy:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.snack-upi-copy code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.snack-close-btn {
+  background: none;
+  border: none;
+  font-size: 20px;
+  line-height: 1;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.snack-close-btn:hover {
+  color: var(--text);
+  background-color: var(--surface-alt);
+}
+
+.snack-card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.snack-qr-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.snack-qr-pad {
+  background: #ffffff;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  min-height: 156px;
+  width: 156px;
+}
+
+.snack-qr-pad img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.snack-qr-caption {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+.snack-input-wrap {
+  display: flex;
+  align-items: center;
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0 12px;
+  height: 38px;
+  transition: border-color 0.15s;
+}
+
+.snack-input-wrap:focus-within {
+  border-color: var(--accent);
+}
+
+.currency-symbol {
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+#snackAmountInput {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  width: 100%;
+}
+
+.snack-presets {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.preset-chip {
+  background-color: var(--surface-alt);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 0;
+  font-size: 12px;
+  font-weight: 500;
+  border-radius: 6px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.preset-chip:hover {
+  background-color: var(--surface);
+  border-color: var(--border-strong);
+  color: var(--text);
+}
+
+.preset-chip.active {
+  background-color: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.snack-pay-btn {
+  text-align: center;
+  justify-content: center;
+}
+
+.snack-sub {
+  font-size: 11px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .snack-widget {
+    bottom: 16px;
+    left: 16px;
+  }
+  .snack-card {
+    width: calc(100vw - 32px);
+    bottom: 52px;
+    left: 0;
+  }
+}
+
 @media (max-width: 768px) {
   .hero-h1 { font-size: 30px; }
   .cards-grid { grid-template-columns: 1fr; }
