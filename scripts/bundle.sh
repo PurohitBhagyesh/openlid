@@ -60,10 +60,27 @@ bundle_app "$DIR/.build/bin_arm64/OpenLid" "$DIST_DIR/OpenLid-AppleSilicon.app"
 echo "📦 Assembling Intel OpenLid-Intel.app..."
 bundle_app "$DIR/.build/bin_x86/OpenLid" "$DIST_DIR/OpenLid-Intel.app"
 
-echo "🗜 Creating release archives..."
-(cd "$DIST_DIR" && zip -rq "OpenLid-AppleSilicon.zip" "OpenLid-AppleSilicon.app")
-(cd "$DIST_DIR" && zip -rq "OpenLid-Intel.zip" "OpenLid-Intel.app")
+echo "🗜 Creating release archives (each containing OpenLid.app)..."
+# Apple Silicon Zip
+TEMP_ZIP_ARM="$DIR/.build/zip_temp_arm"
+rm -rf "$TEMP_ZIP_ARM" && mkdir -p "$TEMP_ZIP_ARM"
+cp -R "$DIST_DIR/OpenLid-AppleSilicon.app" "$TEMP_ZIP_ARM/OpenLid.app"
+(cd "$TEMP_ZIP_ARM" && zip -rq "$DIST_DIR/OpenLid-AppleSilicon.zip" "OpenLid.app")
+rm -rf "$TEMP_ZIP_ARM"
+
+# Intel Zip
+TEMP_ZIP_X86="$DIR/.build/zip_temp_x86"
+rm -rf "$TEMP_ZIP_X86" && mkdir -p "$TEMP_ZIP_X86"
+cp -R "$DIST_DIR/OpenLid-Intel.app" "$TEMP_ZIP_X86/OpenLid.app"
+(cd "$TEMP_ZIP_X86" && zip -rq "$DIST_DIR/OpenLid-Intel.zip" "OpenLid.app")
+rm -rf "$TEMP_ZIP_X86"
+
+# Universal Zip
 (cd "$DIST_DIR" && zip -rq "OpenLid-Universal.zip" "OpenLid.app")
+
+# Copy zips to website downloads
+mkdir -p "$DIR/website/downloads"
+cp "$DIST_DIR"/*.zip "$DIR/website/downloads/"
 
 echo "✅ Dual Architecture Build Complete!"
 echo "📍 Universal App:      $DIST_DIR/OpenLid.app"

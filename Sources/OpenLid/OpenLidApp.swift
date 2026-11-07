@@ -17,6 +17,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Handle auto-awake on user login
         LaunchAtLoginManager.shared.handleAppLaunch()
         
+        // Offer to move to /Applications if launched from Downloads
+        ApplicationMover.promptToMoveToApplicationsIfNecessary()
+        
         // Start local REST control server for website and automations
         ControlServer.shared.start()
     }
