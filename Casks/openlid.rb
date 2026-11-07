@@ -2,13 +2,13 @@ cask "openlid" do
   version "1.0.0"
   sha256 "124c3587af21a83bee96f1e35c68bb90530124bdf6b9b78f2ed8bfd638fcd97f"
 
-  url "https://github.com/PurohitBhagyesh/openlid/releases/download/v#{version}/OpenLid-Universal.zip"
+  url "https://openlid.devs.li/downloads/OpenLid-Universal.zip"
   name "OpenLid"
   desc "Keep your laptop running with the lid closed"
   homepage "https://openlid.devs.li/"
 
   livecheck do
-    url :url
+    url "https://github.com/PurohitBhagyesh/openlid"
     strategy :github_latest
   end
 
