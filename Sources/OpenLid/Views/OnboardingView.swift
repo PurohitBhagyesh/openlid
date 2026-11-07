@@ -65,7 +65,7 @@ public struct OnboardingView: View {
                 .padding(.bottom, 6)
             
             VStack(spacing: 8) {
-                Text("Welcome to OpenLid")
+                Text("OpenLid")
                     .font(.system(size: 26, weight: .bold))
                     .foregroundColor(.white)
                 

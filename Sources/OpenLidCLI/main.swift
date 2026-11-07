@@ -17,7 +17,7 @@ func printHelp() {
         mode [get|menubar|app|both]
                            Configure app presentation mode (Taskbar vs App Window vs Both)
         app, gui           Launch the standalone OpenLid application window
-        welcome            Launch the Welcome to OpenLid onboarding & permissions flow
+        tutorial, setup    Launch the OpenLid tutorial & permissions flow
         helper install     Install passwordless sudo helper for instant toggling
         helper uninstall   Remove passwordless sudo helper
         help, -h, --help   Show this help message
@@ -136,8 +136,8 @@ case "app", "gui":
     proc.arguments = ["-a", "OpenLid"]
     try? proc.run()
 
-case "welcome", "onboarding":
-    print("✨ Resetting onboarding and launching Welcome Guide...")
+case "tutorial", "permissions", "setup", "onboarding", "welcome":
+    print("✨ Launching Tutorial & Permissions setup...")
     AppPreferences.shared.resetOnboarding()
     let proc = Process()
     proc.executableURL = URL(fileURLWithPath: "/usr/bin/open")

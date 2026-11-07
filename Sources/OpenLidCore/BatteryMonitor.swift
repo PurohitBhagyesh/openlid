@@ -1,9 +1,12 @@
 import Foundation
 import IOKit.ps
 
-/// Monitors MacBook battery level, power source, and charging state.
+/// Monitors MacBook battery level, power source, and charging state with persistent safety cutoff thresholds.
 public final class BatteryMonitor: ObservableObject {
     public static let shared = BatteryMonitor()
+    
+    private let thresholdKey = "openlid.lowBatteryThreshold"
+    private let cutoffKey = "openlid.lowBatteryCutoffEnabled"
     
     @Published public private(set) var batteryPercent: Int = 100
     @Published public private(set) var isCharging: Bool = false
@@ -11,13 +14,31 @@ public final class BatteryMonitor: ObservableObject {
     @Published public private(set) var powerSourceName: String = "Unknown"
     
     /// Low battery threshold below which sleep prevention should be automatically aborted (e.g. 15%)
-    @Published public var lowBatteryThreshold: Int = 15
-    @Published public var lowBatteryCutoffEnabled: Bool = true
+    @Published public var lowBatteryThreshold: Int {
+        didSet {
+            UserDefaults.standard.set(lowBatteryThreshold, forKey: thresholdKey)
+        }
+    }
+    
+    @Published public var lowBatteryCutoffEnabled: Bool {
+        didSet {
+            UserDefaults.standard.set(lowBatteryCutoffEnabled, forKey: cutoffKey)
+        }
+    }
     
     private var timer: Timer?
     public var onLowBatteryThresholdReached: (() -> Void)?
     
     public init() {
+        let savedThreshold = UserDefaults.standard.integer(forKey: thresholdKey)
+        self.lowBatteryThreshold = (savedThreshold >= 5 && savedThreshold <= 50) ? savedThreshold : 15
+        
+        if UserDefaults.standard.object(forKey: cutoffKey) != nil {
+            self.lowBatteryCutoffEnabled = UserDefaults.standard.bool(forKey: cutoffKey)
+        } else {
+            self.lowBatteryCutoffEnabled = true
+        }
+        
         updateBatteryState()
         startMonitoring()
     }
@@ -29,9 +50,12 @@ public final class BatteryMonitor: ObservableObject {
     public func startMonitoring() {
         guard timer == nil else { return }
         updateBatteryState()
-        timer = Timer.scheduledTimer(withTimeInterval: 5.0, repeats: true) { [weak self] _ in
+        // Poll every 4 seconds and also hook to common mode
+        let t = Timer(timeInterval: 4.0, repeats: true) { [weak self] _ in
             self?.updateBatteryState()
         }
+        RunLoop.main.add(t, forMode: .common)
+        self.timer = t
     }
     
     public func stopMonitoring() {
@@ -62,7 +86,7 @@ public final class BatteryMonitor: ObservableObject {
                 self.isOnACPower = isAC
                 self.powerSourceName = name
                 
-                // Check safety threshold if on battery and cutoff enabled
+                // Trigger safety cutoff if running on battery and charge drops to or below threshold
                 if self.lowBatteryCutoffEnabled && !isAC && percent <= self.lowBatteryThreshold {
                     self.onLowBatteryThresholdReached?()
                 }
@@ -71,4 +95,3 @@ public final class BatteryMonitor: ObservableObject {
         }
     }
 }
-

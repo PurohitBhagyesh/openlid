@@ -16,8 +16,6 @@ public struct MainWindowView: View {
     @State private var hardwareRefreshedJustNow: Bool = false
     @State private var isResettingAssertions: Bool = false
     @State private var resetMessage: String? = nil
-    @State private var activeAssertionsText: String? = nil
-    @State private var isInspectingAssertions: Bool = false
     
     public enum MainTab: String, CaseIterable, Identifiable {
         case dashboard = "Dashboard"
@@ -115,7 +113,7 @@ public struct MainWindowView: View {
         .background(Color(NSColor.underPageBackgroundColor).opacity(0.5))
     }
     
-    // MARK: - Dashboard Tab
+    // MARK: - Dashboard Tab (Timer runs exclusively in Menu Bar Taskbar)
     private var dashboardView: some View {
         VStack(spacing: 16) {
             // Hero Toggle Card
@@ -164,74 +162,16 @@ public struct MainWindowView: View {
             }
             .buttonStyle(.plain)
             
-            // Real-Time Live Timer Card (Always updates every second)
-            if powerManager.isEnabled {
-                HStack(spacing: 14) {
-                    ZStack {
-                        Circle()
-                            .fill(powerManager.timer.isTimerRunning ? Color.orange.opacity(0.18) : Color.green.opacity(0.18))
-                            .frame(width: 44, height: 44)
-                        Image(systemName: powerManager.timer.isTimerRunning ? "timer" : "clock.arrow.circlepath")
-                            .font(.system(size: 20, weight: .bold))
-                            .foregroundColor(powerManager.timer.isTimerRunning ? .orange : .green)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(powerManager.timer.isTimerRunning ? "Session Countdown (Real-Time)" : "Active Vigilant Session (Real-Time)")
-                            .font(.system(size: 13, weight: .bold))
-                            .foregroundColor(.primary)
-                        
-                        HStack(spacing: 8) {
-                            Text(powerManager.timer.isTimerRunning ? "Time Remaining:" : "Elapsed Awake Time:")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                            
-                            Text(powerManager.timer.isTimerRunning ? powerManager.timer.formattedRemainingTime : powerManager.timer.formattedElapsedTime)
-                                .font(.system(size: 15, weight: .bold, design: .monospaced))
-                                .foregroundColor(powerManager.timer.isTimerRunning ? .orange : .green)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    if powerManager.timer.isTimerRunning {
-                        Button("Stop Timer") {
-                            powerManager.timer.stop()
-                        }
-                        .font(.system(size: 11, weight: .semibold))
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    } else {
-                        Text("Continuous")
-                            .font(.system(size: 10, weight: .semibold))
-                            .padding(.horizontal, 8)
-                            .padding(.vertical, 4)
-                            .background(Color.green.opacity(0.15))
-                            .foregroundColor(.green)
-                            .cornerRadius(6)
-                    }
-                }
-                .padding(14)
-                .background(powerManager.timer.isTimerRunning ? Color.orange.opacity(0.08) : Color.green.opacity(0.05))
-                .cornerRadius(10)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 10)
-                        .stroke(powerManager.timer.isTimerRunning ? Color.orange.opacity(0.3) : Color.green.opacity(0.2), lineWidth: 1)
-                )
-            }
-            
-            // Session Timer Presets
+            // Session Duration Presets
             VStack(alignment: .leading, spacing: 8) {
                 HStack {
                     Text("Session Duration")
                         .font(.system(size: 12, weight: .bold))
                         .foregroundColor(.secondary)
                     Spacer()
-                    if powerManager.isEnabled && powerManager.timer.isTimerRunning {
-                        Text("Live: \(powerManager.timer.formattedRemainingTime)")
-                            .font(.system(size: 11, weight: .semibold, design: .monospaced))
-                            .foregroundColor(.orange)
-                    }
+                    Text("Managed via Menu Bar Icon")
+                        .font(.system(size: 11))
+                        .foregroundColor(.secondary)
                 }
                 
                 HStack(spacing: 8) {
@@ -294,7 +234,7 @@ public struct MainWindowView: View {
                     telemetryCard(
                         icon: powerManager.battery.isCharging ? "bolt.batteryblock.fill" : (powerManager.battery.isOnACPower ? "powerplug.fill" : "battery.100"),
                         title: "Battery Level",
-                        value: "\(powerManager.battery.batteryPercent)% \(powerManager.battery.isOnACPower ? "(AC)" : "(Batt)")",
+                        value: "\(powerManager.battery.batteryPercent)% \(powerManager.battery.isOnACPower ? "(AC Connected)" : "(Battery Power)")",
                         color: powerManager.battery.batteryPercent < 20 ? .red : .green
                     )
                     
@@ -319,7 +259,7 @@ public struct MainWindowView: View {
         }
     }
     
-    // MARK: - Controls Tab (Expanded with Hardware & Safety Controls)
+    // MARK: - Controls Tab (Streamlined & Enhanced Battery Threshold)
     private var controlsView: some View {
         VStack(spacing: 14) {
             // Instant Toggle Helper Control
@@ -368,60 +308,26 @@ public struct MainWindowView: View {
                     .padding(.horizontal, 4)
             }
             
-            // Live Assertions Inspector
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    HStack(spacing: 10) {
-                        Image(systemName: "gauge.badge.plus")
-                            .font(.system(size: 18))
-                            .foregroundColor(.green)
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Live Power Assertions Inspector")
-                                .font(.system(size: 13, weight: .bold))
-                            Text("View active macOS kernel assertions (PreventUserIdleSystemSleep)")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    Button(action: inspectAssertions) {
-                        Text(activeAssertionsText == nil ? "Inspect" : "Re-check")
-                            .font(.system(size: 12, weight: .semibold))
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.secondary.opacity(0.12))
-                            .cornerRadius(6)
-                    }
-                    .buttonStyle(.plain)
-                }
-                
-                if let text = activeAssertionsText {
-                    Text(text)
-                        .font(.system(size: 10, design: .monospaced))
-                        .foregroundColor(.primary)
-                        .padding(10)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .background(Color.secondary.opacity(0.08))
-                        .cornerRadius(6)
-                }
-            }
-            .padding(14)
-            .background(Color.secondary.opacity(0.04))
-            .cornerRadius(10)
-            
-            // Low Battery Protection Floor Slider
-            VStack(alignment: .leading, spacing: 8) {
+            // Improved Low Battery Protection Floor with Quick Presets
+            VStack(alignment: .leading, spacing: 10) {
                 HStack {
                     HStack(spacing: 10) {
                         Image(systemName: "battery.50")
-                            .font(.system(size: 18))
-                            .foregroundColor(.orange)
+                            .font(.system(size: 20))
+                            .foregroundColor(powerManager.battery.batteryPercent <= powerManager.battery.lowBatteryThreshold ? .red : .orange)
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Low Battery Cutoff Floor")
-                                .font(.system(size: 13, weight: .bold))
-                            Text("Automatically drops assertion if battery drops below safety threshold")
+                            HStack(spacing: 6) {
+                                Text("Low Battery Cutoff Floor")
+                                    .font(.system(size: 13, weight: .bold))
+                                Text("\(powerManager.battery.lowBatteryThreshold)%")
+                                    .font(.system(size: 12, weight: .heavy, design: .monospaced))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.orange.opacity(0.2))
+                                    .foregroundColor(.orange)
+                                    .cornerRadius(4)
+                            }
+                            Text("When unplugged, sleep prevention automatically halts if battery drops to this floor.")
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
                         }
@@ -438,18 +344,40 @@ public struct MainWindowView: View {
                 }
                 
                 if powerManager.battery.lowBatteryCutoffEnabled {
-                    HStack(spacing: 12) {
+                    VStack(alignment: .leading, spacing: 8) {
                         Slider(
                             value: Binding(
                                 get: { Double(powerManager.battery.lowBatteryThreshold) },
                                 set: { powerManager.battery.lowBatteryThreshold = Int($0) }
                             ),
-                            in: 5...30,
+                            in: 5...50,
                             step: 1
                         )
-                        Text("\(powerManager.battery.lowBatteryThreshold)%")
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .frame(width: 36)
+                        
+                        HStack(spacing: 6) {
+                            Text("Presets:")
+                                .font(.system(size: 11))
+                                .foregroundColor(.secondary)
+                            
+                            ForEach([10, 15, 20, 25, 30], id: \.self) { val in
+                                Button("\(val)%") {
+                                    powerManager.battery.lowBatteryThreshold = val
+                                }
+                                .font(.system(size: 11, weight: powerManager.battery.lowBatteryThreshold == val ? .bold : .medium))
+                                .padding(.horizontal, 8)
+                                .padding(.vertical, 4)
+                                .background(powerManager.battery.lowBatteryThreshold == val ? Color.green.opacity(0.25) : Color.secondary.opacity(0.12))
+                                .foregroundColor(powerManager.battery.lowBatteryThreshold == val ? .green : .primary)
+                                .cornerRadius(6)
+                                .buttonStyle(.plain)
+                            }
+                            
+                            Spacer()
+                            
+                            Text("Current: \(powerManager.battery.batteryPercent)%")
+                                .font(.system(size: 11, weight: .bold, design: .monospaced))
+                                .foregroundColor(powerManager.battery.batteryPercent <= 20 ? .red : .green)
+                        }
                     }
                 }
             }
@@ -485,11 +413,11 @@ public struct MainWindowView: View {
             .background(Color.secondary.opacity(0.04))
             .cornerRadius(10)
             
-            // Re-run Onboarding Tutorial & Permissions
+            // Tutorial & Permissions Setup
             actionCard(
                 icon: "sparkles",
-                title: "Re-run Welcome Tutorial & Presentation Setup",
-                desc: "Walk through the initial onboarding guide and configure presentation modes.",
+                title: "Tutorial & Permissions Setup",
+                desc: "Step through the setup guide, system privileges, and presentation preferences.",
                 actionTitle: "Launch Wizard"
             ) {
                 showOnboarding = true
@@ -626,7 +554,6 @@ public struct MainWindowView: View {
         isResettingAssertions = true
         resetMessage = nil
         DispatchQueue.global(qos: .userInitiated).async {
-            // Restore pmset disablesleep 0 and release power assertions
             self.powerManager.disable(reason: "System assertions reset by user")
             try? PrivilegeManager.shared.setDisableSleep(enabled: false)
             
@@ -636,36 +563,6 @@ public struct MainWindowView: View {
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
                     self.resetMessage = nil
                 }
-            }
-        }
-    }
-    
-    private func inspectAssertions() {
-        isInspectingAssertions = true
-        DispatchQueue.global(qos: .userInitiated).async {
-            let pipe = Pipe()
-            let process = Process()
-            process.executableURL = URL(fileURLWithPath: "/usr/bin/pmset")
-            process.arguments = ["-g", "assertions"]
-            process.standardOutput = pipe
-            try? process.run()
-            process.waitUntilExit()
-            
-            let data = pipe.fileHandleForReading.readDataToEndOfFile()
-            let output = String(data: data, encoding: .utf8) ?? "No assertion data available."
-            
-            // Extract the active assertions summary lines
-            let lines = output.components(separatedBy: "\n")
-            let relevant = lines.filter { line in
-                line.contains("PreventUserIdleSystemSleep") ||
-                line.contains("PreventSystemSleep") ||
-                line.contains("Listed by owning process") ||
-                line.contains("openlid")
-            }.prefix(6).joined(separator: "\n")
-            
-            DispatchQueue.main.async {
-                self.activeAssertionsText = relevant.isEmpty ? "No active sleep prevention assertions currently held by system." : relevant
-                self.isInspectingAssertions = false
             }
         }
     }

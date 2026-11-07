@@ -68,7 +68,7 @@ struct OpenLidApp: App {
                 }
                 .keyboardShortcut("o", modifiers: .command)
                 
-                Button("Welcome Tutorial & Permissions...") {
+                Button("Tutorial & Permissions...") {
                     AppPreferences.shared.resetOnboarding()
                     MainWindowManager.shared.showMainWindow()
                 }

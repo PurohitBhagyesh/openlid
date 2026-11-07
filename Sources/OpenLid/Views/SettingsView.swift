@@ -76,7 +76,7 @@ struct SettingsView: View {
                         }
                         .buttonStyle(.link)
                         
-                        Button("Re-run Welcome Tutorial ↗") {
+                        Button("Tutorial & Permissions ↗") {
                             AppPreferences.shared.resetOnboarding()
                             MainWindowManager.shared.showMainWindow()
                         }
@@ -109,22 +109,40 @@ struct SettingsView: View {
                     ))
                     
                     if powerManager.battery.lowBatteryCutoffEnabled {
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 6) {
                             HStack {
-                                Text("Battery cutoff threshold:")
+                                Text("Cutoff threshold:")
                                 Spacer()
                                 Text("\(powerManager.battery.lowBatteryThreshold)%")
-                                    .fontWeight(.semibold)
+                                    .fontWeight(.bold)
+                                    .foregroundColor(powerManager.battery.lowBatteryThreshold >= 20 ? .green : .orange)
                             }
+                            
                             Slider(
                                 value: Binding(
                                     get: { Double(powerManager.battery.lowBatteryThreshold) },
                                     set: { powerManager.battery.lowBatteryThreshold = Int($0) }
                                 ),
-                                in: 5...30,
+                                in: 5...50,
                                 step: 1
                             )
-                            Text("OpenLid will automatically disable sleep prevention and allow sleep if the battery reaches this level.")
+                            
+                            HStack(spacing: 6) {
+                                ForEach([10, 15, 20, 25, 30], id: \.self) { val in
+                                    Button("\(val)%") {
+                                        powerManager.battery.lowBatteryThreshold = val
+                                    }
+                                    .buttonStyle(.borderless)
+                                    .font(.system(size: 11, weight: powerManager.battery.lowBatteryThreshold == val ? .bold : .regular))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(powerManager.battery.lowBatteryThreshold == val ? Color.green.opacity(0.2) : Color.secondary.opacity(0.1))
+                                    .foregroundColor(powerManager.battery.lowBatteryThreshold == val ? .green : .secondary)
+                                    .cornerRadius(4)
+                                }
+                            }
+                            
+                            Text("Current battery is \(powerManager.battery.batteryPercent)%. If unplugged and charge drops to \(powerManager.battery.lowBatteryThreshold)%, OpenLid drops assertions to guarantee sleep and preserve remaining battery.")
                                 .font(.caption)
                                 .foregroundColor(.secondary)
                         }
