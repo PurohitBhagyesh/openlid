@@ -1,4 +1,4 @@
-// OpenLid Client Engine & Aesthetic Scroll Interaction
+// OpenLid Client Engine, OS Switcher & Kinetic Scroll Interaction
 
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  // 2. IntersectionObserver for Silky Scroll Reveals
+  // 2. IntersectionObserver for Scroll Reveals
   const revealElements = document.querySelectorAll('.reveal-on-scroll');
   if ('IntersectionObserver' in window) {
     const revealObserver = new IntersectionObserver((entries, obs) => {
@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }, {
       threshold: 0.08,
-      rootMargin: '0px 0px -50px 0px'
+      rootMargin: '0px 0px -40px 0px'
     });
 
     revealElements.forEach(el => revealObserver.observe(el));
@@ -35,13 +35,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 3. Dynamic Mouse Spotlight Glow on Cards
-  const interactiveCards = document.querySelectorAll('.download-card, .spec-card, .three-card, .live-status-card');
+  const interactiveCards = document.querySelectorAll('.download-card, .spec-card, .three-panoramic-card, .safety-item');
   interactiveCards.forEach(card => {
     card.addEventListener('mousemove', (e) => {
       const rect = card.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      card.style.background = `radial-gradient(450px circle at ${x}px ${y}px, rgba(16, 185, 129, 0.07), var(--bg-card) 75%)`;
+      card.style.background = `radial-gradient(500px circle at ${x}px ${y}px, rgba(16, 185, 129, 0.08), var(--bg-card) 75%)`;
     });
 
     card.addEventListener('mouseleave', () => {
@@ -49,74 +49,31 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 4. Local Menu Bar Engine Bridge (127.0.0.1:31415)
-  const statusHeading = document.getElementById('statusHeading');
-  const statusSub = document.getElementById('statusSub');
-  const toggleEngineBtn = document.getElementById('toggleEngineBtn');
-  const eyeStatusBadge = document.getElementById('eyeStatusBadge');
-  const valLid = document.getElementById('valLid');
-  const valPower = document.getElementById('valPower');
-  const valThermal = document.getElementById('valThermal');
-  const valAssertion = document.getElementById('valAssertion');
+  // 4. Cross-Platform OS Switcher (macOS vs Windows)
+  const btnTabMac = document.getElementById('btnTabMac');
+  const btnTabWin = document.getElementById('btnTabWin');
+  const panelMac = document.getElementById('panelMac');
+  const panelWin = document.getElementById('panelWin');
 
-  let isEnabled = true;
-  let isConnected = false;
+  if (btnTabMac && btnTabWin && panelMac && panelWin) {
+    btnTabMac.addEventListener('click', () => {
+      btnTabMac.classList.add('active');
+      btnTabWin.classList.remove('active');
+      panelMac.classList.add('active');
+      panelWin.classList.remove('active');
+    });
 
-  async function fetchTelemetry() {
-    try {
-      const res = await fetch('http://127.0.0.1:31415/api/status');
-      if (res.ok) {
-        const data = await res.json();
-        isConnected = true;
-        isEnabled = data.isEnabled;
+    btnTabWin.addEventListener('click', () => {
+      btnTabWin.classList.add('active');
+      btnTabMac.classList.remove('active');
+      panelWin.classList.add('active');
+      panelMac.classList.remove('active');
+    });
 
-        if (statusHeading) {
-          statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Inactive: Sleep Allowed';
-          statusHeading.style.color = isEnabled ? 'var(--accent-emerald-bright)' : 'var(--text-dim)';
-        }
-        if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
-        if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
-        
-        if (eyeStatusBadge) {
-          eyeStatusBadge.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-muted)';
-        }
-
-        if (valLid) valLid.textContent = data.isLidClosed ? 'Closed' : 'Open';
-        if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Power' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' ⚡️' : ''})`;
-        if (valThermal) valThermal.textContent = data.thermalState || 'Nominal (Cool)';
-        if (valAssertion) {
-          valAssertion.textContent = isEnabled ? 'Active (Sleep Disabled)' : 'Inactive';
-          valAssertion.style.color = isEnabled ? 'var(--accent-emerald-bright)' : 'var(--text-muted)';
-        }
-      }
-    } catch (e) {
-      if (!isConnected) {
-        if (statusHeading) statusHeading.textContent = 'Engine Standby';
-        if (statusSub) statusSub.textContent = 'Run OpenLid in menu bar to connect';
-        if (valLid) valLid.textContent = 'Open';
-        if (valPower) valPower.textContent = 'Battery (58%)';
-        if (valThermal) valThermal.textContent = 'Nominal (Cool)';
-        if (valAssertion) valAssertion.textContent = 'Standby';
-      }
+    // Auto-detect OS from navigator
+    const ua = navigator.userAgent || '';
+    if (ua.includes('Win')) {
+      btnTabWin.click();
     }
   }
-
-  if (toggleEngineBtn) {
-    toggleEngineBtn.addEventListener('click', async () => {
-      try {
-        await fetch('http://127.0.0.1:31415/api/toggle', { method: 'POST' });
-        setTimeout(fetchTelemetry, 250);
-      } catch (e) {
-        isEnabled = !isEnabled;
-        if (statusHeading) {
-          statusHeading.textContent = isEnabled ? 'Simulated: Awake' : 'Simulated: Sleep Allowed';
-          statusHeading.style.color = isEnabled ? 'var(--accent-emerald-bright)' : 'var(--text-dim)';
-        }
-        if (valAssertion) valAssertion.textContent = isEnabled ? 'Active' : 'Inactive';
-      }
-    });
-  }
-
-  fetchTelemetry();
-  setInterval(fetchTelemetry, 2500);
 });
