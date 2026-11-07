@@ -52,11 +52,16 @@ document.addEventListener('DOMContentLoaded', () => {
   const panelWin = document.getElementById('panelWin');
 
   if (btnTabMac && btnTabWin && panelMac && panelWin) {
+    const mailLinkMac = document.getElementById('mailLinkMac');
+    const mailLinkWin = document.getElementById('mailLinkWin');
+
     btnTabMac.addEventListener('click', () => {
       btnTabMac.classList.add('active');
       btnTabWin.classList.remove('active');
       panelMac.classList.add('active');
       panelWin.classList.remove('active');
+      if (mailLinkMac) mailLinkMac.style.borderColor = 'var(--accent)';
+      if (mailLinkWin) mailLinkWin.style.borderColor = '';
     });
 
     btnTabWin.addEventListener('click', () => {
@@ -64,11 +69,15 @@ document.addEventListener('DOMContentLoaded', () => {
       btnTabMac.classList.remove('active');
       panelWin.classList.add('active');
       panelMac.classList.remove('active');
+      if (mailLinkWin) mailLinkWin.style.borderColor = 'var(--accent)';
+      if (mailLinkMac) mailLinkMac.style.borderColor = '';
     });
 
     // Auto-detect OS
     if ((navigator.userAgent || '').includes('Win')) {
       btnTabWin.click();
+    } else {
+      btnTabMac.click();
     }
   }
 

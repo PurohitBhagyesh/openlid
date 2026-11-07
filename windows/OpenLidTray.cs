@@ -587,7 +587,7 @@ namespace OpenLid
 
                 var list = new Label
                 {
-                    Text = "1. Powercfg Lid Action: Configures LIDACTION to 'Do nothing'.\n\n2. SetThreadExecutionState: Engages ES_AWAYMODE_REQUIRED & ES_SYSTEM_REQUIRED.\n\n3. Hardware Watchdog: Polls battery status to halt sleep bypass below 15%.",
+                    Text = "1. Powercfg Lid Action: Configures LIDACTION to 'Do nothing'.\n\n2. SetThreadExecutionState: Engages ES_AWAYMODE_REQUIRED & ES_SYSTEM_REQUIRED.\n\n3. Hardware Watchdog: Continuous system & power state observation.",
                     Font = new Font("Segoe UI", 9.5f),
                     ForeColor = Color.FromArgb(220, 225, 235),
                     Location = new Point(40, 130),
@@ -649,7 +649,7 @@ namespace OpenLid
 
                 var btnDone = new Button
                 {
-                    Text = "Enter OpenLid ✓",
+                    Text = "Enter OpenLid",
                     Font = new Font("Segoe UI", 10, FontStyle.Bold),
                     BackColor = Color.FromArgb(16, 185, 129),
                     ForeColor = Color.Black,

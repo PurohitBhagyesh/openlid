@@ -267,7 +267,7 @@
             Compiled natively for Apple Silicon efficiency cores. Instantaneous wake, negligible RAM overhead, and native power assertion handles.
           </p>
           <div class="card-actions">
-            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn btn-primary btn-block">
+            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn btn-primary btn-block mac-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -276,6 +276,7 @@
               Download ZIP (.zip)
             </a>
             <span class="card-note">Includes OpenLid.app + CLI binary</span>
+            <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20macOS%20Support%20(Apple%20Silicon)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Apple%20Silicon%20(M1/M2/M3/M4):%0D%0A-%20MacBook%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email macOS Support ↗</a>
           </div>
         </div>
 
@@ -287,7 +288,7 @@
             Optimized for legacy Intel MacBook Pro and MacBook Air hardware with direct SMC sleep modulation and thermal monitoring.
           </p>
           <div class="card-actions">
-            <a href="downloads/OpenLid-Intel.zip" download class="btn btn-secondary btn-block">
+            <a href="downloads/OpenLid-Intel.zip" download class="btn btn-secondary btn-block mac-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -296,6 +297,7 @@
               Download ZIP (.zip)
             </a>
             <span class="card-note">Includes OpenLid.app + CLI binary</span>
+            <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20macOS%20Support%20(Intel)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Intel%20Mac:%0D%0A-%20MacBook%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email macOS Support ↗</a>
           </div>
         </div>
       </div>
@@ -318,7 +320,7 @@
             Manages Windows Power Schemes and engages Win32 SetThreadExecutionState AwayMode. Lives in the taskbar notification area.
           </p>
           <div class="card-actions">
-            <a href="downloads/OpenLid-Windows-x64.zip" download class="btn btn-primary btn-block">
+            <a href="downloads/OpenLid-Windows-x64.zip" download class="btn btn-primary btn-block win-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -327,6 +329,7 @@
               Download ZIP (.zip)
             </a>
             <span class="card-note">Includes OpenLidTray.exe + PowerShell scripts</span>
+            <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Windows%20Support%20(x64)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Windows%20(x64):%0D%0A-%20Laptop%20Model:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email Windows Support ↗</a>
           </div>
         </div>
 
@@ -338,7 +341,7 @@
             Native compilation for modern ARM-based Windows devices. Direct power management with zero emulation layer.
           </p>
           <div class="card-actions">
-            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn btn-secondary btn-block">
+            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn btn-secondary btn-block win-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -347,6 +350,7 @@
               Download ZIP (.zip)
             </a>
             <span class="card-note">Native Snapdragon ARM64 binary</span>
+            <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Windows%20Support%20(ARM64)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Windows%20(ARM64):%0D%0A-%20Device:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email Windows Support ↗</a>
           </div>
         </div>
       </div>
@@ -409,9 +413,9 @@
       </div>
 
       <div class="safety-card">
-        <h3 class="safety-head">Battery Cutoff Floor</h3>
+        <h3 class="safety-head">Hardware Sentinel</h3>
         <p class="safety-text">
-          When running on battery, sleep prevention halts automatically if charge drops below 15%, preventing unexpected shutdowns while unplugged.
+          Continuous observation of hardware power sources, clamshell state transitions, and real-time AC adapter connections via native IOKit and Win32.
         </p>
       </div>
 
@@ -690,8 +694,8 @@
             <span class="option-badge">GitHub ↗</span>
           </a>
 
-          <!-- Direct Email -->
-          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device%20(Mac/Windows):%0D%0A-%20OS%20Version:%0D%0A-%20Description%20of%20what%20happened:%0D%0A" class="report-option-card">
+          <!-- Direct Email (macOS Customized) -->
+          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(macOS)&body=Hi,%0D%0A%0D%0AI%20am%20reporting%20a%20problem%20with%20OpenLid%20for%20macOS:%0D%0A-%20Mac%20Model%20(MacBook%20Pro%20/%20Air):%0D%0A-%20macOS%20Version:%0D%0A-%20Chip%20(Apple%20Silicon%20M1/M2/M3/M4%20or%20Intel):%0D%0A-%20Issue%20Description:%0D%0A" class="report-option-card" id="mailLinkMac">
             <div class="option-icon email-icon">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <rect width="20" height="16" x="2" y="4" rx="2"/>
@@ -699,10 +703,25 @@
               </svg>
             </div>
             <div class="option-content">
-              <div class="option-title">Email Bug Report Directly</div>
-              <div class="option-sub">Click to compose email with system specs & crash logs</div>
+              <div class="option-title">Email Developer (macOS Support)</div>
+              <div class="option-sub">Mac template: MacBook model, macOS version & logs</div>
             </div>
-            <span class="option-badge">Send Email ↗</span>
+            <span class="option-badge">Mac Mail ↗</span>
+          </a>
+
+          <!-- Direct Email (Windows Customized) -->
+          <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(Windows)&body=Hi,%0D%0A%0D%0AI%20am%20reporting%20a%20problem%20with%20OpenLid%20for%20Windows:%0D%0A-%20Laptop%20Manufacturer%20&%20Model:%0D%0A-%20Windows%20Version%20(Windows%2011%20/%2010):%0D%0A-%20Architecture%20(x64%20or%20ARM64):%0D%0A-%20Issue%20Description:%0D%0A" class="report-option-card" id="mailLinkWin">
+            <div class="option-icon email-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title">Email Developer (Windows Support)</div>
+              <div class="option-sub">Windows template: Laptop model, Windows version & power state</div>
+            </div>
+            <span class="option-badge">Windows Mail ↗</span>
           </a>
         </div>
       </div>

@@ -39,17 +39,6 @@ public final class PowerManager: ObservableObject {
     }
     
     private func setupSafetyHooks() {
-        // Battery safety hook
-        battery.onLowBatteryThresholdReached = { [weak self] in
-            guard let self = self, self.isEnabled else { return }
-            let msg = "Low battery safety cutoff (\(self.battery.batteryPercent)% remaining)"
-            NotificationManager.shared.sendNotification(
-                title: "OpenLid Battery Guard",
-                body: "Battery dropped to \(self.battery.batteryPercent)%. Restored normal sleep to prevent total drain."
-            )
-            self.disable(reason: msg)
-        }
-        
         // Thermal safety hook
         thermal.onOverheatingDetected = { [weak self] in
             guard let self = self, self.isEnabled else { return }

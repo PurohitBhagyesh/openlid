@@ -285,7 +285,7 @@ public struct MainWindowView: View {
                 icon: "arrow.clockwise",
                 title: "Refresh Hardware Monitors",
                 desc: "Queries IOKit, AppleClamshellState, and IOPS power source registers immediately.",
-                actionTitle: hardwareRefreshedJustNow ? "Refreshed ✓" : "Sync Now"
+                actionTitle: hardwareRefreshedJustNow ? "Refreshed" : "Sync Now"
             ) {
                 refreshHardwareMonitors()
             }
@@ -307,83 +307,6 @@ public struct MainWindowView: View {
                     .frame(maxWidth: .infinity, alignment: .leading)
                     .padding(.horizontal, 4)
             }
-            
-            // Improved Low Battery Protection Floor with Quick Presets
-            VStack(alignment: .leading, spacing: 10) {
-                HStack {
-                    HStack(spacing: 10) {
-                        Image(systemName: "battery.50")
-                            .font(.system(size: 20))
-                            .foregroundColor(powerManager.battery.batteryPercent <= powerManager.battery.lowBatteryThreshold ? .red : .orange)
-                        VStack(alignment: .leading, spacing: 2) {
-                            HStack(spacing: 6) {
-                                Text("Low Battery Cutoff Floor")
-                                    .font(.system(size: 13, weight: .bold))
-                                Text("\(powerManager.battery.lowBatteryThreshold)%")
-                                    .font(.system(size: 12, weight: .heavy, design: .monospaced))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(Color.orange.opacity(0.2))
-                                    .foregroundColor(.orange)
-                                    .cornerRadius(4)
-                            }
-                            Text("When unplugged, sleep prevention automatically halts if battery drops to this floor.")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    Toggle("", isOn: Binding(
-                        get: { powerManager.battery.lowBatteryCutoffEnabled },
-                        set: { powerManager.battery.lowBatteryCutoffEnabled = $0 }
-                    ))
-                    .toggleStyle(.switch)
-                    .labelsHidden()
-                }
-                
-                if powerManager.battery.lowBatteryCutoffEnabled {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Slider(
-                            value: Binding(
-                                get: { Double(powerManager.battery.lowBatteryThreshold) },
-                                set: { powerManager.battery.lowBatteryThreshold = Int($0) }
-                            ),
-                            in: 5...50,
-                            step: 1
-                        )
-                        
-                        HStack(spacing: 6) {
-                            Text("Presets:")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                            
-                            ForEach([10, 15, 20, 25, 30], id: \.self) { val in
-                                Button("\(val)%") {
-                                    powerManager.battery.lowBatteryThreshold = val
-                                }
-                                .font(.system(size: 11, weight: powerManager.battery.lowBatteryThreshold == val ? .bold : .medium))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 4)
-                                .background(powerManager.battery.lowBatteryThreshold == val ? Color.green.opacity(0.25) : Color.secondary.opacity(0.12))
-                                .foregroundColor(powerManager.battery.lowBatteryThreshold == val ? .green : .primary)
-                                .cornerRadius(6)
-                                .buttonStyle(.plain)
-                            }
-                            
-                            Spacer()
-                            
-                            Text("Current: \(powerManager.battery.batteryPercent)%")
-                                .font(.system(size: 11, weight: .bold, design: .monospaced))
-                                .foregroundColor(powerManager.battery.batteryPercent <= 20 ? .red : .green)
-                        }
-                    }
-                }
-            }
-            .padding(14)
-            .background(Color.secondary.opacity(0.04))
-            .cornerRadius(10)
             
             // Thermal Overheating Guard
             HStack(spacing: 14) {

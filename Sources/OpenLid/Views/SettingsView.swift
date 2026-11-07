@@ -102,53 +102,7 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 
-                Section(header: Text("Safety & Battery Protection").font(.headline)) {
-                    Toggle("Auto-off on Low Battery", isOn: Binding(
-                        get: { powerManager.battery.lowBatteryCutoffEnabled },
-                        set: { powerManager.battery.lowBatteryCutoffEnabled = $0 }
-                    ))
-                    
-                    if powerManager.battery.lowBatteryCutoffEnabled {
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack {
-                                Text("Cutoff threshold:")
-                                Spacer()
-                                Text("\(powerManager.battery.lowBatteryThreshold)%")
-                                    .fontWeight(.bold)
-                                    .foregroundColor(powerManager.battery.lowBatteryThreshold >= 20 ? .green : .orange)
-                            }
-                            
-                            Slider(
-                                value: Binding(
-                                    get: { Double(powerManager.battery.lowBatteryThreshold) },
-                                    set: { powerManager.battery.lowBatteryThreshold = Int($0) }
-                                ),
-                                in: 5...50,
-                                step: 1
-                            )
-                            
-                            HStack(spacing: 6) {
-                                ForEach([10, 15, 20, 25, 30], id: \.self) { val in
-                                    Button("\(val)%") {
-                                        powerManager.battery.lowBatteryThreshold = val
-                                    }
-                                    .buttonStyle(.borderless)
-                                    .font(.system(size: 11, weight: powerManager.battery.lowBatteryThreshold == val ? .bold : .regular))
-                                    .padding(.horizontal, 6)
-                                    .padding(.vertical, 2)
-                                    .background(powerManager.battery.lowBatteryThreshold == val ? Color.green.opacity(0.2) : Color.secondary.opacity(0.1))
-                                    .foregroundColor(powerManager.battery.lowBatteryThreshold == val ? .green : .secondary)
-                                    .cornerRadius(4)
-                                }
-                            }
-                            
-                            Text("Current battery is \(powerManager.battery.batteryPercent)%. If unplugged and charge drops to \(powerManager.battery.lowBatteryThreshold)%, OpenLid drops assertions to guarantee sleep and preserve remaining battery.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        .padding(.vertical, 4)
-                    }
-                    
+                Section(header: Text("Thermal Safety Guard").font(.headline)) {
                     Toggle("Thermal Overheating Guard", isOn: Binding(
                         get: { powerManager.thermal.thermalProtectionEnabled },
                         set: { powerManager.thermal.thermalProtectionEnabled = $0 }

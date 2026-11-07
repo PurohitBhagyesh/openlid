@@ -157,7 +157,7 @@ public struct OnboardingView: View {
                 permissionRow(
                     icon: "bell.badge.fill",
                     title: "Safety Notifications",
-                    desc: "Alerts you when thermal pressure is high or battery reaches cutoff floor.",
+                    desc: "Alerts you when thermal pressure is high or safety events occur.",
                     isGranted: true
                 )
                 
@@ -264,7 +264,7 @@ public struct OnboardingView: View {
                             
                             Spacer()
                             
-                            Image(systemName: preferences.presentationMode == mode ? "checkmark.circle.fill" : "circle")
+                            Image(systemName: preferences.presentationMode == mode ? "circle.inset.filled" : "circle")
                                 .font(.system(size: 20))
                                 .foregroundColor(preferences.presentationMode == mode ? .green : Color.white.opacity(0.25))
                         }
@@ -285,18 +285,14 @@ public struct OnboardingView: View {
                 preferences.hasCompletedOnboarding = true
                 onComplete()
             }) {
-                HStack(spacing: 8) {
-                    Text("Enter OpenLid")
-                        .font(.system(size: 14, weight: .bold))
-                    Image(systemName: "checkmark")
-                        .font(.system(size: 12, weight: .heavy))
-                }
-                .foregroundColor(.black)
-                .frame(maxWidth: 240)
-                .padding(.vertical, 12)
-                .background(Color.green)
-                .cornerRadius(10)
-                .shadow(color: Color.green.opacity(0.4), radius: 10, y: 3)
+                Text("Enter OpenLid")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(.black)
+                    .frame(maxWidth: 240)
+                    .padding(.vertical, 12)
+                    .background(Color.green)
+                    .cornerRadius(10)
+                    .shadow(color: Color.green.opacity(0.4), radius: 10, y: 3)
             }
             .buttonStyle(.plain)
             .padding(.top, 10)
