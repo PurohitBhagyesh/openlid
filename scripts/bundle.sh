@@ -41,3 +41,4 @@ echo "  open \"$APP_DIR\""
 echo ""
 echo "To install to /Applications and /usr/local/bin:"
 echo "  ./scripts/install.sh"
+

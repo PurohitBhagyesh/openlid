@@ -146,3 +146,4 @@ MacBooks vent heat partially through the keyboard and display hinge assembly.
 ## 📄 License
 
 MIT License. Feel free to use, modify, and distribute.
+

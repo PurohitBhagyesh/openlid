@@ -71,3 +71,4 @@ public final class BatteryMonitor: ObservableObject {
         }
     }
 }
+

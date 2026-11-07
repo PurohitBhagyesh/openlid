@@ -40,3 +40,4 @@ final class OpenLidCoreTests: XCTestCase {
         XCTAssertEqual(SessionPreset.hour2.duration, 120 * 60)
     }
 }
+

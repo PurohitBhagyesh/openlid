@@ -13,6 +13,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             PowerManager.shared.cleanup()
             exit(0)
         }
+        
+        // Handle auto-awake on user login
+        LaunchAtLoginManager.shared.handleAppLaunch()
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -34,3 +37,4 @@ struct OpenLidApp: App {
         .menuBarExtraStyle(.window)
     }
 }
+

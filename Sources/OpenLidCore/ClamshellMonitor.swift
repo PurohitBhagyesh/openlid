@@ -50,3 +50,4 @@ public final class ClamshellMonitor: ObservableObject {
         return false
     }
 }
+

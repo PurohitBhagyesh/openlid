@@ -60,3 +60,4 @@ public final class ThermalMonitor: ObservableObject {
         return thermalState == .serious || thermalState == .critical
     }
 }
+

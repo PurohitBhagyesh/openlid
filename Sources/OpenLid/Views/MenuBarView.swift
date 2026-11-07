@@ -12,14 +12,14 @@ struct MenuBarView: View {
             // Header
             HStack(alignment: .center) {
                 HStack(spacing: 8) {
-                    Image(systemName: "macbook.gen2")
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(powerManager.isEnabled ? .green : .accentColor)
+                    Image(systemName: powerManager.isEnabled ? "eye.fill" : "eye.slash")
+                        .font(.system(size: 19, weight: .bold))
+                        .foregroundColor(powerManager.isEnabled ? .green : .secondary)
                     
                     VStack(alignment: .leading, spacing: 1) {
                         Text("OpenLid")
                             .font(.system(size: 15, weight: .bold))
-                        Text(powerManager.isEnabled ? "Running in Clamshell Mode" : "Normal Sleep Mode")
+                        Text(powerManager.isEnabled ? "Awake & Vigilant" : "Normal Sleep Mode")
                             .font(.system(size: 11))
                             .foregroundColor(.secondary)
                     }
@@ -28,7 +28,7 @@ struct MenuBarView: View {
                 Spacer()
                 
                 // Status badge
-                Text(powerManager.isEnabled ? "ACTIVE" : "OFF")
+                Text(powerManager.isEnabled ? "AWAKE" : "ASLEEP")
                     .font(.system(size: 10, weight: .heavy))
                     .padding(.horizontal, 8)
                     .padding(.vertical, 3)
@@ -58,17 +58,17 @@ struct MenuBarView: View {
                                     .scaleEffect(0.6)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
                             } else {
-                                Image(systemName: "power")
-                                    .font(.system(size: 16, weight: .bold))
+                                Image(systemName: powerManager.isEnabled ? "eye.fill" : "eye.slash")
+                                    .font(.system(size: 17, weight: .bold))
                                     .foregroundColor(powerManager.isEnabled ? .white : .primary)
                             }
                         }
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Text(powerManager.isEnabled ? "Keep Awake is ON" : "Keep Awake with Lid Closed")
+                            Text(powerManager.isEnabled ? "Mac is Awake (Eye Vigilant)" : "Keep Awake with Lid Closed")
                                 .font(.system(size: 13, weight: .semibold))
                                 .foregroundColor(.primary)
-                            Text(powerManager.isEnabled ? "Mac continues running even if lid is closed" : "Click to prevent sleep when closing lid")
+                            Text(powerManager.isEnabled ? "Mac continues running even if lid is closed" : "Click to keep Mac awake when closing lid")
                                 .font(.system(size: 11))
                                 .foregroundColor(.secondary)
                         }
@@ -335,3 +335,4 @@ struct TelemetryCard: View {
         .cornerRadius(6)
     }
 }
+

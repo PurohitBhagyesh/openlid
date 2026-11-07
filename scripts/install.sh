@@ -29,3 +29,4 @@ echo ""
 echo "🎉 OpenLid installed successfully!"
 echo "• Launch from Applications or Spotlight: OpenLid"
 echo "• Or run from Terminal: openlid on"
+

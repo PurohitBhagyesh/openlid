@@ -49,6 +49,23 @@ struct SettingsView: View {
                     .foregroundColor(.secondary)
             }
             
+            Section(header: Text("Startup & Login Behavior").font(.headline)) {
+                Toggle("Launch OpenLid at Login", isOn: Binding(
+                    get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
+                    set: { newValue in
+                        try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: newValue)
+                    }
+                ))
+                
+                Toggle("Auto-Awake on Login", isOn: Binding(
+                    get: { LaunchAtLoginManager.shared.awakeOnLogin },
+                    set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
+                ))
+                Text("When enabled, OpenLid automatically awakens your Mac in closed-lid mode as soon as you log in.")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+            
             Section(header: Text("Privileges & Quick Toggle").font(.headline)) {
                 VStack(alignment: .leading, spacing: 8) {
                     HStack {
@@ -126,3 +143,4 @@ struct SettingsView: View {
         }
     }
 }
+

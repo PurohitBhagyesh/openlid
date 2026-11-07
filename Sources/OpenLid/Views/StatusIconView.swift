@@ -18,13 +18,12 @@ struct StatusIconView: View {
     }
     
     private var iconName: String {
-        if powerManager.clamshell.isLidClosed {
-            return "display.trianglebadge.exclamationmark" // or special closed-lid indicator
-        }
         if powerManager.isEnabled {
-            return "macbook.gen2"
+            // Open, vigilant eye when awake
+            return powerManager.clamshell.isLidClosed ? "eye.circle.fill" : "eye.fill"
         } else {
-            return "macbook"
+            // Closed/slashed eye when sleep is allowed
+            return "eye.slash"
         }
     }
     
@@ -32,6 +31,7 @@ struct StatusIconView: View {
         if powerManager.isEnabled {
             return .green
         }
-        return .primary
+        return .secondary
     }
 }
+
