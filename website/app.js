@@ -1,9 +1,40 @@
-// OpenLid Client Engine, OS Switcher & Kinetic Scroll Interaction
+// OpenLid Web Engine — Eye Theme Switcher & System Integration
 
 document.addEventListener('DOMContentLoaded', () => {
   'use strict';
 
-  // 1. Top Aesthetic Scroll Progress Bar
+  // 1. The Eye Symbol Theme Switcher (Dark & Light Mode)
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeLabel = document.getElementById('themeLabel');
+  const currentTheme = localStorage.getItem('openlid_theme') || 
+                       (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('openlid_theme', theme);
+    if (themeLabel) {
+      themeLabel.textContent = theme === 'dark' ? 'Dark Mode' : 'Light Mode';
+    }
+  }
+
+  // Initial Theme
+  applyTheme(currentTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const activeTheme = document.documentElement.getAttribute('data-theme') || 'dark';
+      const newTheme = activeTheme === 'dark' ? 'light' : 'dark';
+      
+      // Animate eye blink
+      themeToggleBtn.style.transform = 'scale(0.92)';
+      setTimeout(() => {
+        applyTheme(newTheme);
+        themeToggleBtn.style.transform = 'scale(1)';
+      }, 100);
+    });
+  }
+
+  // 2. Top Scroll Progress Bar
   const progressBar = document.getElementById('scrollProgressBar');
   window.addEventListener('scroll', () => {
     const scrollTop = window.scrollY || document.documentElement.scrollTop;
@@ -14,42 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, { passive: true });
 
-  // 2. IntersectionObserver for Scroll Reveals
-  const revealElements = document.querySelectorAll('.reveal-on-scroll');
-  if ('IntersectionObserver' in window) {
-    const revealObserver = new IntersectionObserver((entries, obs) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('is-revealed');
-          obs.unobserve(entry.target);
-        }
-      });
-    }, {
-      threshold: 0.08,
-      rootMargin: '0px 0px -40px 0px'
-    });
-
-    revealElements.forEach(el => revealObserver.observe(el));
-  } else {
-    revealElements.forEach(el => el.classList.add('is-revealed'));
-  }
-
-  // 3. Dynamic Mouse Spotlight Glow on Cards
-  const interactiveCards = document.querySelectorAll('.download-card, .spec-card, .three-panoramic-card, .safety-item');
-  interactiveCards.forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      card.style.background = `radial-gradient(500px circle at ${x}px ${y}px, rgba(16, 185, 129, 0.08), var(--bg-card) 75%)`;
-    });
-
-    card.addEventListener('mouseleave', () => {
-      card.style.background = '';
-    });
-  });
-
-  // 4. Cross-Platform OS Switcher (macOS vs Windows)
+  // 3. Cross-Platform OS Switcher (macOS vs Windows)
   const btnTabMac = document.getElementById('btnTabMac');
   const btnTabWin = document.getElementById('btnTabWin');
   const panelMac = document.getElementById('panelMac');
@@ -70,10 +66,67 @@ document.addEventListener('DOMContentLoaded', () => {
       panelMac.classList.remove('active');
     });
 
-    // Auto-detect OS from navigator
-    const ua = navigator.userAgent || '';
-    if (ua.includes('Win')) {
+    // Auto-detect OS
+    if ((navigator.userAgent || '').includes('Win')) {
       btnTabWin.click();
     }
   }
+
+  // 4. Live Connection to Local OpenLid Engine (127.0.0.1:31415)
+  const statusHeading = document.getElementById('statusHeading');
+  const statusSub = document.getElementById('statusSub');
+  const toggleEngineBtn = document.getElementById('toggleEngineBtn');
+  const valLid = document.getElementById('valLid');
+  const valPower = document.getElementById('valPower');
+  const valThermal = document.getElementById('valThermal');
+  const valAssertion = document.getElementById('valAssertion');
+
+  let isEnabled = true;
+
+  async function fetchTelemetry() {
+    try {
+      const res = await fetch('http://127.0.0.1:31415/api/status');
+      if (res.ok) {
+        const data = await res.json();
+        isEnabled = data.isEnabled;
+
+        if (statusHeading) {
+          statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
+          statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
+        }
+        if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
+        if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
+        
+        if (valLid) valLid.textContent = data.isLidClosed ? 'Closed 🔒' : 'Open 📖';
+        if (valPower) valPower.textContent = `${data.isOnACPower ? 'AC Connected' : 'Battery'} (${data.batteryPercent}%${data.isCharging ? ' ⚡️' : ''})`;
+        if (valThermal) valThermal.textContent = data.thermalState || 'Nominal';
+        if (valAssertion) {
+          valAssertion.textContent = isEnabled ? 'Active (Awake)' : 'Inactive';
+          valAssertion.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-muted)';
+        }
+      }
+    } catch (e) {
+      // Local engine standby
+      if (statusHeading) statusHeading.textContent = 'Local Engine Standby';
+      if (statusSub) statusSub.textContent = 'Launch OpenLid in menu bar to connect';
+    }
+  }
+
+  if (toggleEngineBtn) {
+    toggleEngineBtn.addEventListener('click', async () => {
+      try {
+        await fetch('http://127.0.0.1:31415/api/toggle', { method: 'POST' });
+        setTimeout(fetchTelemetry, 250);
+      } catch (e) {
+        isEnabled = !isEnabled;
+        if (statusHeading) {
+          statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
+        }
+        if (valAssertion) valAssertion.textContent = isEnabled ? 'Active' : 'Inactive';
+      }
+    });
+  }
+
+  fetchTelemetry();
+  setInterval(fetchTelemetry, 2000);
 });

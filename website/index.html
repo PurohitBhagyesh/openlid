@@ -1,21 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OpenLid — Keep Your Laptop Running With Lid Closed (macOS & Windows)</title>
-  
-  <!-- Taskbar, PWA & Browser Branding -->
+
+  <!-- Taskbar, PWA & Browser Identity -->
   <meta name="application-name" content="OpenLid">
   <meta name="apple-mobile-web-app-title" content="OpenLid">
   <meta name="theme-color" content="#060709">
-  <meta name="description" content="OpenLid prevents laptops from sleeping when the lid is closed. Native macOS menu bar and Windows system tray utility with kernel sleep assertions and thermal safety guards.">
+  <meta name="description" content="OpenLid keeps your MacBook and Windows laptop running with the lid closed. Native menu bar and system tray utility with kernel sleep assertions and thermal safety breakers.">
 
   <!-- Open Graph & Social Cards -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="OpenLid">
   <meta property="og:title" content="OpenLid — Keep Your Laptop Running With Lid Closed">
-  <meta property="og:description" content="Native closed-lid sleep prevention for macOS (Apple Silicon & Intel) and Windows (x64 & ARM64). Zero external displays or dummy HDMI plugs required.">
+  <meta property="og:description" content="Native closed-lid sleep prevention for macOS (Apple Silicon & Intel) and Windows (x64 & ARM64). Zero external displays or dummy plugs required.">
   <meta property="og:url" content="https://openlid.devs.li/">
   <link rel="canonical" href="https://openlid.devs.li/">
 
@@ -44,12 +44,9 @@
 </head>
 <body>
 
-  <!-- Top Aesthetic Scroll Progress Bar -->
+  <!-- Top Scroll Progress Bar -->
   <div class="scroll-progress-bar" id="scrollProgressBar"></div>
-
-  <!-- Ambient Glow Gradients -->
-  <div class="ambient-glow-1"></div>
-  <div class="ambient-glow-2"></div>
+  <div class="ambient-glow"></div>
 
   <!-- Sticky Glass Navigation -->
   <nav class="navbar container">
@@ -65,7 +62,6 @@
     </a>
 
     <div class="nav-links">
-      <a href="#simulation" class="nav-link">3D Stage</a>
       <a href="#downloads" class="nav-link">Downloads</a>
       <a href="#architecture" class="nav-link">Architecture</a>
       <a href="#safety" class="nav-link">Safety</a>
@@ -78,6 +74,15 @@
     </div>
 
     <div class="nav-actions">
+      <!-- Signature Eye Theme Switcher (Dark / Light Mode) -->
+      <button class="theme-toggle-eye" id="themeToggleBtn" aria-label="Toggle Theme" title="Click to toggle Awake Theme (Dark / Light)">
+        <svg class="theme-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+          <circle class="theme-eye-pupil" cx="12" cy="12" r="3" fill="currentColor"/>
+        </svg>
+        <span class="theme-label" id="themeLabel">Dark Mode</span>
+      </button>
+
       <a href="#downloads" class="btn-primary">
         Get OpenLid
       </a>
@@ -85,7 +90,7 @@
   </nav>
 
   <!-- Hero Section -->
-  <header class="hero container reveal-on-scroll">
+  <header class="hero container">
     <div class="hero-badge">
       <span class="status-indicator"></span>
       Universal Release • Native macOS (Apple Silicon & Intel) & Windows (11/10)
@@ -97,7 +102,7 @@
     </h1>
 
     <p class="hero-lead">
-      No external monitors, power adapters, or dummy HDMI plugs required. OpenLid controls kernel sleep assertions from your menu bar or system tray with automatic thermal overheating breakers and battery floor margins.
+      No external monitors, power adapters, or dummy HDMI plugs required. OpenLid controls kernel sleep assertions from your status bar with automatic thermal overheating breakers and smart battery floor cutoffs.
     </p>
 
     <div class="hero-cta-group">
@@ -109,69 +114,57 @@
         </svg>
         Download OpenLid
       </a>
-      <a href="#simulation" class="btn-hero-secondary">
-        Interactive 3D Stage ↓
+      <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="btn-hero-secondary">
+        View on GitHub →
       </a>
+    </div>
+
+    <!-- Live Telemetry & Awake Controller -->
+    <div class="live-controller-card" id="liveController">
+      <div class="ctrl-header">
+        <div class="ctrl-identity">
+          <div class="ctrl-eye-bubble">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <div>
+            <div class="ctrl-title" id="statusHeading">Engine Active: Awake</div>
+            <div class="ctrl-sub" id="statusSub">Connected to local OpenLid menu bar app</div>
+          </div>
+        </div>
+        <button class="btn-toggle-telemetry" id="toggleEngineBtn">Toggle Sleep Bypass</button>
+      </div>
+
+      <div class="telemetry-row">
+        <div class="telemetry-box">
+          <span class="telemetry-label">CLAMSHELL SENSOR</span>
+          <span class="telemetry-val" id="valLid">Open 📖</span>
+        </div>
+        <div class="telemetry-box">
+          <span class="telemetry-label">POWER SOURCE</span>
+          <span class="telemetry-val" id="valPower">Battery (42%)</span>
+        </div>
+        <div class="telemetry-box">
+          <span class="telemetry-label">THERMAL PRESSURE</span>
+          <span class="telemetry-val" id="valThermal">Fair (Warm)</span>
+        </div>
+        <div class="telemetry-box">
+          <span class="telemetry-label">ASSERTION STATE</span>
+          <span class="telemetry-val" id="valAssertion" style="color: var(--accent-emerald)">Active (Awake)</span>
+        </div>
+      </div>
     </div>
   </header>
 
   <!-- =====================================================================
-       WHOLE-PAGE 3D CLAMSHELL STAGE
-       ===================================================================== -->
-  <section id="simulation" class="three-stage container reveal-on-scroll">
-    <div class="section-title-wrap">
-      <h2 class="section-heading">Interactive 3D Clamshell Engine</h2>
-      <p class="section-subheading">
-        Experience real-time clamshell sleep prevention. Scroll to fold the lid, or click and drag to orbit in 360°.
-      </p>
-    </div>
-
-    <div class="three-panoramic-card">
-      <div class="three-toolbar-top">
-        <div class="three-title-group">
-          <span class="badge-3d">WebGL 3D</span>
-          <span class="three-stage-title">Clamshell Physics Stage</span>
-        </div>
-
-        <div class="hud-lid-state" id="hudLidState">
-          <span class="badge-blue">📖 SCREEN OPEN</span> • <span>Display Active</span>
-        </div>
-      </div>
-
-      <!-- Three.js Canvas Viewport -->
-      <div id="threeContainer" class="three-viewport">
-        <div class="three-hud-pill">
-          🖱️ Drag to rotate 360° • Scroll down to watch the lid fold closed
-        </div>
-      </div>
-
-      <!-- Interactive 3D Controls Bar -->
-      <div class="three-controls-bottom">
-        <div class="lid-presets">
-          <button class="btn-preset" id="btnLidOpen">📖 Open (112°)</button>
-          <button class="btn-preset" id="btnLidHalf">📐 Half (48°)</button>
-          <button class="btn-preset" id="btnLidClose">🔒 Close (0° Clamshell)</button>
-        </div>
-
-        <div class="slider-group">
-          <span id="lidAngleDisplay">Lid: <strong>112° (Fully Open)</strong></span>
-          <input type="range" class="lid-range" id="lidSlider" min="0" max="125" value="112" step="1">
-        </div>
-
-        <button class="btn-engine-toggle" id="btn3dEngineToggle">
-          OpenLid Engine: ACTIVE 🟢
-        </button>
-      </div>
-    </div>
-  </section>
-
-  <!-- =====================================================================
        DOWNLOADS SECTION (CROSS-PLATFORM: macOS & WINDOWS)
        ===================================================================== -->
-  <section id="downloads" class="section container reveal-on-scroll">
+  <section id="downloads" class="section container">
     <div class="section-title-wrap">
       <h2 class="section-heading">Download OpenLid</h2>
-      <p class="section-subheading">Standalone `.dmg` and `.zip` packages compiled natively for each platform architecture.</p>
+      <p class="section-subheading">Choose your platform for standalone installers and portable archives.</p>
     </div>
 
     <!-- OS Switcher Tabs -->
@@ -260,7 +253,7 @@
           </p>
 
           <div class="download-action-group">
-            <a href="downloads/OpenLid-Intel.dmg" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #042f24;">
+            <a href="downloads/OpenLid-Intel.dmg" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #ffffff;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -277,7 +270,7 @@
       </div>
 
       <!-- Homebrew Box -->
-      <div class="terminal-install-box reveal-on-scroll">
+      <div class="terminal-install-box">
         <div class="cli-tab-bar">
           <span class="tab-label">Homebrew Cask</span>
         </div>
@@ -351,7 +344,7 @@
           </p>
 
           <div class="download-action-group">
-            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #042f24;">
+            <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn-download btn-secondary-download" style="background: var(--accent-emerald); color: #ffffff;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
@@ -364,8 +357,8 @@
         </div>
       </div>
 
-      <!-- Windows Winget & PowerShell Box -->
-      <div class="terminal-install-box reveal-on-scroll">
+      <!-- Windows PowerShell Box -->
+      <div class="terminal-install-box">
         <div class="cli-tab-bar">
           <span class="tab-label">Windows PowerShell (Zero-Install)</span>
         </div>
@@ -380,7 +373,7 @@
   <!-- =====================================================================
        ARCHITECTURE SECTION
        ===================================================================== -->
-  <section id="architecture" class="section container reveal-on-scroll">
+  <section id="architecture" class="section container">
     <div class="section-title-wrap">
       <h2 class="section-heading">How OpenLid Works</h2>
       <p class="section-subheading">Standard user-space tools fail when the clamshell closes. OpenLid intercepts OS-level power assertions cleanly.</p>
@@ -416,7 +409,7 @@
   <!-- =====================================================================
        HARDWARE SAFETY GUARDS
        ===================================================================== -->
-  <section id="safety" class="section container reveal-on-scroll">
+  <section id="safety" class="section container">
     <div class="safety-banner">
       <h2 class="safety-title">Hardware Safety by Design</h2>
       <p class="safety-desc">
@@ -466,11 +459,6 @@
     </div>
   </footer>
 
-  <!-- Three.js 3D Library -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <!-- Client Engine & OS Switcher -->
   <script src="app.js"></script>
-  <!-- 3D Clamshell Physics Engine -->
-  <script src="3d-viewer.js"></script>
 </body>
 </html>

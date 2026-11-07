@@ -6,27 +6,31 @@ cd "$DIR"
 
 echo "🚀 Building OpenLid for Apple Silicon (arm64)..."
 swift build -c release --triple arm64-apple-macosx
-ARM64_APP_BIN="$DIR/.build/out/Products/Release/OpenLid"
-ARM64_CLI_BIN="$DIR/.build/out/Products/Release/OpenLidCLI"
-mkdir -p "$DIR/.build/bin_arm64"
-cp "$ARM64_APP_BIN" "$DIR/.build/bin_arm64/OpenLid"
-cp "$ARM64_CLI_BIN" "$DIR/.build/bin_arm64/openlid"
+BIN_PATH="$(swift build -c release --triple arm64-apple-macosx --show-bin-path)"
+ARM64_APP_BIN="$BIN_PATH/OpenLid"
+ARM64_CLI_BIN="$BIN_PATH/OpenLidCLI"
+
+mkdir -p "$DIR/.build/bin_arm64_app" "$DIR/.build/bin_arm64_cli"
+cp "$ARM64_APP_BIN" "$DIR/.build/bin_arm64_app/OpenLid"
+cp "$ARM64_CLI_BIN" "$DIR/.build/bin_arm64_cli/openlid_cli"
 
 echo "🚀 Building OpenLid for Intel Macs (x86_64)..."
 swift build -c release --triple x86_64-apple-macosx
-X86_APP_BIN="$DIR/.build/out/Products/Release/OpenLid"
-X86_CLI_BIN="$DIR/.build/out/Products/Release/OpenLidCLI"
-mkdir -p "$DIR/.build/bin_x86"
-cp "$X86_APP_BIN" "$DIR/.build/bin_x86/OpenLid"
-cp "$X86_CLI_BIN" "$DIR/.build/bin_x86/openlid"
+BIN_PATH_X86="$(swift build -c release --triple x86_64-apple-macosx --show-bin-path)"
+X86_APP_BIN="$BIN_PATH_X86/OpenLid"
+X86_CLI_BIN="$BIN_PATH_X86/OpenLidCLI"
+
+mkdir -p "$DIR/.build/bin_x86_app" "$DIR/.build/bin_x86_cli"
+cp "$X86_APP_BIN" "$DIR/.build/bin_x86_app/OpenLid"
+cp "$X86_CLI_BIN" "$DIR/.build/bin_x86_cli/openlid_cli"
 
 DIST_DIR="$DIR/dist"
 rm -rf "$DIST_DIR"
 mkdir -p "$DIST_DIR"
 
 echo "🧬 Creating Universal 2 Mach-O binaries with lipo..."
-lipo -create "$DIR/.build/bin_arm64/OpenLid" "$DIR/.build/bin_x86/OpenLid" -output "$DIST_DIR/OpenLid-Universal-bin"
-lipo -create "$DIR/.build/bin_arm64/openlid" "$DIR/.build/bin_x86/openlid" -output "$DIST_DIR/openlid"
+lipo -create "$DIR/.build/bin_arm64_app/OpenLid" "$DIR/.build/bin_x86_app/OpenLid" -output "$DIST_DIR/OpenLid-Universal-bin"
+lipo -create "$DIR/.build/bin_arm64_cli/openlid_cli" "$DIR/.build/bin_x86_cli/openlid_cli" -output "$DIST_DIR/openlid"
 chmod +x "$DIST_DIR/openlid"
 
 # Function to assemble an app bundle
@@ -55,32 +59,19 @@ bundle_app "$DIST_DIR/OpenLid-Universal-bin" "$DIST_DIR/OpenLid.app"
 rm -f "$DIST_DIR/OpenLid-Universal-bin"
 
 echo "📦 Assembling Apple Silicon OpenLid-AppleSilicon.app..."
-bundle_app "$DIR/.build/bin_arm64/OpenLid" "$DIST_DIR/OpenLid-AppleSilicon.app"
+bundle_app "$DIR/.build/bin_arm64_app/OpenLid" "$DIST_DIR/OpenLid-AppleSilicon.app"
 
 echo "📦 Assembling Intel OpenLid-Intel.app..."
-bundle_app "$DIR/.build/bin_x86/OpenLid" "$DIST_DIR/OpenLid-Intel.app"
+bundle_app "$DIR/.build/bin_x86_app/OpenLid" "$DIST_DIR/OpenLid-Intel.app"
 
 echo "🗜 Creating release archives (each containing OpenLid.app)..."
-# Apple Silicon Zip
-TEMP_ZIP_ARM="$DIR/.build/zip_temp_arm"
-rm -rf "$TEMP_ZIP_ARM" && mkdir -p "$TEMP_ZIP_ARM"
-cp -R "$DIST_DIR/OpenLid-AppleSilicon.app" "$TEMP_ZIP_ARM/OpenLid.app"
-(cd "$TEMP_ZIP_ARM" && zip -rq "$DIST_DIR/OpenLid-AppleSilicon.zip" "OpenLid.app")
-rm -rf "$TEMP_ZIP_ARM"
-
-# Intel Zip
-TEMP_ZIP_X86="$DIR/.build/zip_temp_x86"
-rm -rf "$TEMP_ZIP_X86" && mkdir -p "$TEMP_ZIP_X86"
-cp -R "$DIST_DIR/OpenLid-Intel.app" "$TEMP_ZIP_X86/OpenLid.app"
-(cd "$TEMP_ZIP_X86" && zip -rq "$DIST_DIR/OpenLid-Intel.zip" "OpenLid.app")
-rm -rf "$TEMP_ZIP_X86"
-
-# Universal Zip
-(cd "$DIST_DIR" && zip -rq "OpenLid-Universal.zip" "OpenLid.app")
-
-# Copy zips to website downloads
-mkdir -p "$DIR/website/downloads"
-cp "$DIST_DIR"/*.zip "$DIR/website/downloads/"
+# Each archive contains the app bundle and CLI
+cd "$DIST_DIR"
+tar -czf "$DIST_DIR/OpenLid-Universal.tar.gz" OpenLid.app openlid
+zip -rq "$DIST_DIR/OpenLid-Universal.zip" OpenLid.app openlid
+zip -rq "$DIST_DIR/OpenLid-AppleSilicon.zip" OpenLid-AppleSilicon.app openlid
+zip -rq "$DIST_DIR/OpenLid-Intel.zip" OpenLid-Intel.app openlid
+cd "$DIR"
 
 echo "✅ Dual Architecture Build Complete!"
 echo "📍 Universal App:      $DIST_DIR/OpenLid.app"

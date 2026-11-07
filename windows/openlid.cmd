@@ -25,3 +25,4 @@ echo  OpenLid for Windows: ACTIVE (Eye Vigilant)
 echo  Your laptop will continue running with the lid closed.
 echo  Run "openlid.cmd off" to restore default sleep.
 echo =====================================================
+

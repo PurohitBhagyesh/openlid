@@ -1,4 +1,4 @@
-﻿# OpenLid for Windows — Instant Clamshell Sleep Prevention
+# OpenLid for Windows — Instant Clamshell Sleep Prevention
 # Usage: .\OpenLid.ps1 [-On | -Off | -Status | -Tray]
 
 param (
@@ -68,3 +68,4 @@ if ($Duration -gt 0) {
         Write-Host "`n🛑 OpenLid stopped. Default sleep restored." -ForegroundColor Yellow
     }
 }
+

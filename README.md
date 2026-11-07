@@ -21,7 +21,7 @@
 
 <p align="center">
   <a href="#-downloads">Downloads</a> •
-  <a href="#-interactive-3d-stage">3D Stage</a> •
+  <a href="#-features">Features</a> •
   <a href="#-macos-menu-bar">macOS Menu Bar</a> •
   <a href="#-windows-system-tray">Windows Tray</a> •
   <a href="#-cli-usage">CLI</a> •
@@ -74,18 +74,6 @@ brew install --cask openlid
 # Windows PowerShell Quick-Launch (Zero-Install)
 powershell -Command ".\windows\OpenLid.ps1 -On"
 ```
-
----
-
-## 🎮 Interactive 3D Stage
-
-OpenLid includes an interactive **WebGL 3D Clamshell Stage** on the official website:
-👉 **[https://openlid.devs.li](https://openlid.devs.li)** *(fallback: [openlid.vercel.app](https://openlid.vercel.app))*
-
-- **360° Physics Orbit**: Click and drag to inspect the laptop chassis, ports, and display assembly.
-- **Scroll-Driven Hinge Physics**: Watch the lid smoothly fold closed as you scroll through the technical architecture.
-- **Vigilant Energy Beam**: When closed at 0°, radiant emerald energy pulses from the seams demonstrating continuous CPU execution.
-- **Mode Toggle**: Switch between `OpenLid Engine: ACTIVE 🟢` and `Default OS Sleep 🟡` to observe real-time differences.
 
 ---
 
