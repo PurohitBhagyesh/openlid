@@ -287,7 +287,6 @@ document.addEventListener('DOMContentLoaded', () => {
   updateSnackQr(50);
 
   // Handle UPI Payments & Multi-App Chooser
-  const btnPayViaUpi = document.getElementById('btnPayViaUpi');
   const noUpiAlert = document.getElementById('noUpiAlert');
   const noUpiDesc = document.getElementById('noUpiDesc');
   const btnCloseNoUpi = document.getElementById('btnCloseNoUpi');
@@ -305,8 +304,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let targetUri = '';
 
     switch (scheme) {
+      case 'famapp':
       case 'fampay':
-        targetUri = `fampay://upi/pay?${query}`;
+        // FamApp registered iOS schemes: in.fampay.app://upi/pay? and famapp://upi/pay?
+        targetUri = `in.fampay.app://upi/pay?${query}`;
         break;
       case 'amazonpay':
         targetUri = `amazonpay://upi/pay?${query}`;
@@ -360,8 +361,22 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('pagehide', onAppOpen);
     document.addEventListener('visibilitychange', onVisibilityChange);
 
-    // Trigger specific app URL scheme
+    // Trigger primary app URL scheme
     window.location.href = targetUri;
+
+    // For FamApp on iOS: also attempt alternative scheme if in.fampay.app:// isn't caught
+    if (scheme === 'famapp' || scheme === 'fampay') {
+      setTimeout(() => {
+        if (!appOpened && !document.hidden && document.hasFocus()) {
+          window.location.href = `famapp://upi/pay?${query}`;
+        }
+      }, 350);
+      setTimeout(() => {
+        if (!appOpened && !document.hidden && document.hasFocus()) {
+          window.location.href = `fpupi://pay?${query}`;
+        }
+      }, 700);
+    }
 
     fallbackTimer = setTimeout(() => {
       window.removeEventListener('blur', onAppOpen);
@@ -386,12 +401,6 @@ document.addEventListener('DOMContentLoaded', () => {
       launchSpecificUpi(scheme, name);
     });
   });
-
-  if (btnPayViaUpi) {
-    btnPayViaUpi.addEventListener('click', () => {
-      launchSpecificUpi('upi', 'UPI App');
-    });
-  }
 
   // 6. Mobile Navigation Drawer Toggle
   const navToggleBtn = document.getElementById('navToggleBtn');
