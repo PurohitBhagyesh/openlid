@@ -924,6 +924,93 @@ body {
   font-weight: 600;
 }
 
+.upi-chooser-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 6px 0;
+}
+
+.upi-chooser-header {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.upi-apps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.upi-app-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 8px 4px;
+  background: var(--surface-alt);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.upi-app-btn:hover, .upi-app-btn:active {
+  background: var(--surface);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.upi-app-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: -0.2px;
+}
+
+.fam-badge { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.amz-badge { background: linear-gradient(135deg, #232f3e, #131921); color: #ff9900; border: 1px solid rgba(255,153,0,0.4); }
+.pe-badge { background: linear-gradient(135deg, #5f259f, #7c3aed); }
+.gpay-badge { background: linear-gradient(135deg, #4285f4, #0f9d58); }
+.paytm-badge { background: linear-gradient(135deg, #00b9f5, #002e6e); }
+.wa-badge { background: linear-gradient(135deg, #25d366, #128c7e); }
+
+.upi-generic-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 8px 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  border-radius: 6px;
+  background: var(--surface-alt);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.upi-generic-btn:hover {
+  background: var(--surface);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
 .upi-main-pay-btn {
   display: flex;
   align-items: center;
@@ -1068,6 +1155,15 @@ body {
     display: flex;
   }
   .snack-widget:hover .snack-pill {
+    background-color: var(--surface-alt);
+    border-color: var(--accent);
+  }
+
+  .share-widget:hover .share-card,
+  .share-card:hover {
+    display: flex;
+  }
+  .share-widget:hover .share-pill {
     background-color: var(--surface-alt);
     border-color: var(--accent);
   }
@@ -1785,9 +1881,15 @@ body {
   flex-shrink: 0;
 }
 
-.share-item-icon.link-icon {
-  background: rgba(16, 185, 129, 0.12);
+.share-item-icon.link-icon,
+.share-item-icon.copy-icon {
+  background: rgba(16, 185, 129, 0.15);
   color: #10b981;
+}
+
+.share-item-icon.share-sheet-icon {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
 }
 
 .share-item-icon.msg-icon {
@@ -1894,25 +1996,42 @@ body {
   }
 
   .snack-widget {
-    left: 14px;
-    bottom: 16px;
+    left: 12px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+
+  .snack-pill, .share-pill {
+    padding: 7px 13px;
+    font-size: 12px;
   }
 
   .snack-card {
-    left: 0;
-    width: calc(100vw - 28px);
-    max-width: 330px;
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: max(62px, calc(env(safe-area-inset-bottom) + 54px));
+    width: auto;
+    max-width: 360px;
+    margin: 0 auto;
+    max-height: 82vh;
+    overflow-y: auto;
+    z-index: 9999;
   }
 
   .share-widget {
-    right: 14px;
-    bottom: 16px;
+    right: 12px;
+    bottom: max(14px, env(safe-area-inset-bottom));
   }
 
   .share-card {
-    right: 0;
-    width: calc(100vw - 28px);
-    max-width: 330px;
+    position: fixed;
+    left: 14px;
+    right: 14px;
+    bottom: max(62px, calc(env(safe-area-inset-bottom) + 54px));
+    width: auto;
+    max-width: 360px;
+    margin: 0 auto;
+    z-index: 9999;
   }
 
   .modal-card {

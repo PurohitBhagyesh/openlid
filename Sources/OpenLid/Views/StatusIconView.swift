@@ -3,16 +3,22 @@ import OpenLidCore
 
 struct StatusIconView: View {
     @ObservedObject var powerManager: PowerManager
+    @ObservedObject var timer: SessionTimer
+    
+    init(powerManager: PowerManager = .shared) {
+        self.powerManager = powerManager
+        self.timer = powerManager.timer
+    }
     
     var body: some View {
         HStack(spacing: 4) {
             Image(systemName: iconName)
                 .renderingMode(.template)
-                .imageScale(.medium)
+                .font(.system(size: 14, weight: .semibold))
             
-            if powerManager.isEnabled && powerManager.timer.isTimerRunning {
-                Text(powerManager.timer.formattedRemainingTime)
-                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            if powerManager.isEnabled && timer.isTimerRunning {
+                Text(timer.formattedRemainingTime)
+                    .font(.system(size: 11, weight: .bold, design: .monospaced))
             }
         }
     }

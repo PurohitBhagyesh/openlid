@@ -132,6 +132,8 @@ namespace OpenLid
             {
                 MainWindow = new OpenLidMainWindow();
             }
+            MainWindow.ShowInTaskbar = true;
+            MainWindow.Icon = CreateEyeIcon(IsAwake);
             MainWindow.Show();
             MainWindow.WindowState = FormWindowState.Normal;
             MainWindow.BringToFront();
@@ -481,6 +483,8 @@ namespace OpenLid
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
+            ShowInTaskbar = true;
+            Icon = Program.CreateEyeIcon(true);
             BackColor = Color.FromArgb(12, 13, 16);
             ForeColor = Color.White;
 
@@ -684,6 +688,10 @@ namespace OpenLid
             Text = "OpenLid for Windows";
             Size = new Size(560, 620);
             StartPosition = FormStartPosition.CenterScreen;
+            FormBorderStyle = FormBorderStyle.FixedSingle;
+            MaximizeBox = false;
+            ShowInTaskbar = true;
+            Icon = Program.CreateEyeIcon(Program.IsAwake);
             BackColor = Color.FromArgb(12, 13, 16);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 9);

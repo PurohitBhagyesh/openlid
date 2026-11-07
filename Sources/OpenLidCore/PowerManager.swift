@@ -1,4 +1,5 @@
 import Foundation
+import Combine
 import IOKit.pwr_mgt
 
 public final class PowerManager: ObservableObject {
@@ -16,9 +17,18 @@ public final class PowerManager: ObservableObject {
     
     private var assertionID: IOPMAssertionID = 0
     private var hasActiveAssertion: Bool = false
+    private var cancellables = Set<AnyCancellable>()
     
     public init() {
         setupSafetyHooks()
+        // Forward timer ticks in real time to PowerManager subscribers
+        timer.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in
+                self?.objectWillChange.send()
+            }
+            .store(in: &cancellables)
+        
         // Check if sleep is already disabled at system level on startup
         let liveState = checkLiveSystemSleepDisabled()
         self.isEnabled = liveState

@@ -277,11 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial QR render
   updateSnackQr(50);
 
-  // Handle Single Direct UPI Payment
+  // Handle UPI Payments & Multi-App Chooser
   const btnPayViaUpi = document.getElementById('btnPayViaUpi');
   const noUpiAlert = document.getElementById('noUpiAlert');
   const noUpiDesc = document.getElementById('noUpiDesc');
   const btnCloseNoUpi = document.getElementById('btnCloseNoUpi');
+  const upiAppButtons = document.querySelectorAll('.upi-app-btn');
 
   if (btnCloseNoUpi && noUpiAlert) {
     btnCloseNoUpi.addEventListener('click', () => {
@@ -289,9 +290,34 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function launchDirectUpi() {
+  function launchSpecificUpi(scheme, appName) {
     const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
-    const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+    const query = `pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
+    let targetUri = '';
+
+    switch (scheme) {
+      case 'fampay':
+        targetUri = `fampay://upi/pay?${query}`;
+        break;
+      case 'amazonpay':
+        targetUri = `amazonpay://upi/pay?${query}`;
+        break;
+      case 'phonepe':
+        targetUri = `phonepe://pay?${query}`;
+        break;
+      case 'gpay':
+        targetUri = `tez://upi/pay?${query}`;
+        break;
+      case 'paytm':
+        targetUri = `paytmmp://pay?${query}`;
+        break;
+      case 'whatsapp':
+        targetUri = `whatsapp://pay?${query}`;
+        break;
+      default:
+        targetUri = `upi://pay?${query}`;
+        break;
+    }
 
     if (noUpiAlert) noUpiAlert.style.display = 'none';
 
@@ -299,15 +325,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!isMobile) {
       if (noUpiAlert && noUpiDesc) {
-        noUpiDesc.textContent = 'No UPI payment app is installed on this computer. Please scan the QR code above with Google Pay, PhonePe, or Paytm on your mobile phone, or copy the UPI ID.';
+        noUpiDesc.textContent = `No ${appName} is installed on this computer. Please scan the QR code above with ${appName} or Google Pay on your phone, or copy the UPI ID.`;
         noUpiAlert.style.display = 'flex';
         noUpiAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       }
       return;
     }
 
-    // On mobile devices (Android / iOS):
-    // Triggering upi:// allows the OS to detect and present all installed UPI apps!
     let appOpened = false;
     let fallbackTimer = null;
 
@@ -320,17 +344,15 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     const onVisibilityChange = () => {
-      if (document.hidden) {
-        onAppOpen();
-      }
+      if (document.hidden) onAppOpen();
     };
 
     window.addEventListener('blur', onAppOpen);
     window.addEventListener('pagehide', onAppOpen);
     document.addEventListener('visibilitychange', onVisibilityChange);
 
-    // Trigger system intent
-    window.location.href = upiUri;
+    // Trigger specific app URL scheme
+    window.location.href = targetUri;
 
     fallbackTimer = setTimeout(() => {
       window.removeEventListener('blur', onAppOpen);
@@ -339,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (!appOpened && !document.hidden && document.hasFocus()) {
         if (noUpiAlert && noUpiDesc) {
-          noUpiDesc.textContent = 'No UPI app is installed on your phone. Please install a UPI app (Google Pay, PhonePe, Paytm, or BHIM) to pay directly, or scan the QR code above.';
+          noUpiDesc.textContent = `Could not open ${appName}. If it is not installed on your phone, please try another app above or scan the QR code.`;
           noUpiAlert.style.display = 'flex';
           noUpiAlert.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
@@ -347,8 +369,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 1800);
   }
 
+  upiAppButtons.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      const scheme = btn.getAttribute('data-scheme');
+      const name = btn.getAttribute('data-name') || 'UPI App';
+      launchSpecificUpi(scheme, name);
+    });
+  });
+
   if (btnPayViaUpi) {
-    btnPayViaUpi.addEventListener('click', launchDirectUpi);
+    btnPayViaUpi.addEventListener('click', () => {
+      launchSpecificUpi('upi', 'UPI App');
+    });
   }
 
   // 6. Mobile Navigation Drawer Toggle
@@ -470,11 +503,10 @@ document.addEventListener('DOMContentLoaded', () => {
   const shareCloseBtn = document.getElementById('shareCloseBtn');
   const btnShareCopy = document.getElementById('btnShareCopy');
   const shareCopyBadge = document.getElementById('shareCopyBadge');
-  const btnShareInstagram = document.getElementById('btnShareInstagram');
-  const shareInstaBadge = document.getElementById('shareInstaBadge');
   const btnNativeShare = document.getElementById('btnNativeShare');
 
   if (sharePillBtn && shareCard) {
+    // Tap / Click toggle (Mobile & Touch)
     sharePillBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isActive = shareCard.classList.toggle('active');
@@ -484,6 +516,22 @@ document.addEventListener('DOMContentLoaded', () => {
         if (snackPillBtn) snackPillBtn.setAttribute('aria-expanded', 'false');
       }
     });
+
+    // Hover open/close on desktop devices
+    if (shareWidget && window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      let shareHoverTimer = null;
+      shareWidget.addEventListener('mouseenter', () => {
+        clearTimeout(shareHoverTimer);
+        shareCard.classList.add('active');
+        sharePillBtn.setAttribute('aria-expanded', 'true');
+      });
+      shareWidget.addEventListener('mouseleave', () => {
+        shareHoverTimer = setTimeout(() => {
+          shareCard.classList.remove('active');
+          sharePillBtn.setAttribute('aria-expanded', 'false');
+        }, 220);
+      });
+    }
 
     if (shareCloseBtn) {
       shareCloseBtn.addEventListener('click', (e) => {
@@ -510,7 +558,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Copy Link Action
+  // 1. Copy Link Action
   if (btnShareCopy) {
     btnShareCopy.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -531,27 +579,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Instagram Action
-  if (btnShareInstagram) {
-    btnShareInstagram.addEventListener('click', async (e) => {
-      e.preventDefault();
-      try {
-        await navigator.clipboard.writeText('Check out OpenLid for Mac and Windows (keeps laptop running with lid closed): https://openlid.devs.li/');
-        if (shareInstaBadge) {
-          const original = shareInstaBadge.textContent;
-          shareInstaBadge.textContent = 'Copied!';
-          setTimeout(() => {
-            shareInstaBadge.textContent = original;
-          }, 2000);
-        }
-      } catch (err) {
-        // ignore
-      }
-      window.open('https://www.instagram.com/', '_blank');
-    });
-  }
-
-  // Native Share Action
+  // 2. More Sharing Options (Native System Sheet for iPhone / Android / Desktop)
   if (btnNativeShare) {
     btnNativeShare.addEventListener('click', async (e) => {
       e.preventDefault();
@@ -565,18 +593,21 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
           await navigator.share(shareData);
         } catch (err) {
-          // dismiss
+          // User dismissed or aborted
         }
       } else {
         try {
-          await navigator.clipboard.writeText('https://openlid.devs.li/');
-          const original = btnNativeShare.textContent;
-          btnNativeShare.textContent = 'Link copied to clipboard!';
-          setTimeout(() => {
-            btnNativeShare.textContent = original;
-          }, 2000);
+          await navigator.clipboard.writeText(shareData.url);
+          const titleSpan = btnNativeShare.querySelector('.share-item-title');
+          if (titleSpan) {
+            const original = titleSpan.textContent;
+            titleSpan.textContent = 'Link copied to clipboard!';
+            setTimeout(() => {
+              titleSpan.textContent = original;
+            }, 2000);
+          }
         } catch (err) {
-          window.open('https://openlid.devs.li/', '_blank');
+          window.open(shareData.url, '_blank');
         }
       }
     });
