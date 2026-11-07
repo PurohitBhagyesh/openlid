@@ -8,6 +8,25 @@ struct MenuBarView: View {
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     
     var body: some View {
+        Group {
+            if showSettings {
+                SettingsView(onDismiss: {
+                    showSettings = false
+                })
+            } else {
+                mainView
+            }
+        }
+        .frame(width: showSettings ? 360 : 320)
+        .animation(.easeInOut(duration: 0.18), value: showSettings)
+        .onAppear {
+            helperInstalled = PrivilegeManager.shared.isHelperInstalled()
+            powerManager.clamshell.updateLidState()
+            powerManager.battery.updateBatteryState()
+        }
+    }
+    
+    private var mainView: some View {
         VStack(spacing: 12) {
             // Header
             HStack(alignment: .center) {
@@ -263,14 +282,6 @@ struct MenuBarView: View {
             .padding(.bottom, 12)
         }
         .frame(width: 320)
-        .sheet(isPresented: $showSettings) {
-            SettingsView()
-        }
-        .onAppear {
-            helperInstalled = PrivilegeManager.shared.isHelperInstalled()
-            powerManager.clamshell.updateLidState()
-            powerManager.battery.updateBatteryState()
-        }
     }
     
     private func presetShortTitle(_ preset: SessionPreset) -> String {
