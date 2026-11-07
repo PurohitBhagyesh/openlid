@@ -79,7 +79,7 @@ OpenLid lives natively in your macOS Menu Bar represented by an adaptive Eye ico
 
 ```bash
 # Clone the repository
-git clone https://github.com/openlid/openlid.git
+git clone https://github.com/PurohitBhagyesh/openlid.git
 cd openlid
 
 # Build the release .app bundle and CLI binary
