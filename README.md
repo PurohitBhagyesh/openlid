@@ -18,7 +18,6 @@
 [![Size](https://img.shields.io/badge/Size-%3C%202.5%20MB%20(Universal)-10b981?style=for-the-badge)](https://openlid.devs.li)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Website](https://img.shields.io/badge/Website-openlid.devs.li-06b6d4?style=for-the-badge)](https://openlid.devs.li)
-[![Domain by devs.li](assets/devs-badge.svg)](https://openlid.devs.li)
 
 Developed with precision by **[Bhagyesh Purohit](https://github.com/PurohitBhagyesh)**
 

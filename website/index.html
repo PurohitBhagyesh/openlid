@@ -8,32 +8,82 @@
   <meta name="application-name" content="OpenLid">
   <meta name="apple-mobile-web-app-title" content="OpenLid">
   <meta name="theme-color" content="#0c0d10">
-  <meta name="description" content="OpenLid prevents laptops from sleeping when the lid is closed. Native menu bar and system tray utility for macOS and Windows.">
+  <meta name="description" content="OpenLid prevents laptops from sleeping when the lid is closed. Native menu bar and system tray utility for macOS and Windows. Zero external monitors or dummy plugs required.">
+  <meta name="author" content="Bhagyesh Purohit">
+  <meta name="keywords" content="openlid, keep mac awake lid closed, clamshell mode without monitor, macos sleep prevention, windows away mode, lid close sleep bypass, menu bar utility, caffeinate lid closed, keep laptop awake closed lid">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="google-site-verification" content="google5fefb455a4f252a7">
-  <meta name="robots" content="index, follow">
-  <meta name="keywords" content="openlid, keep mac awake lid closed, clamshell mode without monitor, macos sleep prevention, windows away mode, lid close sleep bypass, menu bar utility">
-  <meta name="author" content="Shivam Purohit">
-
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="OpenLid">
-  <meta property="og:title" content="OpenLid — Keep Your Laptop Running With Lid Closed">
-  <meta property="og:description" content="Native closed-lid sleep prevention for macOS and Windows. Zero external monitors or dummy plugs required.">
-  <meta property="og:url" content="https://openlid.devs.li/">
   <link rel="canonical" href="https://openlid.devs.li/">
 
+  <!-- Open Graph / Facebook / WhatsApp / iMessage / Discord / Slack / LinkedIn -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="OpenLid">
+  <meta property="og:url" content="https://openlid.devs.li/">
+  <meta property="og:title" content="OpenLid — Keep Your Laptop Running With Lid Closed">
+  <meta property="og:description" content="Native closed-lid sleep prevention for macOS and Windows. Zero external monitors or dummy plugs required. Lightweight, secure, battery-safe.">
+  <meta property="og:image" content="https://openlid.devs.li/assets/og-image.png">
+  <meta property="og:image:secure_url" content="https://openlid.devs.li/assets/og-image.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="OpenLid - The Unsleeping Eye for macOS and Windows">
+  <meta property="og:locale" content="en_US">
+
+  <!-- Twitter / X Cards -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@PurohitBhagyesh">
+  <meta name="twitter:creator" content="@PurohitBhagyesh">
+  <meta name="twitter:url" content="https://openlid.devs.li/">
+  <meta name="twitter:title" content="OpenLid — Keep Your Laptop Running With Lid Closed">
+  <meta name="twitter:description" content="Native closed-lid sleep prevention for macOS and Windows. Zero external monitors or dummy plugs required. Lightweight, secure, battery-safe.">
+  <meta name="twitter:image" content="https://openlid.devs.li/assets/og-image.png">
+  <meta name="twitter:image:alt" content="OpenLid - The Unsleeping Eye for macOS and Windows">
+
+  <!-- Message & Chat Previews (WhatsApp, iMessage, Telegram, Slack) -->
+  <link rel="image_src" href="https://openlid.devs.li/assets/og-image.png">
+  <meta itemprop="name" content="OpenLid — Keep Your Laptop Running With Lid Closed">
+  <meta itemprop="description" content="Native closed-lid sleep prevention for macOS and Windows. Zero external monitors or dummy plugs required.">
+  <meta itemprop="image" content="https://openlid.devs.li/assets/og-image.png">
+
+  <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
-    "@type": "SoftwareApplication",
-    "name": "OpenLid",
-    "operatingSystem": "macOS 13+, Windows 10, Windows 11",
-    "applicationCategory": "UtilitiesApplication",
-    "offers": {
-      "@type": "Offer",
-      "price": "0",
-      "priceCurrency": "USD"
-    },
-    "url": "https://openlid.devs.li/"
+    "@graph": [
+      {
+        "@type": "SoftwareApplication",
+        "@id": "https://openlid.devs.li/#software",
+        "name": "OpenLid",
+        "url": "https://openlid.devs.li/",
+        "operatingSystem": "macOS 13+, Windows 10, Windows 11",
+        "applicationCategory": "UtilitiesApplication",
+        "image": "https://openlid.devs.li/assets/og-image.png",
+        "screenshot": "https://openlid.devs.li/assets/og-image.png",
+        "description": "OpenLid prevents laptops from sleeping when the lid is closed. Native menu bar and system tray utility for macOS and Windows with zero dummy display plugs required.",
+        "offers": {
+          "@type": "Offer",
+          "price": "0",
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        },
+        "author": {
+          "@type": "Person",
+          "name": "Bhagyesh Purohit",
+          "url": "https://github.com/PurohitBhagyesh"
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://openlid.devs.li/#website",
+        "url": "https://openlid.devs.li/",
+        "name": "OpenLid",
+        "description": "Keep Your Laptop Running With Lid Closed (macOS & Windows)",
+        "publisher": {
+          "@type": "Person",
+          "name": "Bhagyesh Purohit"
+        }
+      }
+    ]
   }
   </script>
 
@@ -64,6 +114,7 @@
         <a href="#architecture" class="nav-item">Architecture</a>
         <a href="#safety" class="nav-item">Safety</a>
         <a href="#cli" class="nav-item">CLI</a>
+        <a href="#share" class="nav-item">Share</a>
         <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="nav-item nav-ext">
           GitHub
           <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -99,6 +150,7 @@
       <a href="#architecture" class="mobile-nav-item">Architecture</a>
       <a href="#safety" class="mobile-nav-item">Safety</a>
       <a href="#cli" class="mobile-nav-item">CLI Reference</a>
+      <a href="#share" class="mobile-nav-item">Share & Message</a>
       <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">GitHub Repository ↗</a>
       <a href="#report" class="mobile-nav-item" id="mobileNavReport">Report a Problem ↗</a>
     </div>
@@ -393,14 +445,81 @@
     </div>
   </section>
 
+  <!-- Share & Message Section -->
+  <section class="section share-section" id="share">
+    <div class="container">
+      <div class="share-box">
+        <div class="share-header">
+          <div class="share-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            </svg>
+            <span>Message & Share</span>
+          </div>
+          <h2 class="share-title">Send OpenLid via Message or Reach Out</h2>
+          <p class="share-subtitle">Know someone who needs their laptop running with the lid closed? Send them OpenLid in one tap, or message developer Bhagyesh Purohit directly.</p>
+        </div>
+
+        <div class="share-actions-grid">
+          <!-- Share via WhatsApp -->
+          <a href="https://api.whatsapp.com/send?text=Check%20out%20OpenLid%20%E2%80%94%20keep%20your%20laptop%20running%20with%20the%20lid%20closed%20safely%20on%20macOS%20%26%20Windows!%20No%20external%20display%20needed%3A%20https%3A%2F%2Fopenlid.devs.li" target="_blank" rel="noopener noreferrer" class="share-btn share-whatsapp" aria-label="Share via WhatsApp">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.301-.776.978-.952 1.178-.175.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.799-1.5-1.786-1.676-2.087-.175-.301-.019-.464.132-.614.136-.135.301-.351.451-.527.15-.176.2-.301.3-.502.101-.2.051-.376-.025-.526-.075-.15-.676-1.63-.926-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.527.075-.803.376s-1.053 1.028-1.053 2.508 1.078 2.91 1.229 3.111c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.38.197 1.9.12.58-.087 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.126-.275-.201-.576-.351zM12.04 2C6.536 2 2.072 6.46 2.072 11.96c0 1.986.582 3.84 1.59 5.405L2 22l4.802-1.579a9.92 9.92 0 0 0 5.238 1.499h.004c5.503 0 9.967-4.461 9.967-9.96c0-2.66-1.036-5.161-2.92-7.043C17.207 3.036 14.704 2 12.04 2z"/>
+            </svg>
+            <span>WhatsApp</span>
+          </a>
+
+          <!-- Share via iMessage / SMS -->
+          <a href="sms:?&body=Check%20out%20OpenLid%20for%20macOS%20and%20Windows%20(keep%20your%20laptop%20running%20with%20lid%20closed)%3A%20https%3A%2F%2Fopenlid.devs.li" class="share-btn share-imessage" aria-label="Send via iMessage or SMS">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+            </svg>
+            <span>iMessage / SMS</span>
+          </a>
+
+          <!-- Share on Telegram -->
+          <a href="https://t.me/share/url?url=https%3A%2F%2Fopenlid.devs.li&text=OpenLid%20%E2%80%94%20Keep%20laptop%20awake%20with%20lid%20closed%20safely" target="_blank" rel="noopener noreferrer" class="share-btn share-telegram" aria-label="Share on Telegram">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+            </svg>
+            <span>Telegram</span>
+          </a>
+
+          <!-- Share on X -->
+          <a href="https://twitter.com/intent/tweet?text=OpenLid%20%E2%80%94%20Keep%20your%20laptop%20awake%20with%20the%20lid%20closed%20safely%20without%20an%20external%20display%20(macOS%20%26%20Windows)&url=https%3A%2F%2Fopenlid.devs.li" target="_blank" rel="noopener noreferrer" class="share-btn share-x" aria-label="Share on X">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+            </svg>
+            <span>Post on X</span>
+          </a>
+
+          <!-- Copy Link -->
+          <button type="button" class="share-btn share-copy" id="btnCopyShareLink" aria-label="Copy website link">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/>
+              <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>
+            </svg>
+            <span id="copyShareText">Copy Link</span>
+          </button>
+
+          <!-- Direct Message Developer -->
+          <button type="button" class="share-btn share-message-dev" id="btnOpenMessageModal" aria-label="Message Developer directly">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/>
+            </svg>
+            <span>Message Developer</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner container">
       <div class="footer-info">
         <span>OpenLid is distributed under the MIT License.</span>
-        <a href="https://openlid.devs.li" target="_blank" rel="noopener noreferrer" class="footer-badge" style="display:inline-flex; align-items:center; margin-left:12px;">
-          <img src="assets/devs-badge.svg" alt="Domain by devs.li" width="134" height="20" style="vertical-align:middle; display:inline-block;">
-        </a>
+        <span class="footer-dev-credit">• Developed by <a href="https://github.com/PurohitBhagyesh" target="_blank" rel="noopener noreferrer">Bhagyesh Purohit</a></span>
       </div>
       <div class="footer-links">
         <a href="https://openlid.devs.li">openlid.devs.li</a>
@@ -497,6 +616,20 @@
 
       <div class="modal-body">
         <div class="report-options">
+          <!-- WhatsApp Message -->
+          <a href="https://api.whatsapp.com/send?text=Hi%20Bhagyesh%2C%20I%20have%20a%20question%2Ffeedback%20regarding%20OpenLid%3A%20" target="_blank" rel="noopener noreferrer" class="report-option-card">
+            <div class="option-icon whatsapp-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M17.472 14.382c-.301-.15-1.78-.878-2.056-.978-.276-.1-.476-.15-.676.15-.2.301-.776.978-.952 1.178-.175.2-.351.226-.652.075-.301-.15-1.272-.469-2.423-1.496-.895-.799-1.5-1.786-1.676-2.087-.175-.301-.019-.464.132-.614.136-.135.301-.351.451-.527.15-.176.2-.301.3-.502.101-.2.051-.376-.025-.526-.075-.15-.676-1.63-.926-2.233-.244-.587-.492-.507-.676-.516l-.576-.01c-.2 0-.527.075-.803.376s-1.053 1.028-1.053 2.508 1.078 2.91 1.229 3.111c.15.201 2.122 3.24 5.141 4.544.718.31 1.279.496 1.716.635.722.23 1.38.197 1.9.12.58-.087 1.78-.727 2.03-1.43.25-.702.25-1.303.175-1.43-.075-.126-.275-.201-.576-.351zM12.04 2C6.536 2 2.072 6.46 2.072 11.96c0 1.986.582 3.84 1.59 5.405L2 22l4.802-1.579a9.92 9.92 0 0 0 5.238 1.499h.004c5.503 0 9.967-4.461 9.967-9.96c0-2.66-1.036-5.161-2.92-7.043C17.207 3.036 14.704 2 12.04 2z"/>
+              </svg>
+            </div>
+            <div class="option-content">
+              <div class="option-title">Message via WhatsApp</div>
+              <div class="option-sub">Direct message to creator Bhagyesh Purohit</div>
+            </div>
+            <span class="option-badge">Chat ↗</span>
+          </a>
+
           <!-- GitHub Issues -->
           <a href="https://github.com/PurohitBhagyesh/openlid/issues/new" target="_blank" rel="noopener noreferrer" class="report-option-card">
             <div class="option-icon github-icon">

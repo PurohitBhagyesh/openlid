@@ -369,6 +369,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // 9. Share Section Actions
+  const btnCopyShareLink = document.getElementById('btnCopyShareLink');
+  const copyShareText = document.getElementById('copyShareText');
+  const btnOpenMessageModal = document.getElementById('btnOpenMessageModal');
+
+  if (btnCopyShareLink) {
+    btnCopyShareLink.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText('https://openlid.devs.li/');
+        if (copyShareText) {
+          const original = copyShareText.textContent;
+          copyShareText.textContent = 'Copied!';
+          btnCopyShareLink.classList.add('copied');
+          setTimeout(() => {
+            copyShareText.textContent = original;
+            btnCopyShareLink.classList.remove('copied');
+          }, 2000);
+        }
+      } catch (err) {
+        window.open('https://openlid.devs.li/', '_blank');
+      }
+    });
+  }
+
+  if (btnOpenMessageModal) {
+    btnOpenMessageModal.addEventListener('click', (e) => {
+      openReportModal(e);
+    });
+  }
+
   fetchTelemetry();
   setInterval(fetchTelemetry, 2000);
 });
