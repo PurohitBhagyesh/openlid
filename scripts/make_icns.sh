@@ -33,3 +33,4 @@ rm -rf "$ICONSET_DIR"
 cp "$SOURCE" "website/assets/app-icon.png"
 
 echo "✅ AppIcon.icns generated successfully at Resources/AppIcon.icns!"
+

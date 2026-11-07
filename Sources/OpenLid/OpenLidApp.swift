@@ -16,9 +16,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         
         // Handle auto-awake on user login
         LaunchAtLoginManager.shared.handleAppLaunch()
+        
+        // Start local REST control server for website and automations
+        ControlServer.shared.start()
     }
     
     func applicationWillTerminate(_ notification: Notification) {
+        ControlServer.shared.stop()
         PowerManager.shared.cleanup()
     }
 }

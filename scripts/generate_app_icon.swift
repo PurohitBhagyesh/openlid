@@ -104,3 +104,4 @@ func generateIcon() {
 }
 
 generateIcon()
+

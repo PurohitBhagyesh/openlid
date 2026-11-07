@@ -37,6 +37,36 @@ document.addEventListener('DOMContentLoaded', () => {
     termLogs.scrollTop = termLogs.scrollHeight;
   }
 
+  // Live Engine Synchronization (if local OpenLid app is running)
+  let liveEngineConnected = false;
+  async function syncWithLocalEngine() {
+    try {
+      const res = await fetch('http://127.0.0.1:31415/api/status', { method: 'GET' });
+      if (res.ok) {
+        const data = await res.json();
+        if (!liveEngineConnected) {
+          liveEngineConnected = true;
+          addTermLog('🔗 Connected to local OpenLid engine (127.0.0.1:31415)', 'green');
+        }
+        isEyeActive = data.isEnabled;
+        isLidClosed = data.isLidClosed;
+        updateSimulator();
+      }
+    } catch (e) {
+      liveEngineConnected = false;
+    }
+  }
+
+  syncWithLocalEngine();
+  setInterval(syncWithLocalEngine, 2500);
+
+  async function sendEngineToggle() {
+    try {
+      await fetch('http://127.0.0.1:31415/api/toggle', { method: 'POST' });
+      setTimeout(syncWithLocalEngine, 300);
+    } catch (e) {}
+  }
+
   // Update simulator UI based on state
   function updateSimulator() {
     // 1. Eye Button state
@@ -83,6 +113,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Event Listeners - Simulator
   simEyeBtn.addEventListener('click', () => {
     isEyeActive = !isEyeActive;
+    sendEngineToggle();
     if (isEyeActive) {
       addTermLog('▶ OpenLid Eye symbol engaged: macOS sleep prevention active', 'green');
     } else {
@@ -133,6 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Remote Eye Toggle in Cloud Dashboard
   remoteEyeBtn.addEventListener('click', () => {
     isEyeActive = !isEyeActive;
+    sendEngineToggle();
     if (isEyeActive) {
       remoteEyeBtn.classList.add('active');
       remoteStatusText.textContent = 'Mac is AWAKE';
