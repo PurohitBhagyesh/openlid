@@ -125,8 +125,14 @@ Standalone portable ZIP archives compiled natively for each platform architectur
 | **Universal Binary** | [Download `.zip`](downloads/OpenLid-Universal.zip) | All MacBooks (Universal 2 Fat Mach-O) | `OpenLid.app` + `openlid` CLI |
 
 ```bash
-# Homebrew Cask (macOS)
+# Official Homebrew Tap (macOS)
+brew tap PurohitBhagyesh/openlid
+
+# Install GUI App + CLI (Universal Apple Silicon & Intel)
 brew install --cask openlid
+
+# Or install standalone CLI from source
+brew install openlid
 ```
 
 ### Windows (11 / 10)
