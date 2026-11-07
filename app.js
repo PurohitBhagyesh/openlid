@@ -277,44 +277,72 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initial QR render
   updateSnackQr(50);
 
-  // Handle UPI App Click & Detection
+  // Handle UPI App Clicks & Direct App Launching
   const upiStatusMsg = document.getElementById('upiStatusMsg');
-  if (snackUpiLink) {
-    snackUpiLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
-      const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
-      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+  const upiAppsGrid = document.getElementById('upiAppsGrid');
 
-      if (!isMobile) {
-        if (upiStatusMsg) {
-          upiStatusMsg.textContent = 'No UPI app is installed on this PC/Mac. Please scan the QR code above using Google Pay, PhonePe, or Paytm on your mobile phone.';
-          upiStatusMsg.style.display = 'block';
-          setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 6000);
-        }
-        return;
+  const upiAppUrls = {
+    gpay: (amt) => `tez://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
+    phonepe: (amt) => `phonepe://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
+    paytm: (amt) => `paytmmp://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
+    fampay: (amt) => `fampay://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
+    amazon: (amt) => `amazonpay://upi/pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`,
+    bhim: (amt) => `bhim://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`
+  };
+
+  const upiAppNames = {
+    gpay: 'Google Pay',
+    phonepe: 'PhonePe',
+    paytm: 'Paytm',
+    fampay: 'FamPay',
+    amazon: 'Amazon Pay',
+    bhim: 'BHIM UPI'
+  };
+
+  function launchUpiApp(appKey) {
+    const amt = Math.max(1, parseInt(snackAmountInput ? snackAmountInput.value : 50, 10) || 50);
+    const appName = upiAppNames[appKey] || 'UPI App';
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent || '');
+
+    if (!isMobile) {
+      if (upiStatusMsg) {
+        upiStatusMsg.textContent = `No mobile UPI app on desktop. Please scan the QR code above with ${appName} on your phone or copy UPI ID.`;
+        upiStatusMsg.style.display = 'block';
+        setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 6000);
       }
+      return;
+    }
 
-      // On mobile devices, attempt to launch UPI URI
-      let appOpened = false;
-      const onBlur = () => {
-        appOpened = true;
-        window.removeEventListener('blur', onBlur);
-      };
-      window.addEventListener('blur', onBlur);
+    const targetUri = upiAppUrls[appKey] ? upiAppUrls[appKey](amt) : `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${amt}&cu=INR`;
 
-      window.location.href = upiUri;
+    let appOpened = false;
+    const onBlur = () => {
+      appOpened = true;
+      window.removeEventListener('blur', onBlur);
+    };
+    window.addEventListener('blur', onBlur);
 
-      setTimeout(() => {
-        window.removeEventListener('blur', onBlur);
-        if (!appOpened && document.hasFocus()) {
-          if (upiStatusMsg) {
-            upiStatusMsg.textContent = 'No UPI app detected on this device. Please scan the QR code above or copy UPI ID.';
-            upiStatusMsg.style.display = 'block';
-            setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 5000);
-          }
+    // Direct app launch avoiding WhatsApp default hijack
+    window.location.href = targetUri;
+
+    setTimeout(() => {
+      window.removeEventListener('blur', onBlur);
+      if (!appOpened && document.hasFocus()) {
+        if (upiStatusMsg) {
+          upiStatusMsg.textContent = `${appName} is not installed or did not open. You can try PhonePe, Paytm, or scan the QR code above.`;
+          upiStatusMsg.style.display = 'block';
+          setTimeout(() => { upiStatusMsg.style.display = 'none'; }, 5500);
         }
-      }, 1500);
+      }
+    }, 1500);
+  }
+
+  if (upiAppsGrid) {
+    upiAppsGrid.addEventListener('click', (e) => {
+      const btn = e.target.closest('.upi-app-btn');
+      if (!btn) return;
+      const appKey = btn.getAttribute('data-app');
+      if (appKey) launchUpiApp(appKey);
     });
   }
 

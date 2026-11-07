@@ -70,3 +70,4 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         // If the user closed the window and mode is windowedApp only, keep menu bar available or re-open on click
     }
 }
+

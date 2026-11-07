@@ -573,7 +573,7 @@
           <div class="snack-qr-pad" id="snackQrPad">
             <img id="snackQrImg" src="" alt="UPI QR Code" width="140" height="140">
           </div>
-          <span class="snack-qr-caption">Scan with any UPI App (GPay, PhonePe, Paytm)</span>
+          <span class="snack-qr-caption">Scan with GPay, PhonePe, Paytm, or FamPay</span>
         </div>
 
         <div class="snack-input-wrap">
@@ -588,9 +588,33 @@
           <button type="button" class="preset-chip" data-amt="200">&#8377;200</button>
         </div>
 
-        <a id="snackUpiLink" href="upi://pay?pa=Purohit2009@fam&pn=Shivam&am=50&cu=INR" class="btn btn-sm btn-primary btn-block snack-pay-btn">
-          Pay via UPI App
-        </a>
+        <div class="upi-apps-label">Pay with installed UPI app:</div>
+        <div class="upi-apps-grid" id="upiAppsGrid">
+          <button type="button" class="upi-app-btn upi-gpay" data-app="gpay">
+            <span class="upi-app-badge gpay-badge">G</span>
+            <span>Google Pay</span>
+          </button>
+          <button type="button" class="upi-app-btn upi-phonepe" data-app="phonepe">
+            <span class="upi-app-badge phonepe-badge">Pe</span>
+            <span>PhonePe</span>
+          </button>
+          <button type="button" class="upi-app-btn upi-paytm" data-app="paytm">
+            <span class="upi-app-badge paytm-badge">₹</span>
+            <span>Paytm</span>
+          </button>
+          <button type="button" class="upi-app-btn upi-fampay" data-app="fampay">
+            <span class="upi-app-badge fampay-badge">Fam</span>
+            <span>FamPay</span>
+          </button>
+          <button type="button" class="upi-app-btn upi-amazon" data-app="amazon">
+            <span class="upi-app-badge amazon-badge">a</span>
+            <span>Amazon Pay</span>
+          </button>
+          <button type="button" class="upi-app-btn upi-bhim" data-app="bhim">
+            <span class="upi-app-badge bhim-badge">B</span>
+            <span>BHIM UPI</span>
+          </button>
+        </div>
 
         <!-- UPI Status / Fallback Notice -->
         <div id="upiStatusMsg" class="upi-status-banner" style="display:none;"></div>

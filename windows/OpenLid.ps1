@@ -1,4 +1,4 @@
-﻿# OpenLid for Windows — Native Dual App & System Tray Clamshell Sleep Prevention
+# OpenLid for Windows — Native Dual App & System Tray Clamshell Sleep Prevention
 # Usage: .\OpenLid.ps1 [-On | -Off | -Status | -App | -Welcome | -Tray | -Mode <tray|app|both>]
 
 param (
