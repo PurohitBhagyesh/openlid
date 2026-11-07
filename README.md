@@ -48,7 +48,7 @@ If you are:
 
 ...closing the lid interrupts everything. Standard user-space utilities fail because the operating system treats lid closure as a low-level hardware interrupt.
 
-**OpenLid solves this natively by modulating kernel power assertions on macOS (`kIOPMAssertionTypePreventSystemSleep` and `pmset`) and Windows (`SetThreadExecutionState` AwayMode & `powercfg LIDACTION 0`), backed by real-time thermal throttling breakers and battery floor margins.**
+**OpenLid solves this natively by modulating kernel power assertions on macOS (`kIOPMAssertionTypePreventSystemSleep` and `pmset`) and Windows (`SetThreadExecutionState` AwayMode & `powercfg LIDACTION 0`), backed by real-time thermal throttling breakers and native hardware sentinels.**
 
 ---
 
@@ -94,7 +94,7 @@ On first launch (or when clicking **Re-run Welcome Tutorial & Permissions**), Op
   ( ) Menu Bar (Taskbar) Only
   ( ) Windowed App (Dock)
   (*) Both (Recommended)
-  [ Enter OpenLid ✓ ]
+  [ Enter OpenLid ]
          │
          ▼
 [ Main Application UI & Dashboard ]
@@ -212,7 +212,7 @@ openlid/
 │   ├── OpenLidCore/                 # macOS Core Engine (IOKit, Power, Thermal, Battery)
 │   │   ├── AppPreferences.swift     # Presentation mode (menubar vs app vs both) & onboarding state
 │   │   ├── ClamshellMonitor.swift   # Reads AppleClamshellState from IOPMrootDomain
-│   │   ├── BatteryMonitor.swift     # IOPSCopyPowerSourcesInfo telemetry & cutoff
+│   │   ├── BatteryMonitor.swift     # IOPSCopyPowerSourcesInfo power telemetry
 │   │   ├── ThermalMonitor.swift     # ProcessInfo.thermalState overheating guard
 │   │   ├── SessionTimer.swift       # Countdown timer & duration presets
 │   │   ├── LaunchAtLoginManager.swift# SMAppService & auto-awake on login
@@ -229,7 +229,7 @@ openlid/
 │   │       ├── OnboardingView.swift # 3-step Welcome & Permissions Wizard
 │   │       ├── MainWindowView.swift # Full standalone GUI Application Window
 │   │       ├── MenuBarView.swift    # Status bar popover with animated eye & tools
-│   │       ├── SettingsView.swift   # Mode picker, safety thresholds & developer contact
+│   │       ├── SettingsView.swift   # Mode picker, thermal guards & developer contact
 │   │       └── StatusIconView.swift # Menu bar template icon
 │   └── OpenLidCLI/                  # macOS Command-Line Interface (main.swift)
 ├── windows/                         # Windows Subsystem (11/10)
@@ -254,7 +254,8 @@ If you encounter any problem, bug, or have a feature request:
 
 - **Lead Developer:** OpenLid Developer
 - **GitHub Profile:** [@PurohitBhagyesh](https://github.com/PurohitBhagyesh)
-- **Email Directly:** [purohitunofficialbhagyesh@gmail.com](mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20%2F%20Issue%20Report)
+- **macOS Support Email:** [purohitunofficialbhagyesh@gmail.com](mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(macOS)&body=Hi,%0D%0A%0D%0AI%20am%20reporting%20an%20issue%20with%20OpenLid%20for%20macOS:%0D%0A-%20Mac%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Chip%20(Apple%20Silicon%20/%20Intel):%0D%0A-%20Issue%20Description:%20%0D%0A)
+- **Windows Support Email:** [purohitunofficialbhagyesh@gmail.com](mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(Windows)&body=Hi,%0D%0A%0D%0AI%20am%20reporting%20an%20issue%20with%20OpenLid%20for%20Windows:%0D%0A-%20Laptop%20Manufacturer%20&%20Model:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Architecture:%20%0D%0A-%20Issue%20Description:%20%0D%0A)
 - **Issue Tracker:** [GitHub Issues](https://github.com/PurohitBhagyesh/openlid/issues)
 - **Official Website:** [openlid.devs.li](https://openlid.devs.li)
 
