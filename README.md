@@ -1,38 +1,75 @@
-# OpenLid 💻
+<div align="center">
 
-> Keep your MacBook running at full throttle even when the lid is closed — safely, smoothly, and without an external monitor.
+```
+   ██████╗ ██████╗ ███████╗███╗   ██╗██╗     ██╗██████╗ 
+  ██╔═══██╗██╔══██╗██╔════╝████╗  ██║██║     ██║██╔══██╗
+  ██║   ██║██████╔╝█████╗  ██╔██╗ ██║██║     ██║██║  ██║
+  ██║   ██║██╔═══╝ ██╔══╝  ██║╚██╗██║██║     ██║██║  ██║
+  ╚██████╔╝██║     ███████╗██║ ╚████║███████╗██║██████╔╝
+   ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝╚═════╝ 
+```
 
-[![macOS](https://img.shields.io/badge/macOS-13.0%2B-blue.svg)](https://apple.com/macos)
-[![Swift](https://img.shields.io/badge/Swift-6.0-orange.svg)](https://swift.org)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+### 👁️ The Unsleeping Eye for your MacBook
+
+**Keep your Mac awake, running, and vigilant — even when the lid is closed.**
+
+[![macOS](https://img.shields.io/badge/macOS-13.0%2B%20%7C%20Apple%20Silicon%20%26%20Intel-black?style=for-the-badge&logo=apple)](https://apple.com/macos)
+[![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
+[![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Passing-emerald?style=for-the-badge&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+
+<p align="center">
+  <a href="#-features">Features</a> •
+  <a href="#-menu-bar-eye-states">Eye States</a> •
+  <a href="#-quick-start">Quick Start</a> •
+  <a href="#-cli-usage">CLI</a> •
+  <a href="#-interactive-website">Website</a> •
+  <a href="#-architecture">Architecture</a>
+</p>
 
 ---
 
-## 🎯 The Problem
+</div>
 
-By default, macOS forces your MacBook into sleep mode the moment you close the lid unless:
-1. You are plugged into AC power **AND**
-2. An external display is connected **AND**
-3. An external keyboard/mouse is connected.
+## 🌌 Overview
 
-If you are listening to music, streaming audio/podcasts, running a dev server (Docker, Vite, Node, Python), training an ML model, or letting an AI coding agent work overnight, closing your laptop interrupts everything.
+By default, closing your MacBook lid puts it to sleep instantly unless plugged into AC power with an external monitor and keyboard attached.
 
-Standard idle-sleep utilities (like `caffeinate` or general keeping-awake apps) **cannot prevent sleep on lid close** because Apple treats clamshell closure as a hardware power event.
+If you are:
+- 🎧 **Streaming audio, podcasts, or music** to Bluetooth speakers or AirPods
+- 🤖 **Running long AI inference, fine-tuning, or coding agents** (Claude Code, Ollama, OpenDevin)
+- 🚀 **Hosting local dev servers, Docker containers, or Vite/Node environments**
+- 📦 **Downloading massive datasets, game assets, or syncing backups**
 
-**OpenLid solves this natively and safely.**
+...closing the lid interrupts everything. Standard utilities (`caffeinate`, etc.) cannot prevent clamshell closure sleep because Apple handles lid closure as a low-level hardware interrupt.
+
+**OpenLid solves this with surgical power assertion management, hardware thermal guards, and an aesthetic status icon on your menu bar: the vigilant Eye.**
+
+---
+
+## 👁️ Menu Bar Eye States
+
+OpenLid lives natively in your macOS Menu Bar represented by an adaptive Eye icon:
+
+| Icon | State | Meaning |
+| :---: | :---: | :--- |
+| `👁️` (`eye.fill`) | **Vigilant & Awake** | OpenLid is ACTIVE. Your MacBook will continue running with the lid closed. |
+| `👁️‍🗨️` (`eye.circle.fill`) | **Lid Closed & Running** | Physical lid is closed, screen is powered off, but CPU and tasks run at full speed. |
+| `🚫` (`eye.slash`) | **Normal Sleep** | Default macOS sleep behavior restored. Closing the lid will sleep your Mac. |
 
 ---
 
 ## ✨ Features
 
-- ⚡️ **Native Clamshell Sleep Prevention**: Run background tasks, dev servers, audio playback, downloads, and AI agents with the lid closed on battery or AC.
-- 🎛 **Sleek Menu Bar Interface**: Lives in your macOS Menu Bar (`LSUIElement`). Quick toggle, duration selectors, and hardware telemetry in a single popover.
-- 💻 **Companion CLI (`openlid`)**: Control OpenLid directly from your terminal or shell scripts (`openlid on`, `openlid off`, `openlid status`).
-- ⏱ **Session Duration Presets**: Set it to run **Indefinitely**, or for **15 minutes**, **30 minutes**, **1 hour**, or **2 hours**.
-- 🛡 **Low Battery Cutoff Guard**: Automatically restores normal sleep if battery drops below a configurable threshold (e.g. 15%) so your battery never unexpectedly drains.
-- 🌡 **Thermal Overheating Protection**: Continuously monitors Apple Silicon / Intel thermal states (`ProcessInfo.thermalState`). If dangerous temperatures are detected, OpenLid instantly restores sleep to protect your hardware.
-- ⚡️ **Zero-Friction Instant Toggle**: Includes a 1-click helper installer (`/etc/sudoers.d/openlid`) so you authorize once via Touch ID / admin password and never get prompted again.
-- 🧹 **Fail-Safe Cleanup**: Signal handlers (`SIGINT`, `SIGTERM`) and app termination hooks automatically reset macOS power settings so your Mac is never stuck in a sleep-disabled state.
+- 👁️ **Vigilant Menu Bar Eye**: Sleek, distraction-free native SwiftUI interface.
+- ⚡️ **Native Clamshell Sleep Bypass**: Keeps your system wide-awake without an external monitor.
+- 🌡️ **Thermal Overheating Protection**: Continuously samples `ProcessInfo.processInfo.thermalState`. If system heat spikes to dangerous levels, sleep prevention automatically disengages to protect your screen and chassis.
+- 🔋 **Smart Battery Cutoff**: Configurable battery floor (default 15%). Automatically aborts keep-awake mode if battery runs low, so you never wake up to an empty battery.
+- ⏱️ **Session Timers**: Select **15m**, **30m**, **1h**, **2h**, or **Indefinite** sessions with a live countdown timer in the menu bar.
+- 🚀 **Auto-Awake on Login**: Automatically launch on user login and optionally awaken your Mac immediately.
+- 🔑 **1-Click Passwordless Helper**: Authorize once with Touch ID / admin password to write a scoped sudoers rule (`/etc/sudoers.d/openlid`). Future toggles happen in <50ms with zero dialogs.
+- 🧹 **Fail-Safe Teardown**: Hooks into `SIGINT`, `SIGTERM`, and system shutdown to guarantee default sleep settings are restored.
+- 💻 **Complete CLI (`openlid`)**: Automate and script sleep behavior from your terminal.
 
 ---
 
@@ -42,56 +79,57 @@ Standard idle-sleep utilities (like `caffeinate` or general keeping-awake apps) 
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-username/openlid.git
+git clone https://github.com/openlid/openlid.git
 cd openlid
 
-# Build the release .app bundle and CLI tool
+# Build the release .app bundle and CLI binary
 ./scripts/bundle.sh
 ```
 
 ### 2. Launch or Install
 
-To launch immediately:
+To launch immediately from the project:
 ```bash
 open dist/OpenLid.app
 ```
 
-To install `OpenLid.app` into `/Applications` and `openlid` CLI into `/usr/local/bin`:
+To install permanently into `/Applications` and copy the CLI into `/usr/local/bin`:
 ```bash
 ./scripts/install.sh
 ```
 
 ---
 
-## 🖥 Command Line Interface (`openlid`)
+## 💻 CLI Usage
 
-OpenLid includes a command-line tool `openlid` for developers and scripts:
+OpenLid includes a command-line tool `openlid` that can be run from any terminal:
 
 ```bash
-# Enable closed-lid mode indefinitely
+# Awaken your Mac indefinitely
 openlid on
 
-# Enable closed-lid mode for a specific duration
+# Awaken your Mac for a specific session length
 openlid on --duration 30m
 openlid on -d 1h
 
-# Check live hardware, battery, and sleep status
+# Check live telemetry and state
 openlid status
 
-# Disable closed-lid mode (restore normal macOS sleep)
+# Put your Mac back to normal sleep behavior
 openlid off
 
 # Toggle state
 openlid toggle
 
-# Install passwordless helper for zero-prompt toggles
+# Install passwordless sudo helper for instant zero-prompt toggles
 openlid helper install
 ```
 
-### Example `openlid status` output:
+### Sample `openlid status` Output:
+
 ```text
 ================ OpenLid Status ================
-• Closed-Lid Running: 🟢 ACTIVE (Lid close sleep prevented)
+• Closed-Lid Running: 🟢 ACTIVE (Eye Vigilant)
 • Physical Lid:       🔒 CLOSED
 • Power Source:       ⚡️ Connected to AC Power
 • Battery Level:      94% (Charging ⚡️)
@@ -102,48 +140,59 @@ openlid helper install
 
 ---
 
-## 🏗 Architecture
+## 🌐 Interactive Website & Simulator
 
-The project is structured into three clean Swift targets:
+OpenLid comes with a product website and interactive web simulator located in [`website/`](website):
+
+- **Interactive Eye Simulator**: Toggle the virtual Eye, shut the virtual MacBook lid, and watch the simulated terminal keep streaming audio and running servers.
+- **Login & Remote Awake Console**: Sign in to the demo cloud portal to manage and awaken your Mac remotely.
+- **Preview Locally**: Run `./scripts/serve-website.sh` to preview at `http://localhost:8080`.
+
+---
+
+## 🏗 Architecture
 
 ```text
 openlid/
-├── Package.swift
+├── Package.swift                    # Swift Package definition
 ├── Sources/
-│   ├── OpenLidCore/            # Core library (IOKit, Power, Thermal, Battery)
-│   │   ├── ClamshellMonitor.swift  # Reads AppleClamshellState from IOPMrootDomain
-│   │   ├── BatteryMonitor.swift    # IOKit.ps power source telemetry & cutoff
-│   │   ├── ThermalMonitor.swift    # ProcessInfo thermal states & safety triggers
-│   │   ├── SessionTimer.swift      # Countdown timer & duration presets
-│   │   ├── PrivilegeManager.swift  # Sudoers helper & AppleScript elevation
-│   │   └── PowerManager.swift      # Central orchestrator & fail-safe cleanup
-│   ├── OpenLid/                # macOS Menu Bar Application (SwiftUI)
-│   │   ├── OpenLidApp.swift        # App lifecycle & signal traps
+│   ├── OpenLidCore/                 # Core engine (IOKit, Power, Thermal, Battery)
+│   │   ├── ClamshellMonitor.swift   # Reads AppleClamshellState from IOPMrootDomain
+│   │   ├── BatteryMonitor.swift     # IOKit battery level, AC telemetry & cutoff
+│   │   ├── ThermalMonitor.swift     # ProcessInfo.thermalState overheating guard
+│   │   ├── SessionTimer.swift       # Countdown timer & duration presets
+│   │   ├── LaunchAtLoginManager.swift# SMAppService & auto-awake on login
+│   │   ├── PrivilegeManager.swift   # Sudoers helper & Touch ID elevation
+│   │   └── PowerManager.swift       # Orchestrator & fail-safe teardown
+│   ├── OpenLid/                     # macOS Menu Bar Application (SwiftUI)
+│   │   ├── OpenLidApp.swift         # App lifecycle & signal traps
 │   │   └── Views/
-│   │       ├── MenuBarView.swift   # Main popover interface & telemetry
-│   │       ├── SettingsView.swift  # Safety & helper preferences
-│   │       └── StatusIconView.swift# Dynamic menu bar icon & countdown
-│   └── OpenLidCLI/             # Command-Line Utility
-│       └── main.swift              # Terminal subcommands (on/off/status/helper)
+│   │       ├── MenuBarView.swift    # Popover with hero toggle, telemetry & presets
+│   │       ├── SettingsView.swift   # Safety thresholds & helper installer
+│   │       └── StatusIconView.swift # Vigilant Eye menu bar symbol & countdown
+│   └── OpenLidCLI/                  # Command-Line Utility
+│       └── main.swift               # Terminal subcommands (on/off/status/helper)
 ├── Tests/
-│   └── OpenLidCoreTests/       # Unit tests
+│   └── OpenLidCoreTests/            # Unit test suite
+├── website/                         # Aesthetic landing page, simulator & auth portal
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
 └── scripts/
-    ├── bundle.sh               # Compiles release binary and creates OpenLid.app
-    └── install.sh              # Installs app to /Applications & CLI to /usr/local/bin
+    ├── bundle.sh                    # Release bundling & ad-hoc code-signing
+    ├── install.sh                   # System-wide installation script
+    └── serve-website.sh             # Local preview web server
 ```
 
 ---
 
-## ⚠️ Hardware Safety Note
+## ⚠️ Hardware Safety Advisory
 
-MacBooks vent heat partially through the keyboard and display hinge assembly. 
-
-> [!WARNING]
-> **Never** leave your MacBook running heavy workloads with the lid closed inside an enclosed container, backpack, or sleeve. Ensure adequate airflow when using closed-lid mode. OpenLid includes built-in thermal guards, but physical ventilation is always required.
+> [!CAUTION]
+> MacBooks dissipate heat partially through the keyboard and display hinge assembly. **Never** leave your MacBook running high-intensity tasks with the lid closed inside a tightly zippered backpack or sleeve. OpenLid features automatic thermal shutdowns, but physical airflow is always essential.
 
 ---
 
-## 📄 License
+## 📜 License
 
-MIT License. Feel free to use, modify, and distribute.
-
+Distributed under the [MIT License](LICENSE). Built for macOS developers and power users.

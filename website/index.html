@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenLid — The Unsleeping Eye for your MacBook</title>
+  <meta name="description" content="Keep your MacBook running at full throttle even when the lid is closed — safely, smoothly, and without an external monitor.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg-glow-top"></div>
+
+  <!-- Navigation -->
+  <nav class="navbar container">
+    <a href="#" class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+          <circle cx="12" cy="12" r="3" fill="currentColor"/>
+        </svg>
+      </div>
+      <span>OpenLid</span>
+    </a>
+
+    <div class="nav-links">
+      <a href="#features" class="nav-link">Features</a>
+      <a href="#simulator" class="nav-link">Live Simulator</a>
+      <a href="#cli" class="nav-link">CLI</a>
+      <a href="https://github.com/openlid/openlid" target="_blank" class="nav-link">GitHub</a>
+    </div>
+
+    <div class="nav-actions">
+      <button class="btn-secondary" id="openLoginBtn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+          <polyline points="10 17 15 12 10 7"/>
+          <line x1="15" y1="12" x2="3" y2="12"/>
+        </svg>
+        Sign In / Remote Awake
+      </button>
+      <a href="#download" class="btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download App
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero container">
+    <div class="hero-badge">
+      <span class="pulse-dot"></span>
+      The Unsleeping Eye for your MacBook • macOS 13+
+    </div>
+
+    <h1 class="hero-title">
+      Your Mac stays awake.<br>Even with the lid tightly closed.
+    </h1>
+
+    <p class="hero-subtitle">
+      Play audio, compile code, train AI models, and run servers without interruption. 
+      Lives discreetly in your menu bar with the vigilant symbol of an eye.
+    </p>
+
+    <div class="hero-buttons">
+      <a href="#download" class="btn-primary btn-large">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+          <polyline points="7 10 12 15 17 10"/>
+          <line x1="12" y1="15" x2="12" y2="3"/>
+        </svg>
+        Download for macOS (Universal)
+      </a>
+      <button class="btn-secondary btn-large" id="heroTrySimulatorBtn">
+        Try Interactive Simulator
+      </button>
+    </div>
+  </header>
+
+  <!-- Interactive Live Simulator -->
+  <section id="simulator" class="container">
+    <div class="simulator-wrapper">
+      <div class="simulator-header">
+        <div style="font-size: 0.95rem; font-weight: 700; color: var(--text-primary);">
+          Interactive MacBook Simulation
+        </div>
+        
+        <!-- Virtual Menu Bar -->
+        <div class="sim-menu-bar">
+          <span style="font-size: 0.8rem; color: var(--text-muted);">macOS Menu Bar:</span>
+          <button class="sim-eye-btn active" id="simEyeBtn" title="Click to toggle OpenLid">
+            <svg class="sim-eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+            <span id="simEyeText">Eye Vigilant</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="sim-stage">
+        <!-- Virtual MacBook Display -->
+        <div class="macbook-visual" id="macbookVisual">
+          <div class="lid-state-badge badge-open" id="lidBadge">📖 Lid Open</div>
+          
+          <div class="macbook-icon-wrapper" id="laptopGraphic">
+            💻
+          </div>
+
+          <div style="font-size: 0.9rem; font-weight: 600; margin-bottom: 8px;" id="macbookStatusTitle">
+            MacBook Running
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 16px;" id="macbookStatusDesc">
+            Display is on, tasks running normally.
+          </div>
+
+          <button class="btn-secondary" id="toggleLidBtn" style="width: 100%; justify-content: center;">
+            Close MacBook Lid
+          </button>
+        </div>
+
+        <!-- Virtual Terminal Output -->
+        <div class="terminal-box">
+          <div class="terminal-header">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+            <span style="margin-left: 8px; font-size: 0.75rem; color: var(--text-muted);">openlid-daemon — zsh</span>
+          </div>
+          <div id="termLogs">
+            <div class="term-line green">● OpenLid daemon v1.0.0 initialized</div>
+            <div class="term-line cyan">▶ Eye icon engaged in Menu Bar: Watchful & Awake</div>
+            <div class="term-line muted">ℹ︎ Clamshell assertion active (kIOPMAssertionTypePreventSystemSleep)</div>
+            <div class="term-line">[Vite] Local: http://localhost:5173/</div>
+            <div class="term-line">[Audio] CoreAudio output to AirPods Max: Streaming 🎵</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Grid -->
+  <section id="features" class="features-section container">
+    <div class="section-header">
+      <h2 class="section-title">Engineered for Unbroken Workflows</h2>
+      <p class="section-desc">Everything you need to turn your laptop into an autonomous workstation.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-icon">👁️</div>
+        <h3 class="card-title">The Vigilant Eye</h3>
+        <p class="card-desc">Sits quietly in your menu bar. Open eye with radiant glow signifies sleep-bypass is active; closed eye indicates normal system sleep.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🌡️</div>
+        <h3 class="card-title">Thermal Overheating Guard</h3>
+        <p class="card-desc">Monitors Apple Silicon & Intel thermal pressure via ProcessInfo. Automatically disengages if dangerous temperatures are reached in bags.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">🔋</div>
+        <h3 class="card-title">Smart Battery Floor</h3>
+        <p class="card-desc">Configurable battery cutoff (default 15%). Never wake up to a drained MacBook if left unplugged on battery power.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">⚡️</div>
+        <h3 class="card-title">Zero-Prompt Instant Helper</h3>
+        <p class="card-desc">Authorize once via Touch ID / admin password to install a scoped sudoers rule. Every subsequent toggle is 100% instant with zero dialogs.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">⏱️</div>
+        <h3 class="card-title">Session Timers</h3>
+        <p class="card-desc">Keep your Mac running for 15m, 30m, 1h, 2h, or Indefinitely. Includes live countdown in your menu bar.</p>
+      </div>
+
+      <div class="card">
+        <div class="card-icon">💻</div>
+        <h3 class="card-title">Hacker-Friendly CLI</h3>
+        <p class="card-desc">Includes the <code>openlid</code> binary. Integrate into automations, Raycast, Alfred, or terminal scripts with ease.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- CLI Showcase -->
+  <section id="cli" class="cli-section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Scriptable Command-Line Tool</h2>
+        <p class="section-desc">Manage your Mac's sleep behavior directly from your favorite terminal or scripts.</p>
+      </div>
+
+      <div class="cli-box">
+        <div class="cli-header">
+          <div class="terminal-header" style="margin: 0;">
+            <div class="dot dot-red"></div>
+            <div class="dot dot-yellow"></div>
+            <div class="dot dot-green"></div>
+          </div>
+          <span style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">Terminal</span>
+        </div>
+        <div class="cli-body">
+          <p><span class="cli-prompt">$</span>openlid on --duration 1h</p>
+          <p style="color: var(--accent-green);">✅ OpenLid is ACTIVE! Session will run for 60 minutes with lid closed.</p>
+          <br>
+          <p><span class="cli-prompt">$</span>openlid status</p>
+          <pre style="color: var(--text-secondary); margin-top: 4px;">
+================ OpenLid Status ================
+• Closed-Lid Running: 🟢 ACTIVE (Eye Vigilant)
+• Physical Lid:       🔒 CLOSED
+• Power Source:       ⚡️ Connected to AC Power
+• Battery Level:      94% (Charging ⚡️)
+• Thermal State:      Nominal (Cool)
+• Passwordless Helper: Installed ✅
+================================================</pre>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="container" style="padding: 100px 0; text-align: center;">
+    <div class="card" style="max-width: 680px; margin: 0 auto; padding: 48px 36px;">
+      <h2 style="font-size: 2.2rem; font-weight: 800; margin-bottom: 16px;">Ready to Awaken Your Mac?</h2>
+      <p style="color: var(--text-secondary); margin-bottom: 32px;">Download OpenLid for macOS 13.0 or higher. Universal binary optimized for Apple Silicon (M1/M2/M3/M4) and Intel Macs.</p>
+      
+      <div style="display: flex; justify-content: center; gap: 16px; margin-bottom: 24px;">
+        <a href="https://github.com/openlid/openlid/releases" class="btn-primary btn-large">
+          Download OpenLid.app
+        </a>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.4); border-radius: 8px; padding: 12px; font-family: var(--font-mono); font-size: 0.85rem; color: var(--text-muted);">
+        brew install --cask openlid
+      </div>
+    </div>
+  </section>
+
+  <!-- Login & Remote Awake Modal -->
+  <div class="modal-overlay" id="loginModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeModalBtn">&times;</button>
+      
+      <!-- View 1: Login Form -->
+      <div id="loginFormView">
+        <div class="modal-header">
+          <div class="modal-logo">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 6px;">Sign In to OpenLid</h3>
+          <p style="font-size: 0.85rem; color: var(--text-secondary);">Manage and awaken your Mac remotely</p>
+        </div>
+
+        <form id="authForm">
+          <div class="form-group">
+            <label class="form-label">Email or Apple ID</label>
+            <input type="email" class="form-input" id="authEmail" value="user@apple.com" required>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="authPassword" value="••••••••••••" required>
+          </div>
+
+          <button type="submit" class="btn-primary btn-full">
+            Sign In & Awaken Mac
+          </button>
+        </form>
+
+        <p style="text-align: center; font-size: 0.75rem; color: var(--text-muted); margin-top: 16px;">
+          Demo Portal • Click Sign In to enter the Remote Awake Console
+        </p>
+      </div>
+
+      <!-- View 2: Remote Awake Dashboard (Post-Login) -->
+      <div class="remote-dashboard" id="remoteDashboardView">
+        <div class="modal-header" style="margin-bottom: 18px;">
+          <h3 style="font-size: 1.3rem; font-weight: 700;">Remote Awake Console</h3>
+          <p style="font-size: 0.8rem; color: var(--accent-green);">● Connected to: Bhagyesh's MacBook Pro</p>
+        </div>
+
+        <div class="device-card">
+          <div class="remote-eye-toggle active" id="remoteEyeBtn" title="Click to Toggle Remote Awake">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle cx="12" cy="12" r="3" fill="currentColor"/>
+            </svg>
+          </div>
+          
+          <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 4px;" id="remoteStatusText">
+            Mac is AWAKE
+          </div>
+          <div style="font-size: 0.8rem; color: var(--text-secondary);">
+            Closed-lid sleep prevention is active
+          </div>
+
+          <div class="telemetry-row">
+            <div class="telemetry-pill">
+              <div>LID</div>
+              <div class="val" id="remoteLidVal">CLOSED</div>
+            </div>
+            <div class="telemetry-pill">
+              <div>BATTERY</div>
+              <div class="val">94% ⚡️</div>
+            </div>
+            <div class="telemetry-pill">
+              <div>THERMAL</div>
+              <div class="val" style="color: var(--accent-green);">COOL</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn-secondary btn-full" id="signOutBtn" style="font-size: 0.85rem;">
+          Sign Out of Remote Console
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <p>OpenLid — Released under the MIT License • Built with Swift & SwiftUI for macOS.</p>
+      <p style="margin-top: 8px; font-size: 0.8rem;">MacBook, macOS, and Apple Silicon are trademarks of Apple Inc.</p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
