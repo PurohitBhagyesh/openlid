@@ -20,8 +20,27 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Offer to move to /Applications if launched from Downloads
         ApplicationMover.promptToMoveToApplicationsIfNecessary()
         
+        // Apply user's presentation mode preference (menu bar vs windowed vs both)
+        AppPreferences.shared.applyPresentationMode()
+        
+        // If onboarding is not completed, or if mode is windowedApp or both, show the main window
+        if !AppPreferences.shared.hasCompletedOnboarding ||
+            AppPreferences.shared.presentationMode == .windowedApp ||
+            AppPreferences.shared.presentationMode == .both {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                MainWindowManager.shared.showMainWindow()
+            }
+        }
+        
         // Start local REST control server for website and automations
         ControlServer.shared.start()
+    }
+    
+    func applicationShouldHandleReopen(_ sender: NSApplication, hasVisibleWindows flag: Bool) -> Bool {
+        if !flag {
+            MainWindowManager.shared.showMainWindow()
+        }
+        return true
     }
     
     func applicationWillTerminate(_ notification: Notification) {
@@ -43,6 +62,18 @@ struct OpenLidApp: App {
         }
         .menuBarExtraStyle(.window)
         .commands {
+            CommandGroup(after: .appInfo) {
+                Button("Open Main Window") {
+                    MainWindowManager.shared.showMainWindow()
+                }
+                .keyboardShortcut("o", modifiers: .command)
+                
+                Button("Welcome Tutorial & Permissions...") {
+                    AppPreferences.shared.resetOnboarding()
+                    MainWindowManager.shared.showMainWindow()
+                }
+            }
+            
             CommandGroup(replacing: .appSettings) {
                 Button("Settings...") {
                     SettingsWindowManager.shared.showSettings()
@@ -52,4 +83,3 @@ struct OpenLidApp: App {
         }
     }
 }
-

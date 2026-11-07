@@ -76,6 +76,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const statusHeading = document.getElementById('statusHeading');
   const statusSub = document.getElementById('statusSub');
   const toggleEngineBtn = document.getElementById('toggleEngineBtn');
+  const monitorEyeWrap = document.getElementById('monitorEyeWrap');
   const valLid = document.getElementById('valLid');
   const valPower = document.getElementById('valPower');
   const valThermal = document.getElementById('valThermal');
@@ -96,7 +97,8 @@ document.addEventListener('DOMContentLoaded', () => {
             statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
             statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
           }
-          if (statusSub) statusSub.textContent = 'Connected to local OpenLid menu bar app';
+          if (monitorEyeWrap) monitorEyeWrap.classList.toggle('asleep', !isEnabled);
+          if (statusSub) statusSub.textContent = 'Connected to local OpenLid process';
           if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
           
           if (valLid) valLid.textContent = data.isLidClosed ? 'Closed' : 'Open';
@@ -118,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
       statusHeading.textContent = isEnabled ? 'Engine Active: Awake' : 'Engine Standby: Sleep Allowed';
       statusHeading.style.color = isEnabled ? 'var(--accent-emerald)' : 'var(--text-dim)';
     }
+    if (monitorEyeWrap) monitorEyeWrap.classList.toggle('asleep', !isEnabled);
     if (statusSub) statusSub.textContent = 'Native menu bar utility • Clamshell sleep prevention enabled';
     if (toggleEngineBtn) toggleEngineBtn.textContent = isEnabled ? 'Disengage Bypass' : 'Engage Sleep Bypass';
     if (valLid) valLid.textContent = 'Monitored (Closed Bypass)';

@@ -39,5 +39,21 @@ final class OpenLidCoreTests: XCTestCase {
         XCTAssertEqual(SessionPreset.hour1.duration, 60 * 60)
         XCTAssertEqual(SessionPreset.hour2.duration, 120 * 60)
     }
+    
+    func testAppPreferences() {
+        let prefs = AppPreferences.shared
+        let originalMode = prefs.presentationMode
+        
+        prefs.presentationMode = .windowedApp
+        XCTAssertEqual(prefs.presentationMode, .windowedApp)
+        
+        prefs.presentationMode = .menuBarOnly
+        XCTAssertEqual(prefs.presentationMode, .menuBarOnly)
+        
+        prefs.presentationMode = .both
+        XCTAssertEqual(prefs.presentationMode, .both)
+        
+        prefs.presentationMode = originalMode
+    }
 }
 

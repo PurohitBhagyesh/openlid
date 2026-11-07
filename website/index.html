@@ -190,7 +190,12 @@
     <div class="monitor">
       <div class="monitor-top">
         <div class="monitor-info">
-          <div class="monitor-dot"></div>
+          <div class="monitor-eye-wrap" id="monitorEyeWrap">
+            <svg class="monitor-eye" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+              <circle class="monitor-pupil" cx="12" cy="12" r="3.2" fill="currentColor"/>
+            </svg>
+          </div>
           <div>
             <div class="monitor-title" id="statusHeading">Engine Active: Awake</div>
             <div class="monitor-desc" id="statusSub">Connected to local OpenLid process on 127.0.0.1:31415</div>
@@ -370,25 +375,25 @@
     <div class="specs-grid">
       <div class="spec-col">
         <div class="spec-num">01</div>
-        <h3 class="spec-heading">IOPMrootDomain Assertion</h3>
+        <h3 class="spec-heading">IOPMrootDomain & Win32 AwayMode</h3>
         <p class="spec-text">
-          On macOS, lid closure triggers an interrupt directly into IOPMrootDomain. OpenLid modulates <code>pmset -a disablesleep 1</code> alongside an active <code>kIOPMAssertionTypePreventSystemSleep</code> token.
+          On macOS, OpenLid modulates <code>pmset -a disablesleep 1</code> alongside an active <code>kIOPMAssertionTypePreventSystemSleep</code> token. On Windows, it engages <code>ES_AWAYMODE_REQUIRED</code> and sets <code>LIDACTION 0</code>.
         </p>
       </div>
 
       <div class="spec-col">
         <div class="spec-num">02</div>
-        <h3 class="spec-heading">Win32 Away Mode</h3>
+        <h3 class="spec-heading">Dual Mode: Taskbar or Window</h3>
         <p class="spec-body spec-text">
-          On Windows, OpenLid engages <code>ES_AWAYMODE_REQUIRED</code> and configures <code>powercfg LIDACTION 0</code>, turning off the LCD panel while preserving CPU execution and audio streams.
+          Choose where OpenLid lives: discreetly in the macOS Menu Bar / Windows System Tray, as a standalone App Window in your Dock/Taskbar, or both simultaneously.
         </p>
       </div>
 
       <div class="spec-col">
         <div class="spec-num">03</div>
-        <h3 class="spec-heading">Scoped Elevation</h3>
+        <h3 class="spec-heading">Vigilant Scanning Eye & Setup</h3>
         <p class="spec-text">
-          Elevated power management modifications require privilege. OpenLid writes a scoped sudoers configuration (<code>/etc/sudoers.d/openlid</code>) via Touch ID once, avoiding subsequent password prompts.
+          An intuitive 3-step Welcome Onboarding flow with 3D animated vigilant eye (scanning left-to-right) walks you through instant passwordless Touch ID elevation and safety thresholds.
         </p>
       </div>
     </div>
@@ -441,7 +446,12 @@
       <div class="code-row">
         <span class="code-muted">$</span> <code>openlid status</code>
       </div>
-      <div class="code-output">Lid: Closed | Power: AC Connected (94%) | Thermal: Nominal | State: Active</div>
+      <div class="code-output">Lid: Closed | Power: AC Connected (94%) | Mode: Both | State: Active</div>
+
+      <div class="code-row">
+        <span class="code-muted">$</span> <code>openlid mode app</code>
+      </div>
+      <div class="code-output">OpenLid presentation mode updated to: Windowed App (Dock)</div>
 
       <div class="code-row">
         <span class="code-muted">$</span> <code>openlid off</code>

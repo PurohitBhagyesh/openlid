@@ -1,19 +1,25 @@
-# OpenLid for Windows — Instant Clamshell Sleep Prevention
-# Usage: .\OpenLid.ps1 [-On | -Off | -Status | -Tray]
+﻿# OpenLid for Windows — Native Dual App & System Tray Clamshell Sleep Prevention
+# Usage: .\OpenLid.ps1 [-On | -Off | -Status | -App | -Welcome | -Tray | -Mode <tray|app|both>]
 
 param (
     [switch]$On,
     [switch]$Off,
     [switch]$Status,
+    [switch]$App,
+    [switch]$Gui,
+    [switch]$Welcome,
     [switch]$Tray,
+    [string]$Mode = "",
     [int]$Duration = 0
 )
 
+$scriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+
 function Set-LidAction([int]$action) {
     # 0 = Do Nothing (Keep Awake), 1 = Sleep (Default)
-    powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION $action
-    powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION $action
-    powercfg /setactive SCHEME_CURRENT
+    powercfg /setacvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION $action | Out-Null
+    powercfg /setdcvalueindex SCHEME_CURRENT SUB_BUTTONS LIDACTION $action | Out-Null
+    powercfg /setactive SCHEME_CURRENT | Out-Null
 }
 
 function Enable-AwayMode {
@@ -28,6 +34,56 @@ function Enable-AwayMode {
     }
 }
 
+function Launch-OpenLidGUI([string]$flag = "") {
+    $csFile = Join-Path $scriptDir "OpenLidTray.cs"
+    $exeFile = Join-Path $scriptDir "OpenLid.exe"
+    
+    if (-not (Test-Path $exeFile) -and (Test-Path $csFile)) {
+        Write-Host "🔨 Compiling OpenLid for Windows with csc.exe..." -ForegroundColor Cyan
+        $csc = Join-Path ([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()) "csc.exe"
+        if (Test-Path $csc) {
+            & $csc /target:winexe /out:"$exeFile" /r:System.Windows.Forms.dll,System.Drawing.dll "$csFile" | Out-Null
+        }
+    }
+    
+    if (Test-Path $exeFile) {
+        Start-Process $exeFile -ArgumentList $flag
+    } else {
+        # Fallback to direct PowerShell execution with WinForms
+        Add-Type -Path $csFile -ReferencedAssemblies System.Windows.Forms,System.Drawing
+        [OpenLid.Program]::Main(@($flag))
+    }
+}
+
+if ($App -or $Gui) {
+    Launch-OpenLidGUI "--app"
+    exit
+}
+
+if ($Welcome) {
+    Launch-OpenLidGUI "--welcome"
+    exit
+}
+
+if ($Tray) {
+    Launch-OpenLidGUI "--tray"
+    exit
+}
+
+if ($Mode -ne "") {
+    $validModes = @("tray", "app", "both")
+    if ($validModes -contains $Mode.ToLower()) {
+        $appDataDir = Join-Path $env:APPDATA "OpenLid"
+        if (-not (Test-Path $appDataDir)) { New-Item -ItemType Directory -Path $appDataDir | Out-Null }
+        $configFile = Join-Path $appDataDir "config.ini"
+        "Mode=$($Mode.ToLower())`nOnboarded=True" | Set-Content $configFile
+        Write-Host "✅ OpenLid presentation mode updated to: $Mode" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Invalid mode. Choose from: tray, app, both" -ForegroundColor Red
+    }
+    exit
+}
+
 if ($Off) {
     Set-LidAction 1
     Write-Host "✅ OpenLid for Windows: STANDBY (Default sleep restored when lid closes)" -ForegroundColor Yellow
@@ -37,13 +93,14 @@ if ($Off) {
 if ($Status) {
     Write-Host "================ OpenLid for Windows ================" -ForegroundColor Cyan
     Write-Host "• Platform: Windows 10 / Windows 11 (x64 / ARM64)"
+    Write-Host "• Presentation Modes: System Tray, App Window, or Both"
     Write-Host "• Website:  https://openlid.devs.li"
     Write-Host "• Lid Sleep Action: Configured via powercfg & SetThreadExecutionState"
     Write-Host "=====================================================" -ForegroundColor Cyan
     exit
 }
 
-# Default: Turn ON
+# Default CLI: Turn ON
 Set-LidAction 0
 Enable-AwayMode
 
@@ -68,4 +125,3 @@ if ($Duration -gt 0) {
         Write-Host "`n🛑 OpenLid stopped. Default sleep restored." -ForegroundColor Yellow
     }
 }
-

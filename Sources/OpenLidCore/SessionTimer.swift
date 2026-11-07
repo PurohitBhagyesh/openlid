@@ -1,11 +1,13 @@
 import Foundation
 
-public enum SessionPreset: Equatable, Hashable, CaseIterable {
-    case indefinite
-    case min15
-    case min30
-    case hour1
-    case hour2
+public enum SessionPreset: String, Equatable, Hashable, CaseIterable, Identifiable {
+    case indefinite = "indefinite"
+    case min15 = "15m"
+    case min30 = "30m"
+    case hour1 = "1h"
+    case hour2 = "2h"
+    
+    public var id: String { rawValue }
     
     public static var allCases: [SessionPreset] {
         return [.indefinite, .min15, .min30, .hour1, .hour2]

@@ -21,9 +21,7 @@ struct MenuBarView: View {
             // Header
             HStack(alignment: .center) {
                 HStack(spacing: 8) {
-                    Image(systemName: powerManager.isEnabled ? "eye.fill" : "eye.slash")
-                        .font(.system(size: 19, weight: .bold))
-                        .foregroundColor(powerManager.isEnabled ? .green : .secondary)
+                    AnimatedEyeView(size: 24, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
                     
                     VStack(alignment: .leading, spacing: 1) {
                         Text("OpenLid")
@@ -58,18 +56,13 @@ struct MenuBarView: View {
                 }) {
                     HStack(spacing: 12) {
                         ZStack {
-                            Circle()
-                                .fill(powerManager.isEnabled ? Color.green : Color.secondary.opacity(0.2))
-                                .frame(width: 38, height: 38)
-                            
                             if powerManager.isBusy {
                                 ProgressView()
                                     .scaleEffect(0.6)
                                     .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                                    .frame(width: 38, height: 38)
                             } else {
-                                Image(systemName: powerManager.isEnabled ? "eye.fill" : "eye.slash")
-                                    .font(.system(size: 17, weight: .bold))
-                                    .foregroundColor(powerManager.isEnabled ? .white : .primary)
+                                AnimatedEyeView(size: 38, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
                             }
                         }
                         
@@ -289,10 +282,21 @@ struct MenuBarView: View {
                 Spacer()
                 
                 Button(action: {
+                    MainWindowManager.shared.showMainWindow()
+                }) {
+                    Label("App Window", systemImage: "macwindow")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.green)
+                }
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button(action: {
                     powerManager.cleanup()
                     NSApplication.shared.terminate(nil)
                 }) {
-                    Text("Quit OpenLid")
+                    Text("Quit")
                         .font(.system(size: 11))
                         .foregroundColor(.secondary)
                 }

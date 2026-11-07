@@ -24,8 +24,9 @@ Developed with precision by **[Bhagyesh Purohit](https://github.com/PurohitBhagy
 <p align="center">
   <a href="#downloads">Downloads</a> •
   <a href="#overview">Overview</a> •
-  <a href="#features">Features</a> •
-  <a href="#status-bar-indicators">Status Bar</a> •
+  <a href="#presentation-modes">Presentation Modes</a> •
+  <a href="#onboarding--permissions-flow">Onboarding</a> •
+  <a href="#animated-vigilant-eye">Animated Eye</a> •
   <a href="#cli-usage">CLI</a> •
   <a href="#architecture">Architecture</a> •
   <a href="#contact--support">Contact & Support</a>
@@ -51,17 +52,63 @@ If you are:
 
 ---
 
-## Features
+## Presentation Modes: Menu Bar / Taskbar vs. Standalone App Window
 
-- **Ultra-Lightweight Footprint:** Under **2.5 MB** compiled Universal 2 Mach-O binary (< 700 KB compressed archive); uses less than **20 MB** of system RAM.
-- **Native Menu Bar & Tray:** High-contrast template icons that automatically adapt to light/dark wallpaper themes.
-- **Session Presets:** Choose between `∞ Always`, `15m`, `30m`, `1h`, and `2h` countdown timers without accidental truncation.
-- **Hardware Sentinels:** 
-  - **Thermal Sentinel:** Automatically drops sleep bypass if internal temperatures reach serious/critical thresholds.
-  - **Battery Cutoff Floor:** Configurable minimum battery margin (default: 15%) so you never drain your laptop to zero when unplugged.
-- **Instant Passwordless Elevation:** Touch ID-authorized scoped `/etc/sudoers.d/openlid` rule to toggle power states instantly without password prompts.
-- **Local Telemetry REST API:** Runs on `127.0.0.1:31415` for instant status inspection from terminal, scripts, or the OpenLid web dashboard.
-- **Cross-Platform:** Native Swift for macOS; zero-install C# and PowerShell for Windows 11/10 (x64 and Snapdragon ARM64).
+OpenLid is designed with complete user freedom. Both macOS and Windows provide three presentation modes selectable in Settings:
+
+1. **Menu Bar / System Tray Only (Discreet Taskbar Mode):**
+   - **macOS:** Operates as an `NSApplication.ActivationPolicy.accessory`. Lives quietly in the macOS menu bar without taking space in the Dock.
+   - **Windows:** Minimizes to the notification area / system tray next to the Windows clock.
+2. **Windowed App Only (Standard Dock / Taskbar Mode):**
+   - **macOS:** Operates as a regular app with Dock icon and dedicated Main Application Window.
+   - **Windows:** Standard desktop application window pinned to the Windows taskbar.
+3. **Both (Menu Bar + Windowed App):**
+   - Provides an instant status indicator and quick-toggle popover in the menu bar/system tray alongside a full application dashboard window.
+
+Users can toggle between these modes at any time in **Settings → App Presentation Mode** or via the terminal using `openlid mode [menubar|app|both]`.
+
+---
+
+## Onboarding & Permissions Flow
+
+On first launch (or when clicking **Re-run Welcome Tutorial & Permissions**), OpenLid greets users with a streamlined 3-step setup:
+
+```
+[ Step 1: Welcome to OpenLid ]
+      ┌────────────────┐
+      │  Animated Eye  │ ◄── Eyeball scans left-to-right continuously
+      │   (3D Depth)   │
+      └────────────────┘
+    Welcome to OpenLid
+  [ Get Started → ]
+         │
+         ▼
+[ Step 2: Essential Permissions ]
+  • Kernel Sleep Assertion (IOPMAssertion / Win32 Away Mode)
+  • Clamshell Elevation Helper (sudoers Touch ID / powercfg)
+  • IOPS Hardware Sentinel (Battery & Thermal Watchdog)
+  [ Authorize & Install Helper ] ──► [ Continue → ]
+         │
+         ▼
+[ Step 3: Choose Presentation Mode ]
+  ( ) Menu Bar (Taskbar) Only
+  ( ) Windowed App (Dock)
+  (*) Both (Recommended)
+  [ Enter OpenLid ✓ ]
+         │
+         ▼
+[ Main Application UI & Dashboard ]
+```
+
+---
+
+## Animated Vigilant Eye
+
+When OpenLid is **Active & Awake**, the eye symbol features a live vigilance animation:
+- **Horizontal Eyeball Scanning:** The glowing neon-emerald iris and pupil move smoothly from left to right and right to left, simulating continuous vigilance.
+- **Glass Specular Light Reflection:** Layered 3D depth and specular highlight for an authentic hardware sentinel appearance.
+- **Dynamic Transition:** When opening the menu or returning from Settings, the animated eye remains responsive and indicates active sleep prevention.
+- **Sleep Mode:** When disengaged, the eye shows a subdued, slashed indicator indicating normal sleep is permitted.
 
 ---
 
@@ -86,25 +133,13 @@ brew install --cask openlid
 
 | Architecture | Standalone Archive | Target Hardware | Contents |
 | :--- | :---: | :--- | :--- |
-| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `OpenLidTray.exe` + PowerShell Scripts |
-| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `OpenLidTray.exe` + PowerShell Scripts |
+| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `OpenLidTray.cs` + `OpenLid.ps1` + `openlid.cmd` |
+| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `OpenLidTray.cs` + `OpenLid.ps1` + `openlid.cmd` |
 
 ```powershell
-# Windows PowerShell Quick-Launch (Zero-Install)
-powershell -Command ".\windows\OpenLid.ps1 -On"
+# Windows PowerShell Quick-Launch (Zero-Install GUI)
+powershell -ExecutionPolicy Bypass -Command ".\windows\OpenLid.ps1 -App"
 ```
-
----
-
-## Status Bar Indicators
-
-OpenLid lives natively in your status bar with an adaptive Unsleeping Eye symbol:
-
-| State | macOS Menu Bar | Windows System Tray | Meaning |
-| :--- | :---: | :---: | :--- |
-| **Vigilant & Awake** | `eye.fill` (Open Eye) | Green Eye | OpenLid is ACTIVE. Your laptop continues running with the lid closed. |
-| **Clamshell Running** | `eye.circle.fill` | Green Pulse Dot | Lid is physically closed; display backlight is off, but CPU and network operate at full speed. |
-| **Default Sleep** | `eye.slash` (Closed Eye) | Dimmed Eye | Sleep assertions disengaged. Closing the lid will sleep your laptop normally. |
 
 ---
 
@@ -120,8 +155,19 @@ openlid on
 openlid on --duration 30m
 openlid on -d 1h
 
-# Check live hardware telemetry
+# Check live hardware telemetry & mode
 openlid status
+
+# Configure presentation mode (menubar, app, or both)
+openlid mode menubar
+openlid mode app
+openlid mode both
+
+# Launch standalone GUI application window
+openlid app
+
+# Re-run onboarding & permissions wizard
+openlid welcome
 
 # Disable sleep prevention (return to default macOS sleep)
 openlid off
@@ -136,6 +182,15 @@ openlid helper install
 ### Windows (`OpenLid.ps1` / `openlid.cmd`)
 
 ```cmd
+:: Launch GUI Application Window
+openlid.cmd app
+
+:: Re-run Welcome Onboarding
+openlid.cmd welcome
+
+:: Set presentation mode
+powershell -File .\OpenLid.ps1 -Mode both
+
 :: Enable closed-lid sleep prevention
 openlid.cmd on
 
@@ -155,6 +210,7 @@ openlid/
 ├── Package.swift                    # Swift Package Manager manifest
 ├── Sources/
 │   ├── OpenLidCore/                 # macOS Core Engine (IOKit, Power, Thermal, Battery)
+│   │   ├── AppPreferences.swift     # Presentation mode (menubar vs app vs both) & onboarding state
 │   │   ├── ClamshellMonitor.swift   # Reads AppleClamshellState from IOPMrootDomain
 │   │   ├── BatteryMonitor.swift     # IOPSCopyPowerSourcesInfo telemetry & cutoff
 │   │   ├── ThermalMonitor.swift     # ProcessInfo.thermalState overheating guard
@@ -164,17 +220,26 @@ openlid/
 │   │   ├── ControlServer.swift      # Local REST API on 127.0.0.1:31415
 │   │   ├── ApplicationMover.swift   # Auto-prompts to move app to /Applications
 │   │   └── PowerManager.swift       # Assertion coordinator & signal trap cleanup
-│   ├── OpenLid/                     # macOS Menu Bar App (SwiftUI)
-│   │   ├── OpenLidApp.swift         # MenuBarExtra window lifecycle
-│   │   └── Views/                   # MenuBarView, SettingsView, StatusIconView
+│   ├── OpenLid/                     # macOS Dual-Mode App (SwiftUI & AppKit)
+│   │   ├── OpenLidApp.swift         # Lifecycle, activation policy & menu commands
+│   │   ├── MainWindowManager.swift  # Standalone Application Window Controller
+│   │   ├── SettingsWindowManager.swift # Settings Window Controller
+│   │   └── Views/
+│   │       ├── AnimatedEyeView.swift# 3D layered eye with scanning pupil animation
+│   │       ├── OnboardingView.swift # 3-step Welcome & Permissions Wizard
+│   │       ├── MainWindowView.swift # Full standalone GUI Application Window
+│   │       ├── MenuBarView.swift    # Status bar popover with animated eye & tools
+│   │       ├── SettingsView.swift   # Mode picker, safety thresholds & developer contact
+│   │       └── StatusIconView.swift # Menu bar template icon
 │   └── OpenLidCLI/                  # macOS Command-Line Interface (main.swift)
 ├── windows/                         # Windows Subsystem (11/10)
-│   ├── OpenLidTray.cs               # Native C# System Tray app with AwayMode
-│   ├── OpenLid.ps1                  # Zero-install PowerShell engine
-│   └── openlid.cmd                  # Windows batch launcher
+│   ├── OpenLidTray.cs               # Native C# Dual GUI & Tray App with Animated Eye
+│   ├── OpenLid.ps1                  # Zero-install PowerShell engine & launcher
+│   ├── openlid.cmd                  # Windows batch launcher
+│   └── README-Windows.txt           # Windows instructions
 ├── index.html                       # Product landing site with Eye theme switcher
 ├── style.css                        # Universal responsive design system
-├── app.js                           # State manager & live telemetry client
+├── app.js                           # State manager, UPI detection & share widget
 ├── downloads/                       # Direct distribution builds (.zip only)
 └── scripts/
     ├── bundle.sh                    # Universal lipo compilation & ZIP packaging
@@ -187,7 +252,7 @@ openlid/
 
 If you encounter any problem, bug, or have a feature request:
 
-- **Lead Developer:** Bhagyesh Purohit
+- **Lead Developer:** OpenLid Developer
 - **GitHub Profile:** [@PurohitBhagyesh](https://github.com/PurohitBhagyesh)
 - **Email Directly:** [purohitunofficialbhagyesh@gmail.com](mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20%2F%20Issue%20Report)
 - **Issue Tracker:** [GitHub Issues](https://github.com/PurohitBhagyesh/openlid/issues)

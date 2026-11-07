@@ -55,6 +55,36 @@ struct SettingsView: View {
             
             // Settings Form
             Form {
+                Section(header: Text("App Presentation Mode").font(.headline)) {
+                    Picker("Run OpenLid in:", selection: Binding(
+                        get: { AppPreferences.shared.presentationMode },
+                        set: { AppPreferences.shared.presentationMode = $0 }
+                    )) {
+                        ForEach(AppPresentationMode.allCases) { mode in
+                            Text(mode.title).tag(mode)
+                        }
+                    }
+                    .pickerStyle(.radioGroup)
+                    
+                    Text(AppPreferences.shared.presentationMode.subtitle)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                    
+                    HStack(spacing: 16) {
+                        Button("Open Main App Window ↗") {
+                            MainWindowManager.shared.showMainWindow()
+                        }
+                        .buttonStyle(.link)
+                        
+                        Button("Re-run Welcome Tutorial ↗") {
+                            AppPreferences.shared.resetOnboarding()
+                            MainWindowManager.shared.showMainWindow()
+                        }
+                        .buttonStyle(.link)
+                    }
+                    .padding(.top, 4)
+                }
+                
                 Section(header: Text("Startup & Login Behavior").font(.headline)) {
                     Toggle("Launch OpenLid at Login", isOn: Binding(
                         get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },

@@ -14,6 +14,10 @@ func printHelp() {
         off, disable       Restore normal macOS sleep behavior
         toggle             Toggle closed-lid awake state
         status             Show live lid, battery, thermal, and sleep status
+        mode [get|menubar|app|both]
+                           Configure app presentation mode (Taskbar vs App Window vs Both)
+        app, gui           Launch the standalone OpenLid application window
+        welcome            Launch the Welcome to OpenLid onboarding & permissions flow
         helper install     Install passwordless sudo helper for instant toggling
         helper uninstall   Remove passwordless sudo helper
         help, -h, --help   Show this help message
@@ -23,6 +27,8 @@ func printHelp() {
         openlid on --duration 30m
         openlid off
         openlid status
+        openlid mode app
+        openlid app
         openlid helper install
     """)
 }
@@ -93,10 +99,12 @@ case "status":
     let battery = BatteryMonitor.shared
     let thermal = ThermalMonitor.shared
     let helperInstalled = PrivilegeManager.shared.isHelperInstalled()
+    let mode = AppPreferences.shared.presentationMode
     
     print("""
     ================ OpenLid Status ================
     • Closed-Lid Running: \(isSleepDisabled ? "🟢 ACTIVE (Lid close sleep prevented)" : "⚪️ INACTIVE (Normal sleep)")
+    • Presentation Mode:  \(mode.title)
     • Physical Lid:       \(isLidClosed ? "🔒 CLOSED" : "📖 OPEN")
     • Power Source:       \(battery.isOnACPower ? "⚡️ Connected to AC Power" : "🔋 Battery (\(battery.batteryPercent)%)")
     • Battery Level:      \(battery.batteryPercent)% \(battery.isCharging ? "(Charging ⚡️)" : "")
@@ -104,6 +112,37 @@ case "status":
     • Passwordless Helper:\(helperInstalled ? " Installed ✅" : " Not Installed (Admin prompt used) ⚠️")
     ================================================
     """)
+
+case "mode":
+    if args.count > 2 {
+        let rawMode = args[2].lowercased()
+        if let newMode = AppPresentationMode(rawValue: rawMode) {
+            AppPreferences.shared.presentationMode = newMode
+            print("✅ OpenLid presentation mode updated to: \(newMode.title)")
+            print("ℹ️ \(newMode.subtitle)")
+        } else {
+            print("❌ Invalid mode '\(rawMode)'. Choose from: menubar, app, both")
+            exit(1)
+        }
+    } else {
+        print("Current presentation mode: \(AppPreferences.shared.presentationMode.title)")
+        print("Options: openlid mode [menubar|app|both]")
+    }
+
+case "app", "gui":
+    print("🚀 Launching OpenLid Application Window...")
+    let proc = Process()
+    proc.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+    proc.arguments = ["-a", "OpenLid"]
+    try? proc.run()
+
+case "welcome", "onboarding":
+    print("✨ Resetting onboarding and launching Welcome Guide...")
+    AppPreferences.shared.resetOnboarding()
+    let proc = Process()
+    proc.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+    proc.arguments = ["-a", "OpenLid"]
+    try? proc.run()
 
 case "helper":
     guard args.count > 2 else {
@@ -143,4 +182,3 @@ default:
     printHelp()
     exit(1)
 }
-

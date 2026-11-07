@@ -300,6 +300,47 @@ body {
   gap: 12px;
 }
 
+.monitor-eye-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex-shrink: 0;
+  transition: all 0.25s ease;
+}
+
+.monitor-eye-wrap.asleep {
+  background: rgba(140, 150, 165, 0.12);
+  color: var(--text-muted);
+}
+
+.monitor-eye {
+  overflow: visible;
+}
+
+.monitor-pupil {
+  animation: eyeScan 2s ease-in-out infinite alternate;
+  transform-origin: 12px 12px;
+}
+
+.monitor-eye-wrap.asleep .monitor-pupil {
+  animation-play-state: paused;
+  transform: none;
+}
+
+@keyframes eyeScan {
+  0% {
+    transform: translateX(-3.5px);
+  }
+  100% {
+    transform: translateX(3.5px);
+  }
+}
+
 .monitor-dot {
   width: 10px;
   height: 10px;
