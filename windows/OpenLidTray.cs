@@ -67,7 +67,17 @@ namespace OpenLid
             trayMenu.Items.Add(durationMenu);
 
             trayMenu.Items.Add(new ToolStripSeparator());
-            trayMenu.Items.Add("Website: openlid.devs.li", null, (s, e) => Process.Start("https://openlid.devs.li"));
+            var contactMenu = new ToolStripMenuItem("Contact Developer");
+            contactMenu.DropDownItems.Add("GitHub: @PurohitBhagyesh", null, (s, e) => {
+                try { Process.Start(new ProcessStartInfo("https://github.com/PurohitBhagyesh") { UseShellExecute = true }); } catch {}
+            });
+            contactMenu.DropDownItems.Add("Official Website: openlid.devs.li", null, (s, e) => {
+                try { Process.Start(new ProcessStartInfo("https://openlid.devs.li") { UseShellExecute = true }); } catch {}
+            });
+            contactMenu.DropDownItems.Add("Report a Problem: purohitunofficialbhagyesh@gmail.com", null, (s, e) => {
+                try { Process.Start(new ProcessStartInfo("mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report%20(Windows)") { UseShellExecute = true }); } catch {}
+            });
+            trayMenu.Items.Add(contactMenu);
             trayMenu.Items.Add(new ToolStripSeparator());
             trayMenu.Items.Add("Exit OpenLid", null, (s, e) => ExitApplication());
 

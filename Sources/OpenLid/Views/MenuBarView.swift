@@ -4,26 +4,16 @@ import OpenLidCore
 struct MenuBarView: View {
     @ObservedObject var powerManager = PowerManager.shared
     @State private var selectedPreset: SessionPreset = .indefinite
-    @State private var showSettings: Bool = false
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     
     var body: some View {
-        Group {
-            if showSettings {
-                SettingsView(onDismiss: {
-                    showSettings = false
-                })
-            } else {
-                mainView
+        mainView
+            .frame(width: 350)
+            .onAppear {
+                helperInstalled = PrivilegeManager.shared.isHelperInstalled()
+                powerManager.clamshell.updateLidState()
+                powerManager.battery.updateBatteryState()
             }
-        }
-        .frame(width: showSettings ? 370 : 350)
-        .animation(.easeInOut(duration: 0.18), value: showSettings)
-        .onAppear {
-            helperInstalled = PrivilegeManager.shared.isHelperInstalled()
-            powerManager.clamshell.updateLidState()
-            powerManager.battery.updateBatteryState()
-        }
     }
     
     private var mainView: some View {
@@ -289,9 +279,9 @@ struct MenuBarView: View {
             // Footer Controls
             HStack {
                 Button(action: {
-                    showSettings.toggle()
+                    SettingsWindowManager.shared.showSettings()
                 }) {
-                    Label("Settings", systemImage: "gearshape")
+                    Label("Settings...", systemImage: "gearshape")
                         .font(.system(size: 11))
                 }
                 .buttonStyle(.plain)
