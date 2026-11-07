@@ -3,13 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OpenLid — Clamshell sleep prevention for macOS</title>
-  <meta name="description" content="OpenLid prevents macOS from sleeping when your laptop lid is closed. Native Apple Silicon and Intel builds.">
+  <title>OpenLid — Clamshell Sleep Prevention for macOS</title>
+  <meta name="description" content="OpenLid prevents macOS from sleeping when your MacBook lid is closed. Native Apple Silicon and Intel menu bar utility with kernel sleep assertions and thermal guard.">
   <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2.2'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3' fill='%2310b981'/></svg>">
 </head>
 <body>
 
-  <!-- Navigation -->
+  <!-- Top Scroll Progress Bar -->
+  <div class="scroll-progress-bar" id="scrollProgressBar"></div>
+
+  <!-- Ambient Glow Gradients -->
+  <div class="ambient-glow-1"></div>
+  <div class="ambient-glow-2"></div>
+
+  <!-- Sticky Glass Navigation -->
   <nav class="navbar container">
     <a href="#" class="logo">
       <div class="logo-icon">
@@ -23,9 +31,10 @@
     </a>
 
     <div class="nav-links">
+      <a href="#simulation" class="nav-link">3D Simulator</a>
       <a href="#downloads" class="nav-link">Downloads</a>
-      <a href="#how-it-works" class="nav-link">Architecture</a>
-      <a href="#safety" class="nav-link">Safety Guards</a>
+      <a href="#architecture" class="nav-link">Architecture</a>
+      <a href="#safety" class="nav-link">Safety</a>
       <a href="#cli" class="nav-link">CLI</a>
       <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" class="nav-link nav-github">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
@@ -37,24 +46,25 @@
 
     <div class="nav-actions">
       <a href="#downloads" class="btn-primary">
-        Download for macOS
+        Get OpenLid
       </a>
     </div>
   </nav>
 
   <!-- Hero Section -->
-  <header class="hero container">
+  <header class="hero container reveal-on-scroll">
     <div class="hero-badge">
       <span class="status-indicator"></span>
-      Native macOS 13+ • Universal (Apple Silicon & Intel)
+      Native macOS 13+ • Universal for Apple Silicon (M1-M4) & Intel
     </div>
 
     <h1 class="hero-title">
-      Keep your MacBook running<br>with the lid closed.
+      Keep your MacBook running<br>
+      <span class="gradient-text">with the lid closed.</span>
     </h1>
 
     <p class="hero-lead">
-      No external display or dummy HDMI plug required. OpenLid controls kernel sleep assertions directly from your menu bar, with automatic thermal throttling protection and battery drain cutoffs.
+      No external display, power bricks, or dummy HDMI plugs required. OpenLid controls kernel sleep assertions directly from your menu bar with automatic thermal breakers and battery margin cutoffs.
     </p>
 
     <div class="hero-cta-group">
@@ -64,15 +74,15 @@
           <polyline points="7 10 12 15 17 10"/>
           <line x1="12" y1="15" x2="12" y2="3"/>
         </svg>
-        Get OpenLid
+        Download OpenLid
       </a>
-      <a href="#how-it-works" class="btn-hero-secondary">
-        Read Technical Specs →
+      <a href="#simulation" class="btn-hero-secondary">
+        Interactive 3D Simulator ↓
       </a>
     </div>
 
-    <!-- Live Status Card -->
-    <div class="live-status-card" id="liveTelemetryCard">
+    <!-- Live Status Bridge Card -->
+    <div class="live-status-card reveal-on-scroll" id="liveTelemetryCard">
       <div class="status-header">
         <div class="status-title-row">
           <div class="eye-badge" id="eyeStatusBadge">
@@ -96,7 +106,7 @@
         </div>
         <div class="telemetry-cell">
           <span class="telemetry-label">POWER SOURCE</span>
-          <span class="telemetry-val" id="valPower">Battery (58%)</span>
+          <span class="telemetry-val" id="valPower">AC Power (96% ⚡️)</span>
         </div>
         <div class="telemetry-cell">
           <span class="telemetry-label">THERMAL PRESSURE</span>
@@ -104,17 +114,85 @@
         </div>
         <div class="telemetry-cell">
           <span class="telemetry-label">ASSERTION STATE</span>
-          <span class="telemetry-val" id="valAssertion">Active</span>
+          <span class="telemetry-val" id="valAssertion" style="color: var(--accent-emerald-bright)">Active (Awake)</span>
         </div>
       </div>
     </div>
   </header>
 
-  <!-- Downloads Section -->
-  <section id="downloads" class="section container">
+  <!-- =====================================================================
+       3D CLAMSHELL SIMULATOR SHOWCASE
+       ===================================================================== -->
+  <section id="simulation" class="three-section container reveal-on-scroll">
+    <div class="section-title-wrap">
+      <h2 class="section-heading">Interactive 3D Clamshell Engine</h2>
+      <p class="section-subheading">
+        Drag to inspect in 360°. Adjust the hinge angle to test how OpenLid maintains system execution when the lid closes.
+      </p>
+    </div>
+
+    <div class="three-card">
+      <div class="three-header">
+        <div class="three-title-group">
+          <span class="badge-3d">3D WebGL</span>
+          <span class="three-title">MacBook Pro Physics Simulator</span>
+        </div>
+
+        <div class="hud-lid-state" id="hudLidState">
+          <span class="badge-blue">📖 SCREEN OPEN</span> • <span>Display Active</span>
+        </div>
+      </div>
+
+      <!-- Three.js Canvas Container -->
+      <div id="threeContainer" class="three-viewport">
+        <!-- Overlay HUD Indicators -->
+        <div class="three-hud-overlay">
+          <div class="hud-pill">
+            <span>Kernel Assertion:</span>
+            <strong>kIOPMAssertionTypePreventSystemSleep</strong>
+          </div>
+          <div class="hud-pill">
+            <span>SMC Clamshell Hook:</span>
+            <strong>AppleClamshellState Overridden</strong>
+          </div>
+          <div class="hud-pill">
+            <span>Hardware Watchdog:</span>
+            <strong>ProcessInfo Thermal Safety Active</strong>
+          </div>
+        </div>
+
+        <div class="hud-hint-pill">
+          🖱️ Drag to rotate 360° • Pinch / scroll to inspect
+        </div>
+      </div>
+
+      <!-- Interactive 3D Controls Bar -->
+      <div class="three-controls-bar">
+        <div class="lid-presets">
+          <button class="btn-preset" id="btnLidOpen">📖 Open (112°)</button>
+          <button class="btn-preset" id="btnLidHalf">📐 Half (48°)</button>
+          <button class="btn-preset" id="btnLidClose">🔒 Close (0° Clamshell)</button>
+        </div>
+
+        <div class="slider-group">
+          <span id="lidAngleDisplay">Lid: <strong>112° (Fully Open)</strong></span>
+          <input type="range" class="lid-range" id="lidSlider" min="0" max="125" value="112" step="1">
+        </div>
+
+        <button class="btn-engine-toggle" id="btn3dEngineToggle">
+          OpenLid Engine: ACTIVE 🟢
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =====================================================================
+       DOWNLOADS SECTION (UN-SLOPPED DUAL ARCHITECTURE)
+       ===================================================================== -->
+  <section id="downloads" class="section container reveal-on-scroll">
     <div class="section-title-wrap">
       <h2 class="section-heading">Download OpenLid</h2>
-      <p class="section-subheading">Select the build optimized for your Mac's processor architecture.</p>
+      <p class="section-subheading">Standalone `.dmg` installers and `.zip` archives compiled natively for each Mac processor architecture.</p>
     </div>
 
     <div class="download-grid">
@@ -138,12 +216,12 @@
           </div>
           <div>
             <h3 class="arch-name">Apple Silicon</h3>
-            <span class="arch-target">arm64 • M1, M2, M3, M4, Max, Ultra</span>
+            <span class="arch-target">arm64 • M1, M2, M3, M4, Pro, Max, Ultra</span>
           </div>
         </div>
 
         <p class="arch-desc">
-          Compiled natively for Apple Silicon neural and performance cores. Minimal memory footprint and instant wake.
+          Compiled natively for Apple Silicon efficiency and performance cores. Instantaneous wake with negligible memory overhead and zero translation penalties.
         </p>
 
         <div class="download-action-group">
@@ -158,7 +236,7 @@
           <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn-download btn-secondary-download">
             Download ZIP (.zip)
           </a>
-          <span class="meta-tag">M1, M2, M3, M4 • Includes Move-to-Applications</span>
+          <span class="meta-tag">M1, M2, M3, M4 • Includes Move-to-Applications Helper</span>
         </div>
       </div>
 
@@ -179,7 +257,7 @@
         </div>
 
         <p class="arch-desc">
-          Optimized for legacy Intel MacBook Pro and MacBook Air hardware with native SMC power assertions.
+          Engineered for legacy Intel MacBook Pro and MacBook Air models with direct SMC power assertions and dedicated thermal fan safeguards.
         </p>
 
         <div class="download-action-group">
@@ -194,16 +272,16 @@
           <a href="downloads/OpenLid-Intel.zip" download class="btn-download btn-secondary-download">
             Download ZIP (.zip)
           </a>
-          <span class="meta-tag">Intel x86_64 • Includes Move-to-Applications</span>
+          <span class="meta-tag">Intel x86_64 • Includes Move-to-Applications Helper</span>
         </div>
       </div>
     </div>
 
-    <!-- Package Manager Installation -->
-    <div class="terminal-install-box">
+    <!-- Homebrew Installation -->
+    <div class="terminal-install-box reveal-on-scroll">
       <div class="cli-tab-bar">
         <span class="tab-label">Homebrew</span>
-        <span class="tab-label inactive">cURL Installer</span>
+        <span class="tab-label inactive">Universal Binary</span>
       </div>
       <div class="command-row">
         <code>brew install --cask openlid</code>
@@ -212,83 +290,87 @@
     </div>
   </section>
 
-  <!-- How It Works / Architecture -->
-  <section id="how-it-works" class="section container">
+  <!-- =====================================================================
+       ARCHITECTURE SECTION
+       ===================================================================== -->
+  <section id="architecture" class="section container reveal-on-scroll">
     <div class="section-title-wrap">
       <h2 class="section-heading">How OpenLid Works</h2>
-      <p class="section-subheading">Why standard tools fail when the lid closes, and how OpenLid manages power safely.</p>
+      <p class="section-subheading">Standard user-space tools sleep upon clamshell close. OpenLid intercepts kernel interrupts cleanly.</p>
     </div>
 
     <div class="spec-grid">
       <div class="spec-card">
-        <div class="spec-num">01</div>
-        <h3 class="spec-title">The Clamshell Interrupt</h3>
+        <div class="spec-num">01 / INTERRUPT</div>
+        <h3 class="spec-title">The Clamshell Trap</h3>
         <p class="spec-body">
-          macOS does not treat closing the laptop lid as an idle event. It triggers a hardware interrupt in <code>IOPMrootDomain</code> that bypasses normal user-space assertions like <code>caffeinate</code> or <code>NSProcessInfo.beginActivity</code>.
+          Closing the lid fires a hardware interrupt directly into <code>IOPMrootDomain</code>. Normal utilities like <code>caffeinate</code> or <code>NSProcessInfo.beginActivity</code> are bypassed by macOS unless an external monitor is attached.
         </p>
       </div>
 
       <div class="spec-card">
-        <div class="spec-num">02</div>
-        <h3 class="spec-title">Kernel Assertion Toggle</h3>
+        <div class="spec-num">02 / KERNEL</div>
+        <h3 class="spec-title">Kernel Sleep Modulation</h3>
         <p class="spec-body">
-          OpenLid modulates the kernel's sleep-disabled flag via <code>pmset -a disablesleep 1</code> alongside an active <code>kIOPMAssertionTypePreventSystemSleep</code> handle, keeping CPU, networking, and disks operating without keeping the screen illuminated.
+          OpenLid controls the kernel flag via <code>pmset -a disablesleep 1</code> paired with an active <code>kIOPMAssertionTypePreventSystemSleep</code> token. CPUs, network adapters, and background daemons keep running without powering the LCD backlight.
         </p>
       </div>
 
       <div class="spec-card">
-        <div class="spec-num">03</div>
-        <h3 class="spec-title">Zero-Prompt Touch ID Helper</h3>
+        <div class="spec-num">03 / SECURITY</div>
+        <h3 class="spec-title">Zero-Popup Touch ID Helper</h3>
         <p class="spec-body">
-          Elevated power management normally requires a sudo password. OpenLid installs a minimal, scoped sudoers file (<code>/etc/sudoers.d/openlid</code>) via Touch ID once, permitting subsequent state changes in under 40 milliseconds without popups.
+          Power management modifications require elevated privileges. OpenLid writes a scoped sudoers definition (<code>/etc/sudoers.d/openlid</code>) validated once via Touch ID, permitting instant toggles in &lt;30ms without password dialogues.
         </p>
       </div>
     </div>
   </section>
 
-  <!-- Safety Guards -->
-  <section id="safety" class="section container">
+  <!-- =====================================================================
+       HARDWARE SAFETY GUARDS
+       ===================================================================== -->
+  <section id="safety" class="section container reveal-on-scroll">
     <div class="safety-banner">
-      <div class="safety-content">
-        <h2 class="safety-title">Hardware Safety by Design</h2>
-        <p class="safety-desc">
-          Running closed-lid workflows without an external monitor can trap heat if airflow is obstructed. OpenLid incorporates two automatic safety breakers to prevent hardware damage:
-        </p>
+      <h2 class="safety-title">Hardware Safety by Design</h2>
+      <p class="safety-desc">
+        Running a laptop with a closed lid in a bag or enclosed space can lead to heat accumulation. OpenLid implements automated fail-safes to protect your silicon:
+      </p>
 
-        <div class="safety-features">
-          <div class="safety-item">
-            <span class="safety-icon">🌡️</span>
-            <div>
-              <strong>Thermal Overheating Breaker:</strong>
-              <p>Polls <code>ProcessInfo.processInfo.thermalState</code> continuously. If thermal pressure reaches <code>.serious</code> or <code>.critical</code>, OpenLid immediately drops assertions and permits the Mac to sleep safely.</p>
-            </div>
-          </div>
+      <div class="safety-features">
+        <div class="safety-item">
+          <span class="safety-icon">🌡️</span>
+          <strong>Thermal Overheating Breaker</strong>
+          <p>
+            Monitors <code>ProcessInfo.processInfo.thermalState</code> in real-time. If thermal levels escalate to <code>.serious</code> or <code>.critical</code>, OpenLid drops all sleep assertions and lets the machine sleep safely.
+          </p>
+        </div>
 
-          <div class="safety-item">
-            <span class="safety-icon">🔋</span>
-            <div>
-              <strong>Battery Floor Threshold:</strong>
-              <p>Configurable cutoff (default 15%). When running on battery power, sleep prevention automatically halts if the battery drops below your safety margin.</p>
-            </div>
-          </div>
+        <div class="safety-item">
+          <span class="safety-icon">🔋</span>
+          <strong>Configurable Battery Floor</strong>
+          <p>
+            Avoid waking up to an empty battery. OpenLid tracks <code>IOPSCopyPowerSourcesInfo</code> and halts sleep prevention when battery drops below your chosen margin (default 15%).
+          </p>
+        </div>
 
-          <div class="safety-item">
-            <span class="safety-icon">🛡️</span>
-            <div>
-              <strong>Signal Trap Cleanup:</strong>
-              <p>Traps <code>SIGINT</code>, <code>SIGTERM</code>, and app crashes to guarantee power settings are restored to default state upon termination.</p>
-            </div>
-          </div>
+        <div class="safety-item">
+          <span class="safety-icon">🛡️</span>
+          <strong>Signal Trap Cleanups</strong>
+          <p>
+            Intercepts <code>SIGINT</code>, <code>SIGTERM</code>, and unhandled exits to guarantee kernel sleep settings are cleanly restored to system default.
+          </p>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- CLI Section -->
-  <section id="cli" class="section container">
+  <!-- =====================================================================
+       SCRIPTABLE CLI SECTION
+       ===================================================================== -->
+  <section id="cli" class="section container reveal-on-scroll">
     <div class="section-title-wrap">
       <h2 class="section-heading">Scriptable Command-Line Interface</h2>
-      <p class="section-subheading">Control OpenLid from shell scripts, Raycast extensions, or remote SSH sessions.</p>
+      <p class="section-subheading">Automate OpenLid from terminal scripts, Raycast shortcuts, or remote SSH sessions.</p>
     </div>
 
     <div class="terminal-window">
@@ -296,7 +378,7 @@
         <span class="term-dot red"></span>
         <span class="term-dot yellow"></span>
         <span class="term-dot green"></span>
-        <span class="term-title">openlid status</span>
+        <span class="term-title">openlid --status</span>
       </div>
       <div class="term-content">
         <span class="term-dim">$</span> <span class="term-bold">openlid status</span>
@@ -304,14 +386,14 @@
 • Closed-Lid Running: 🟢 ACTIVE (Eye Vigilant)
 • Physical Lid:       🔒 CLOSED
 • Power Source:       ⚡️ Connected to AC Power
-• Battery Level:      94% (Charging ⚡️)
+• Battery Level:      96% (Charging ⚡️)
 • Thermal State:      Nominal (Cool)
 • Passwordless Helper: Installed ✅
 ================================================</pre>
-        <span class="term-dim">$</span> <span class="term-bold">openlid on --duration 30m</span>
-        <pre class="term-output">⏳ Enabling OpenLid (duration: 30 Minutes)...
+        <span class="term-dim">$</span> <span class="term-bold">openlid on --duration 1h</span>
+        <pre class="term-output">⏳ Enabling OpenLid (duration: 1 Hour)...
 ✅ OpenLid is ACTIVE! Your MacBook will continue running with the lid closed.
-⏱ Session will run for 30 minutes.</pre>
+⏱ Session will run for 60 minutes.</pre>
       </div>
     </div>
   </section>
@@ -320,9 +402,10 @@
   <footer class="footer container">
     <div class="footer-row">
       <div class="footer-left">
-        <strong>OpenLid</strong> — Open source macOS utility distributed under the MIT License.
+        <strong>OpenLid</strong> — Open-source macOS utility distributed under the MIT License.
       </div>
       <div class="footer-links">
+        <a href="https://openlid.devs.li">openlid.devs.li</a>
         <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank">Source Code</a>
         <a href="https://github.com/PurohitBhagyesh/openlid/releases" target="_blank">Releases</a>
         <a href="https://github.com/PurohitBhagyesh/openlid/blob/main/LICENSE" target="_blank">MIT License</a>
@@ -330,6 +413,11 @@
     </div>
   </footer>
 
+  <!-- Three.js 3D Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <!-- Client Engine & Aesthetics -->
   <script src="app.js"></script>
+  <!-- 3D Clamshell Physics Engine -->
+  <script src="3d-viewer.js"></script>
 </body>
 </html>

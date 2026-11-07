@@ -9,22 +9,23 @@
    ╚═════╝ ╚═╝     ╚══════╝╚═╝  ╚═══╝╚══════╝╚═╝╚═════╝ 
 ```
 
-### 👁️ The Unsleeping Eye for your MacBook
+### 👁️ The Unsleeping Eye for macOS
 
-**Keep your Mac awake, running, and vigilant — even when the lid is closed.**
+**Keep your MacBook awake, running, and vigilant — even when the lid is closed.**
 
 [![macOS](https://img.shields.io/badge/macOS-13.0%2B%20%7C%20Apple%20Silicon%20%26%20Intel-black?style=for-the-badge&logo=apple)](https://apple.com/macos)
 [![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Passing-emerald?style=for-the-badge&logo=githubactions&logoColor=white)](.github/workflows/ci.yml)
+[![Website](https://img.shields.io/badge/Website-openlid.devs.li-06b6d4?style=for-the-badge)](https://openlid.devs.li)
 
 <p align="center">
-  <a href="#-features">Features</a> •
+  <a href="#-downloads">Downloads</a> •
+  <a href="#-3d-clamshell-simulator">3D Simulator</a> •
   <a href="#-menu-bar-eye-states">Eye States</a> •
-  <a href="#-quick-start">Quick Start</a> •
   <a href="#-cli-usage">CLI</a> •
-  <a href="#-interactive-website">Website</a> •
-  <a href="#-architecture">Architecture</a>
+  <a href="#-architecture">Architecture</a> •
+  <a href="#-hardware-safety">Safety</a>
 </p>
 
 ---
@@ -33,89 +34,90 @@
 
 ## 🌌 Overview
 
-By default, closing your MacBook lid puts it to sleep instantly unless plugged into AC power with an external monitor and keyboard attached.
+By default, closing your MacBook lid puts macOS to sleep immediately unless the laptop is connected to AC power with an external monitor and keyboard attached.
 
 If you are:
-- 🎧 **Streaming audio, podcasts, or music** to Bluetooth speakers or AirPods
-- 🤖 **Running long AI inference, fine-tuning, or coding agents** (Claude Code, Ollama, OpenDevin)
-- 🚀 **Hosting local dev servers, Docker containers, or Vite/Node environments**
-- 📦 **Downloading massive datasets, game assets, or syncing backups**
+- 🤖 **Running long local AI inference or coding agents** (Claude Code, Ollama, DeepSeek, OpenDevin)
+- 🎧 **Streaming music or podcasts** to AirPods or Bluetooth speakers
+- 🚀 **Hosting local dev servers, Docker containers, or Vite/Next.js builds**
+- 📦 **Downloading massive datasets, game assets, or syncing background backups**
 
-...closing the lid interrupts everything. Standard utilities (`caffeinate`, etc.) cannot prevent clamshell closure sleep because Apple handles lid closure as a low-level hardware interrupt.
+...closing the lid interrupts everything. Standard user-space utilities (`caffeinate`, `NSProcessInfo.beginActivity`) fail because macOS handles lid closure as a hardware interrupt within `IOPMrootDomain`.
 
-**OpenLid solves this with surgical power assertion management, hardware thermal guards, and an aesthetic status icon on your menu bar: the vigilant Eye.**
+**OpenLid solves this natively by modulating kernel power assertions (`kIOPMAssertionTypePreventSystemSleep` and `pmset -a disablesleep 1`), backed by real-time thermal throttling breakers and battery floor margins.**
+
+---
+
+## 💾 Downloads
+
+Download standalone, notarization-ready packages compiled natively for your processor:
+
+| Architecture | DMG Installer (Drag to Apps) | Portable ZIP Archive | Target Hardware |
+| :--- | :---: | :---: | :--- |
+| **Apple Silicon** | [Download `.dmg`](downloads/OpenLid-AppleSilicon.dmg) | [Download `.zip`](downloads/OpenLid-AppleSilicon.zip) | M1, M2, M3, M4, Pro, Max, Ultra |
+| **Intel Processor** | [Download `.dmg`](downloads/OpenLid-Intel.dmg) | [Download `.zip`](downloads/OpenLid-Intel.zip) | Core i5, i7, i9 MacBooks |
+| **Universal Binary** | [Download `.dmg`](downloads/OpenLid-Universal.dmg) | [Download `.zip`](downloads/OpenLid-Universal.zip) | Fat Mach-O (both architectures) |
+
+### Package Manager (Homebrew)
+```bash
+brew install --cask openlid
+```
+
+---
+
+## 🎮 3D Clamshell Simulator
+
+OpenLid includes an interactive **3D WebGL Clamshell Simulator** on the official website:
+👉 **[https://openlid.devs.li](https://openlid.devs.li)** *(fallback: [openlid.vercel.app](https://openlid.vercel.app))*
+
+- **360° Physics Orbit**: Click and drag to inspect the MacBook chassis, ports, and display assembly.
+- **Hinge Angle Controls**: Slide between 0° (Closed Clamshell) and 125° (Fully Open).
+- **Dual Engine Simulation**: Observe the difference between default macOS sleep (display cuts off, execution stops) and OpenLid vigilance (emerald status pulse, continuous kernel execution).
 
 ---
 
 ## 👁️ Menu Bar Eye States
 
-OpenLid lives natively in your macOS Menu Bar represented by an adaptive Eye icon:
+OpenLid lives in your macOS menu bar with an adaptive SF Symbol Eye icon:
 
 | Icon | State | Meaning |
 | :---: | :---: | :--- |
-| `👁️` (`eye.fill`) | **Vigilant & Awake** | OpenLid is ACTIVE. Your MacBook will continue running with the lid closed. |
-| `👁️‍🗨️` (`eye.circle.fill`) | **Lid Closed & Running** | Physical lid is closed, screen is powered off, but CPU and tasks run at full speed. |
-| `🚫` (`eye.slash`) | **Normal Sleep** | Default macOS sleep behavior restored. Closing the lid will sleep your Mac. |
+| `👁️` (`eye.fill`) | **Vigilant & Awake** | OpenLid is ACTIVE. Your MacBook continues running with the lid closed. |
+| `👁️‍🗨️` (`eye.circle.fill`) | **Clamshell Running** | Lid is physically closed, display backlight is off, but CPU and network operate at full speed. |
+| `🚫` (`eye.slash`) | **Default Sleep** | Sleep assertions disengaged. Closing the lid will sleep your Mac normally. |
 
 ---
 
 ## ✨ Features
 
-- 👁️ **Vigilant Menu Bar Eye**: Sleek, distraction-free native SwiftUI interface.
-- ⚡️ **Native Clamshell Sleep Bypass**: Keeps your system wide-awake without an external monitor.
-- 🌡️ **Thermal Overheating Protection**: Continuously samples `ProcessInfo.processInfo.thermalState`. If system heat spikes to dangerous levels, sleep prevention automatically disengages to protect your screen and chassis.
-- 🔋 **Smart Battery Cutoff**: Configurable battery floor (default 15%). Automatically aborts keep-awake mode if battery runs low, so you never wake up to an empty battery.
-- ⏱️ **Session Timers**: Select **15m**, **30m**, **1h**, **2h**, or **Indefinite** sessions with a live countdown timer in the menu bar.
-- 🚀 **Auto-Awake on Login**: Automatically launch on user login and optionally awaken your Mac immediately.
-- 🔑 **1-Click Passwordless Helper**: Authorize once with Touch ID / admin password to write a scoped sudoers rule (`/etc/sudoers.d/openlid`). Future toggles happen in <50ms with zero dialogs.
-- 🧹 **Fail-Safe Teardown**: Hooks into `SIGINT`, `SIGTERM`, and system shutdown to guarantee default sleep settings are restored.
-- 💻 **Complete CLI (`openlid`)**: Automate and script sleep behavior from your terminal.
-
----
-
-## 🚀 Quick Start
-
-### 1. Build and Bundle
-
-```bash
-# Clone the repository
-git clone https://github.com/PurohitBhagyesh/openlid.git
-cd openlid
-
-# Build the release .app bundle and CLI binary
-./scripts/bundle.sh
-```
-
-### 2. Launch or Install
-
-To launch immediately from the project:
-```bash
-open dist/OpenLid.app
-```
-
-To install permanently into `/Applications` and copy the CLI into `/usr/local/bin`:
-```bash
-./scripts/install.sh
-```
+- 👁️ **Adaptive Menu Bar Eye**: Real-time visual feedback and quick-access popover.
+- ⚡️ **Hardware Clamshell Bypass**: Keep your laptop active without dummy HDMI dongles or external displays.
+- 🌡️ **Thermal Protection Breaker**: Continuously samples `ProcessInfo.processInfo.thermalState`. Automatically drops assertions if system thermal pressure hits `.serious` or `.critical`.
+- 🔋 **Configurable Battery Margin**: Automatically disengages if battery drops below your chosen safety floor (default 15%).
+- ⏱️ **Preset Session Timers**: Timed sessions for 15m, 30m, 1h, 2h, or Indefinite with live countdown.
+- 🚀 **Auto-Awake on Login**: Native `SMAppService` launch-at-login integration.
+- 🔑 **Touch ID Sudo Helper**: Authorize once with Touch ID to install `/etc/sudoers.d/openlid` for &lt;30ms toggles without popups.
+- 🛡️ **Signal Trap Cleanups**: Hooks `SIGINT`, `SIGTERM`, and abnormal termination to guarantee kernel sleep settings are cleanly restored.
+- 💻 **Complete CLI (`openlid`)**: Full command-line interface for terminal workflows and Raycast shortcuts.
 
 ---
 
 ## 💻 CLI Usage
 
-OpenLid includes a command-line tool `openlid` that can be run from any terminal:
+The bundled CLI tool `openlid` provides scriptable control:
 
 ```bash
-# Awaken your Mac indefinitely
+# Enable closed-lid sleep prevention
 openlid on
 
-# Awaken your Mac for a specific session length
+# Enable for a specific duration
 openlid on --duration 30m
 openlid on -d 1h
 
-# Check live telemetry and state
+# Check live hardware telemetry
 openlid status
 
-# Put your Mac back to normal sleep behavior
+# Disable sleep prevention (return to default macOS sleep)
 openlid off
 
 # Toggle state
@@ -126,13 +128,12 @@ openlid helper install
 ```
 
 ### Sample `openlid status` Output:
-
 ```text
 ================ OpenLid Status ================
 • Closed-Lid Running: 🟢 ACTIVE (Eye Vigilant)
 • Physical Lid:       🔒 CLOSED
 • Power Source:       ⚡️ Connected to AC Power
-• Battery Level:      94% (Charging ⚡️)
+• Battery Level:      96% (Charging ⚡️)
 • Thermal State:      Nominal (Cool)
 • Passwordless Helper: Installed ✅
 ================================================
@@ -140,48 +141,39 @@ openlid helper install
 
 ---
 
-## 🌐 Interactive Website & Simulator
-
-OpenLid comes with a product website and interactive web simulator located in [`website/`](website):
-
-- **Interactive Eye Simulator**: Toggle the virtual Eye, shut the virtual MacBook lid, and watch the simulated terminal keep streaming audio and running servers.
-- **Login & Remote Awake Console**: Sign in to the demo cloud portal to manage and awaken your Mac remotely.
-- **Preview Locally**: Run `./scripts/serve-website.sh` to preview at `http://localhost:8080`.
-
----
-
 ## 🏗 Architecture
 
 ```text
 openlid/
-├── Package.swift                    # Swift Package definition
+├── Package.swift                    # Swift Package Manager manifest
 ├── Sources/
 │   ├── OpenLidCore/                 # Core engine (IOKit, Power, Thermal, Battery)
 │   │   ├── ClamshellMonitor.swift   # Reads AppleClamshellState from IOPMrootDomain
-│   │   ├── BatteryMonitor.swift     # IOKit battery level, AC telemetry & cutoff
+│   │   ├── BatteryMonitor.swift     # IOPSCopyPowerSourcesInfo telemetry & cutoff
 │   │   ├── ThermalMonitor.swift     # ProcessInfo.thermalState overheating guard
 │   │   ├── SessionTimer.swift       # Countdown timer & duration presets
 │   │   ├── LaunchAtLoginManager.swift# SMAppService & auto-awake on login
 │   │   ├── PrivilegeManager.swift   # Sudoers helper & Touch ID elevation
-│   │   └── PowerManager.swift       # Orchestrator & fail-safe teardown
-│   ├── OpenLid/                     # macOS Menu Bar Application (SwiftUI)
-│   │   ├── OpenLidApp.swift         # App lifecycle & signal traps
+│   │   ├── ControlServer.swift      # Local REST API on 127.0.0.1:31415
+│   │   ├── ApplicationMover.swift   # Auto-prompts to move app to /Applications
+│   │   └── PowerManager.swift       # Assertion coordinator & signal trap cleanup
+│   ├── OpenLid/                     # macOS Menu Bar App (SwiftUI)
+│   │   ├── OpenLidApp.swift         # MenuBarExtra window lifecycle
 │   │   └── Views/
-│   │       ├── MenuBarView.swift    # Popover with hero toggle, telemetry & presets
-│   │       ├── SettingsView.swift   # Safety thresholds & helper installer
-│   │       └── StatusIconView.swift # Vigilant Eye menu bar symbol & countdown
-│   └── OpenLidCLI/                  # Command-Line Utility
-│       └── main.swift               # Terminal subcommands (on/off/status/helper)
-├── Tests/
-│   └── OpenLidCoreTests/            # Unit test suite
-├── website/                         # Aesthetic landing page, simulator & auth portal
-│   ├── index.html
-│   ├── style.css
-│   └── app.js
+│   │       ├── MenuBarView.swift    # Popover with master toggle & telemetry
+│   │       ├── SettingsView.swift   # Dedicated settings with back navigation
+│   │       └── StatusIconView.swift # Vigilant Eye menu bar symbol
+│   └── OpenLidCLI/                  # Command-Line Interface
+│       └── main.swift               # Terminal commands (on/off/status/helper)
+├── website/                         # Un-slopped product site with 3D simulator
+│   ├── index.html                   # Semantic markup & WebGL container
+│   ├── style.css                    # Dark glassmorphic theme & kinetic scroll
+│   ├── app.js                       # Aesthetic scroll observer & local REST bridge
+│   └── 3d-viewer.js                 # Three.js 3D MacBook physics engine
 └── scripts/
-    ├── bundle.sh                    # Release bundling & ad-hoc code-signing
-    ├── install.sh                   # System-wide installation script
-    └── serve-website.sh             # Local preview web server
+    ├── bundle.sh                    # Universal lipo compilation & DMG creation
+    ├── create_dmg.sh                # Drag-to-Applications disk image builder
+    └── install.sh                   # System-wide installation
 ```
 
 ---
@@ -189,10 +181,10 @@ openlid/
 ## ⚠️ Hardware Safety Advisory
 
 > [!CAUTION]
-> MacBooks dissipate heat partially through the keyboard and display hinge assembly. **Never** leave your MacBook running high-intensity tasks with the lid closed inside a tightly zippered backpack or sleeve. OpenLid features automatic thermal shutdowns, but physical airflow is always essential.
+> MacBooks dissipate a portion of heat through the keyboard and display hinge assembly. **Never** leave your MacBook running intensive compute tasks with the lid closed inside a sealed backpack or sleeve without airflow. OpenLid incorporates automated thermal shutdowns, but physical ventilation is always required.
 
 ---
 
 ## 📜 License
 
-Distributed under the [MIT License](LICENSE). Built for macOS developers and power users.
+Distributed under the [MIT License](LICENSE). Copyright (c) 2026 Bhagyesh Purohit.
