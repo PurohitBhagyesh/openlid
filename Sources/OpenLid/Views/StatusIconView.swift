@@ -5,10 +5,10 @@ struct StatusIconView: View {
     @ObservedObject var powerManager: PowerManager
     
     var body: some View {
-        HStack(spacing: 3) {
+        HStack(spacing: 4) {
             Image(systemName: iconName)
-                .symbolRenderingMode(.hierarchical)
-                .foregroundStyle(iconColor)
+                .renderingMode(.template)
+                .imageScale(.medium)
             
             if powerManager.isEnabled && powerManager.timer.isTimerRunning {
                 Text(powerManager.timer.formattedRemainingTime)
@@ -22,16 +22,8 @@ struct StatusIconView: View {
             // Open, vigilant eye when awake
             return powerManager.clamshell.isLidClosed ? "eye.circle.fill" : "eye.fill"
         } else {
-            // Closed/slashed eye when sleep is allowed
+            // Slashed eye when sleep is allowed
             return "eye.slash"
         }
     }
-    
-    private var iconColor: Color {
-        if powerManager.isEnabled {
-            return .green
-        }
-        return .secondary
-    }
 }
-
