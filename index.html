@@ -81,8 +81,25 @@
           <span id="themeLabel">Dark</span>
         </button>
 
-        <a href="#downloads" class="btn btn-sm btn-primary">Download</a>
+        <a href="#downloads" class="btn btn-sm btn-primary nav-dl-btn">Download</a>
+
+        <button class="nav-toggle" id="navToggleBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="6" x2="21" y2="6"/>
+            <line x1="3" y1="12" x2="21" y2="12"/>
+            <line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
       </div>
+    </div>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-drawer" id="mobileDrawer">
+      <a href="#downloads" class="mobile-nav-item">Downloads</a>
+      <a href="#architecture" class="mobile-nav-item">Architecture</a>
+      <a href="#safety" class="mobile-nav-item">Safety</a>
+      <a href="#cli" class="mobile-nav-item">CLI Reference</a>
+      <a href="https://github.com/PurohitBhagyesh/openlid" target="_blank" rel="noopener noreferrer" class="mobile-nav-item">GitHub Repository ↗</a>
     </div>
   </nav>
 
@@ -150,6 +167,31 @@
     <div class="section-head">
       <h2 class="section-title">Downloads</h2>
       <p class="section-desc">Standalone portable ZIP archives compiled natively for each target architecture.</p>
+    </div>
+
+    <!-- Mobile Compatibility Notice (Visible on mobile/tablets) -->
+    <div class="mobile-compat-card" id="mobileCompatCard">
+      <div class="mobile-compat-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+          <line x1="8" y1="21" x2="16" y2="21"/>
+          <line x1="12" y1="17" x2="12" y2="21"/>
+        </svg>
+        <span>Desktop Application • Not compatible with mobile OS</span>
+      </div>
+      <p class="mobile-compat-desc">
+        OpenLid modulates hardware power assertions for <strong>macOS</strong> and <strong>Windows</strong> laptops. To install, please open this site on your laptop or PC.
+      </p>
+      <div class="mobile-compat-action">
+        <button type="button" class="btn btn-sm btn-outline btn-block" id="btnShareMobileLink">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+            <polyline points="16 6 12 2 8 6"/>
+            <line x1="12" y1="2" x2="12" y2="15"/>
+          </svg>
+          <span id="shareMobileText">Share link to open on laptop</span>
+        </button>
+      </div>
     </div>
 
     <div class="os-tabs">
@@ -368,9 +410,9 @@
     </div>
   </footer>
 
-  <!-- Buy a Snack / Support Widget (Bottom-Left Corner) -->
+  <!-- Buy me a Coffee / Support Widget (Bottom-Left Corner) -->
   <div class="snack-widget" id="snackWidget">
-    <button class="snack-pill" id="snackPillBtn" aria-label="Buy a Snack" aria-expanded="false">
+    <button class="snack-pill" id="snackPillBtn" aria-label="Buy me a Coffee" aria-expanded="false">
       <svg class="snack-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M18 8h1a4 4 0 0 1 0 8h-1"/>
         <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/>
@@ -378,13 +420,13 @@
         <line x1="10" y1="1" x2="10" y2="4"/>
         <line x1="14" y1="1" x2="14" y2="4"/>
       </svg>
-      <span>Buy a Snack</span>
+      <span>Buy me a Coffee</span>
     </button>
 
-    <div class="snack-card" id="snackCard" role="dialog" aria-modal="false" aria-label="Support Shivam">
+    <div class="snack-card" id="snackCard" role="dialog" aria-modal="false" aria-label="Support Developer">
       <div class="snack-card-header">
         <div class="snack-header-text">
-          <h3 class="snack-title">Support Shivam</h3>
+          <h3 class="snack-title">Support Developer</h3>
           <button class="snack-upi-copy" id="snackUpiCopyBtn" type="button" title="Click to copy UPI ID">
             <code id="snackUpiText">Purohit2009@fam</code>
             <svg class="copy-icon" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -420,7 +462,7 @@
           Pay via UPI App
         </a>
 
-        <p class="snack-sub">Every snack fuels Shivam's creativity.</p>
+        <p class="snack-sub">Every coffee fuels continuous development.</p>
       </div>
     </div>
   </div>

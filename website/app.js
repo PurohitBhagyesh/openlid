@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Buy a Snack / Support Widget Logic (Bottom-Left Corner)
+  // 5. Buy me a Coffee / Support Widget Logic (Bottom-Left Corner)
   const snackWidget = document.getElementById('snackWidget');
   const snackPillBtn = document.getElementById('snackPillBtn');
   const snackCard = document.getElementById('snackCard');
@@ -153,7 +153,33 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
+  let snackHoverTimer = null;
+  function openSnack() {
+    clearTimeout(snackHoverTimer);
+    if (snackCard) {
+      snackCard.classList.add('active');
+      snackPillBtn.setAttribute('aria-expanded', 'true');
+      if (snackAmountInput) updateSnackQr(snackAmountInput.value || 50);
+    }
+  }
+
+  function closeSnackWithDelay() {
+    snackHoverTimer = setTimeout(() => {
+      if (snackCard && !snackCard.matches(':hover') && !snackPillBtn.matches(':hover')) {
+        snackCard.classList.remove('active');
+        snackPillBtn.setAttribute('aria-expanded', 'false');
+      }
+    }, 280);
+  }
+
   if (snackPillBtn && snackCard) {
+    // Hover-to-open on desktop fine pointer devices
+    if (snackWidget) {
+      snackWidget.addEventListener('mouseenter', openSnack);
+      snackWidget.addEventListener('mouseleave', closeSnackWithDelay);
+    }
+
+    // Click/tap toggle for mobile and keyboard
     snackPillBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isActive = snackCard.classList.toggle('active');
@@ -230,6 +256,75 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial QR render
   updateSnackQr(50);
+
+  // 6. Mobile Navigation Drawer Toggle
+  const navToggleBtn = document.getElementById('navToggleBtn');
+  const mobileDrawer = document.getElementById('mobileDrawer');
+
+  if (navToggleBtn && mobileDrawer) {
+    navToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = mobileDrawer.classList.toggle('open');
+      navToggleBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+
+    mobileDrawer.querySelectorAll('.mobile-nav-item').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileDrawer.classList.remove('open');
+        navToggleBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!navToggleBtn.contains(e.target) && !mobileDrawer.contains(e.target)) {
+        mobileDrawer.classList.remove('open');
+        navToggleBtn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  }
+
+  // 7. Mobile Device Compatibility Detection & Native Share
+  const mobileCompatCard = document.getElementById('mobileCompatCard');
+  const btnShareMobileLink = document.getElementById('btnShareMobileLink');
+  const shareMobileText = document.getElementById('shareMobileText');
+
+  const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                         (window.innerWidth <= 768 && 'ontouchstart' in window);
+
+  if (mobileCompatCard && isMobileDevice) {
+    mobileCompatCard.classList.add('visible');
+  }
+
+  if (btnShareMobileLink) {
+    btnShareMobileLink.addEventListener('click', async () => {
+      const shareData = {
+        title: 'OpenLid — Keep Laptop Running with Lid Closed',
+        text: 'Open this link on your Mac or Windows laptop to download OpenLid:',
+        url: 'https://openlid.devs.li/'
+      };
+
+      if (navigator.share) {
+        try {
+          await navigator.share(shareData);
+        } catch (err) {
+          // User dismissed share dialog
+        }
+      } else {
+        try {
+          await navigator.clipboard.writeText('https://openlid.devs.li/');
+          if (shareMobileText) {
+            const original = shareMobileText.textContent;
+            shareMobileText.textContent = 'Link copied to clipboard!';
+            setTimeout(() => {
+              shareMobileText.textContent = original;
+            }, 2000);
+          }
+        } catch (e) {
+          window.open('https://openlid.devs.li/', '_blank');
+        }
+      }
+    });
+  }
 
   fetchTelemetry();
   setInterval(fetchTelemetry, 2000);

@@ -895,25 +895,282 @@ body {
   text-align: center;
 }
 
-@media (max-width: 480px) {
+/* Hover-to-open on desktop pointer devices */
+@media (hover: hover) and (pointer: fine) {
+  .snack-widget:hover .snack-card,
+  .snack-card:hover {
+    display: flex;
+  }
+  .snack-widget:hover .snack-pill {
+    background-color: var(--surface-alt);
+    border-color: var(--accent);
+  }
+}
+
+/* Mobile Navigation Toggle & Drawer */
+.nav-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 6px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s, border-color 0.15s;
+}
+
+.nav-toggle:hover {
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.mobile-drawer {
+  display: none;
+  flex-direction: column;
+  background-color: var(--bg);
+  border-bottom: 1px solid var(--border);
+  padding: 8px 24px 16px;
+  gap: 4px;
+}
+
+.mobile-drawer.open {
+  display: flex;
+}
+
+.mobile-nav-item {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  transition: color 0.15s;
+}
+
+.mobile-nav-item:last-child {
+  border-bottom: none;
+}
+
+.mobile-nav-item:hover {
+  color: var(--text);
+}
+
+/* Mobile Device Compatibility Notice */
+.mobile-compat-card {
+  display: none;
+  background-color: var(--surface);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: 10px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mobile-compat-card.visible {
+  display: flex;
+}
+
+.mobile-compat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #f59e0b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.mobile-compat-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.mobile-compat-desc strong {
+  color: var(--text);
+}
+
+.mobile-compat-action {
+  margin-top: 2px;
+}
+
+/* Full Mobile Responsive Rubric */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
+  .nav-menu {
+    display: none;
+  }
+
+  .nav-dl-btn {
+    display: none;
+  }
+
+  .nav-toggle {
+    display: inline-flex;
+  }
+
+  .hero {
+    padding: 36px 0 24px;
+  }
+
+  .hero-h1 {
+    font-size: clamp(26px, 6.5vw, 36px);
+    line-height: 1.25;
+  }
+
+  .hero-sub {
+    font-size: 14px;
+    margin-bottom: 24px;
+  }
+
+  .hero-actions {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .hero-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 44px;
+  }
+
+  .monitor {
+    padding: 14px;
+  }
+
+  .monitor-top {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .monitor-top button {
+    width: 100%;
+  }
+
+  .monitor-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .monitor-cell {
+    border-bottom: 1px solid var(--border);
+    padding: 10px;
+  }
+
+  .os-tabs {
+    display: flex;
+    width: 100%;
+  }
+
+  .os-btn {
+    flex: 1;
+    padding: 10px 0;
+    min-height: 44px;
+    font-size: 13px;
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .card-actions .btn {
+    min-height: 44px;
+  }
+
+  .specs-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .safety-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .code-box {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 14px;
+  }
+
+  .code-box code {
+    white-space: nowrap;
+  }
+
+  .code-box-large {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 14px;
+  }
+
+  .code-output {
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  .footer-inner {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+  }
+
+  .footer-links {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
   .snack-widget {
     bottom: 16px;
     left: 16px;
   }
+
   .snack-card {
     width: calc(100vw - 32px);
-    bottom: 52px;
+    max-width: 340px;
+    bottom: 56px;
     left: 0;
   }
 }
 
-@media (max-width: 768px) {
-  .hero-h1 { font-size: 30px; }
-  .cards-grid { grid-template-columns: 1fr; }
-  .specs-grid { grid-template-columns: 1fr; }
-  .safety-grid { grid-template-columns: 1fr; }
-  .monitor-grid { grid-template-columns: 1fr 1fr; }
-  .monitor-cell { border-bottom: 1px solid var(--border); }
-  .nav-menu { display: none; }
-  .footer-inner { flex-direction: column; text-align: center; }
+@media (max-width: 480px) {
+  .container {
+    padding: 0 16px;
+  }
+
+  .nav-inner {
+    height: 52px;
+  }
+
+  .brand-version {
+    display: none;
+  }
+
+  .section {
+    padding: 48px 0;
+  }
+
+  .section-title {
+    font-size: 20px;
+  }
+
+  .monitor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .preset-chip {
+    min-height: 38px;
+    font-size: 13px;
+  }
+
+  .snack-input-wrap {
+    height: 42px;
+  }
 }
