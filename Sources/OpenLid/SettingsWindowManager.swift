@@ -56,3 +56,4 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         // Keep window controller available for reopening
     }
 }
+
