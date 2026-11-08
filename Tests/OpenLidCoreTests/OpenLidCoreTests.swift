@@ -55,5 +55,19 @@ final class OpenLidCoreTests: XCTestCase {
         
         prefs.presentationMode = originalMode
     }
+    
+    func testApplicationMover() {
+        let appDirURL = URL(fileURLWithPath: "/Applications/OpenLid.app")
+        XCTAssertTrue(ApplicationMover.isInstalledInApplications(url: appDirURL))
+        
+        let userAppDirURL = URL(fileURLWithPath: NSHomeDirectory() + "/Applications/OpenLid.app")
+        XCTAssertTrue(ApplicationMover.isInstalledInApplications(url: userAppDirURL))
+        
+        let downloadsURL = URL(fileURLWithPath: NSHomeDirectory() + "/Downloads/OpenLid.app")
+        XCTAssertFalse(ApplicationMover.isInstalledInApplications(url: downloadsURL))
+        
+        let buildURL = URL(fileURLWithPath: "/tmp/project/.build/debug/OpenLid.app")
+        XCTAssertTrue(ApplicationMover.isDevOrBuildEnvironment(url: buildURL))
+    }
 }
 

@@ -139,13 +139,22 @@ brew install openlid
 
 | Architecture | Standalone Archive | Target Hardware | Contents |
 | :--- | :---: | :--- | :--- |
-| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `OpenLidTray.cs` + `OpenLid.ps1` + `openlid.cmd` |
-| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `OpenLidTray.cs` + `OpenLid.ps1` + `openlid.cmd` |
+| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `Launch-OpenLid.cmd` + `Install-OpenLid.cmd` + `OpenLid.ico` + `OpenLidTray.cs` + `OpenLid.ps1` |
+| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `Launch-OpenLid.cmd` + `Install-OpenLid.cmd` + `OpenLid.ico` + `OpenLidTray.cs` + `OpenLid.ps1` |
 
 ```powershell
-# Windows PowerShell Quick-Launch (Zero-Install GUI)
+# Windows One-Click Launch (GUI & System Tray)
+# Double-click "Launch-OpenLid.cmd" or run:
 powershell -ExecutionPolicy Bypass -Command ".\windows\OpenLid.ps1 -App"
+
+# Permanent User Installation (Desktop & Start Menu Shortcuts)
+# Double-click "Install-OpenLid.cmd" or run:
+powershell -ExecutionPolicy Bypass -Command ".\windows\OpenLid.ps1 -Install"
 ```
+
+> [!TIP]
+> **Automatic Relocation to Applications Folder**:
+> Both macOS and Windows release packages intelligently detect when running from your Downloads or temporary directory, offering a one-click relocation to `/Applications` (macOS) or `%LOCALAPPDATA%\Programs\OpenLid` (Windows) with custom app shortcuts and system persistence.
 
 ---
 

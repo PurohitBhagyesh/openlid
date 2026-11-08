@@ -90,6 +90,15 @@ namespace OpenLid
             });
             TrayMenu.Items.Add(contactMenu);
 
+            string currentDir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\');
+            string localPrograms = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "OpenLid");
+            if (!currentDir.Equals(localPrograms, StringComparison.OrdinalIgnoreCase))
+            {
+                TrayMenu.Items.Add(new ToolStripSeparator());
+                var installItem = new ToolStripMenuItem("Move to Programs Folder (Install)...", null, (s, e) => MoveToProgramsFolder(currentDir, localPrograms));
+                TrayMenu.Items.Add(installItem);
+            }
+
             TrayMenu.Items.Add(new ToolStripSeparator());
             TrayMenu.Items.Add("Exit OpenLid", null, (s, e) => ExitApplication());
 
@@ -108,6 +117,9 @@ namespace OpenLid
             // Shutdown hooks
             Application.ApplicationExit += (s, e) => RestoreDefaultPower();
             AppDomain.CurrentDomain.ProcessExit += (s, e) => RestoreDefaultPower();
+
+            // Offer to move to Applications/Programs folder if launched from Downloads/Temp
+            CheckPromptMoveToProgramsFolder();
 
             // First run onboarding or app window
             if (!HasCompletedOnboarding)
@@ -275,8 +287,141 @@ namespace OpenLid
             Application.Exit();
         }
 
+        public static void CheckPromptMoveToProgramsFolder()
+        {
+            try
+            {
+                string currentExeDir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\');
+                string localProgramsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "OpenLid");
+
+                if (currentExeDir.Equals(localProgramsDir, StringComparison.OrdinalIgnoreCase))
+                    return;
+
+                string appDataOpenLid = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "OpenLid");
+                string suppressPath = Path.Combine(appDataOpenLid, "suppress_move.txt");
+                if (File.Exists(suppressPath))
+                    return;
+
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string downloadsDir = Path.Combine(userProfile, "Downloads");
+                string tempDir = Path.GetTempPath().TrimEnd('\\');
+
+                bool isInDownloadsOrTemp = currentExeDir.StartsWith(downloadsDir, StringComparison.OrdinalIgnoreCase) ||
+                                           currentExeDir.StartsWith(tempDir, StringComparison.OrdinalIgnoreCase) ||
+                                           currentExeDir.IndexOf("Downloads", StringComparison.OrdinalIgnoreCase) >= 0 ||
+                                           currentExeDir.IndexOf("Temp", StringComparison.OrdinalIgnoreCase) >= 0;
+
+                if (!isInDownloadsOrTemp)
+                    return;
+
+                var result = MessageBox.Show(
+                    "OpenLid is running from your Downloads or temporary folder.\n\n" +
+                    "Would you like to install OpenLid to your user Programs folder (%LOCALAPPDATA%\\Programs\\OpenLid) and create Start Menu & Desktop shortcuts?\n\n" +
+                    "• Keeps your Downloads folder clean\n" +
+                    "• Creates Desktop and Start Menu shortcuts\n" +
+                    "• Keeps background clamshell sleep guards operating reliably\n\n" +
+                    "Click 'Yes' to install to Programs folder, or 'No' to continue running here.",
+                    "Move OpenLid to Programs Folder?",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question
+                );
+
+                if (result == DialogResult.Yes)
+                {
+                    MoveToProgramsFolder(currentExeDir, localProgramsDir);
+                }
+                else
+                {
+                    if (!Directory.Exists(appDataOpenLid)) Directory.CreateDirectory(appDataOpenLid);
+                    File.WriteAllText(suppressPath, "Suppressed by user");
+                }
+            }
+            catch {}
+        }
+
+        public static void MoveToProgramsFolder(string sourceDir, string targetDir)
+        {
+            try
+            {
+                if (!Directory.Exists(targetDir))
+                {
+                    Directory.CreateDirectory(targetDir);
+                }
+
+                // Copy all files from current directory
+                foreach (string file in Directory.GetFiles(sourceDir))
+                {
+                    try
+                    {
+                        string dest = Path.Combine(targetDir, Path.GetFileName(file));
+                        File.Copy(file, dest, true);
+                    }
+                    catch {}
+                }
+
+                // Create shortcuts with WScript.Shell via COM
+                try
+                {
+                    Type shellType = Type.GetTypeFromProgID("WScript.Shell");
+                    if (shellType != null)
+                    {
+                        dynamic shell = Activator.CreateInstance(shellType);
+                        string targetExe = Path.Combine(targetDir, "OpenLid.exe");
+                        if (!File.Exists(targetExe)) targetExe = Path.Combine(targetDir, "Launch-OpenLid.cmd");
+                        string iconPath = Path.Combine(targetDir, "OpenLid.ico");
+
+                        // Desktop shortcut
+                        string desktop = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+                        dynamic deskShortcut = shell.CreateShortcut(Path.Combine(desktop, "OpenLid.lnk"));
+                        deskShortcut.TargetPath = targetExe;
+                        deskShortcut.WorkingDirectory = targetDir;
+                        if (File.Exists(iconPath)) deskShortcut.IconLocation = iconPath + ",0";
+                        deskShortcut.Description = "OpenLid - Keep your laptop running with lid closed";
+                        deskShortcut.Save();
+
+                        // Start Menu shortcut
+                        string startMenu = Environment.GetFolderPath(Environment.SpecialFolder.Programs);
+                        dynamic startShortcut = shell.CreateShortcut(Path.Combine(startMenu, "OpenLid.lnk"));
+                        startShortcut.TargetPath = targetExe;
+                        startShortcut.WorkingDirectory = targetDir;
+                        if (File.Exists(iconPath)) startShortcut.IconLocation = iconPath + ",0";
+                        startShortcut.Description = "OpenLid - Keep your laptop running with lid closed";
+                        startShortcut.Save();
+                    }
+                }
+                catch {}
+
+                // Launch from installed target
+                string exeToLaunch = Path.Combine(targetDir, "OpenLid.exe");
+                if (File.Exists(exeToLaunch))
+                {
+                    Process.Start(new ProcessStartInfo(exeToLaunch, "--app") { UseShellExecute = true, WorkingDirectory = targetDir });
+                }
+                else
+                {
+                    Process.Start(new ProcessStartInfo(Path.Combine(targetDir, "Launch-OpenLid.cmd")) { UseShellExecute = true, WorkingDirectory = targetDir });
+                }
+
+                Environment.Exit(0);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not complete installation: " + ex.Message, "OpenLid Setup", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         public static Icon CreateEyeIcon(bool active)
         {
+            try
+            {
+                string icoPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenLid.ico");
+                if (File.Exists(icoPath))
+                {
+                    return new Icon(icoPath, 32, 32);
+                }
+            }
+            catch {}
+
             using (Bitmap bmp = new Bitmap(32, 32))
             using (Graphics g = Graphics.FromImage(bmp))
             {
@@ -813,6 +958,40 @@ namespace OpenLid
                 try { Process.Start(new ProcessStartInfo("https://openlid.devs.li") { UseShellExecute = true }); } catch {}
             };
             Controls.Add(btnContact);
+
+            string currentExeDir = AppDomain.CurrentDomain.BaseDirectory.TrimEnd('\\');
+            string localProgramsDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Programs", "OpenLid");
+            if (!currentExeDir.Equals(localProgramsDir, StringComparison.OrdinalIgnoreCase))
+            {
+                var pnlInstallBanner = new Panel
+                {
+                    Location = new Point(20, 485),
+                    Size = new Size(505, 48),
+                    BackColor = Color.FromArgb(18, 25, 38)
+                };
+                var lblInstall = new Label
+                {
+                    Text = "Running portable. Move to user Programs folder for Start Menu & Desktop shortcuts.",
+                    Location = new Point(12, 8),
+                    Size = new Size(340, 32),
+                    ForeColor = Color.FromArgb(180, 200, 225),
+                    Font = new Font("Segoe UI", 8.5f)
+                };
+                var btnInstall = new Button
+                {
+                    Text = "Move to Programs",
+                    Location = new Point(360, 9),
+                    Size = new Size(135, 30),
+                    FlatStyle = FlatStyle.Flat,
+                    BackColor = Color.FromArgb(16, 185, 129),
+                    ForeColor = Color.Black,
+                    Font = new Font("Segoe UI", 9f, FontStyle.Bold)
+                };
+                btnInstall.Click += (s, e) => Program.MoveToProgramsFolder(currentExeDir, localProgramsDir);
+                pnlInstallBanner.Controls.Add(lblInstall);
+                pnlInstallBanner.Controls.Add(btnInstall);
+                Controls.Add(pnlInstallBanner);
+            }
 
             // Telemetry update timer
             var telemTimer = new System.Windows.Forms.Timer { Interval = 2000 };

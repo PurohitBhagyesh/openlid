@@ -1,5 +1,5 @@
-# OpenLid for Windows — Native Dual App & System Tray Clamshell Sleep Prevention
-# Usage: .\OpenLid.ps1 [-On | -Off | -Status | -App | -Welcome | -Tray | -Mode <tray|app|both>]
+﻿# OpenLid for Windows — Native Dual App & System Tray Clamshell Sleep Prevention
+# Usage: .\OpenLid.ps1 [-On | -Off | -Status | -App | -Welcome | -Tray | -Install | -Uninstall | -Mode <tray|app|both>]
 
 param (
     [switch]$On,
@@ -9,6 +9,9 @@ param (
     [switch]$Gui,
     [switch]$Welcome,
     [switch]$Tray,
+    [switch]$Install,
+    [switch]$Uninstall,
+    [switch]$MoveToApplications,
     [string]$Mode = "",
     [int]$Duration = 0
 )
@@ -34,15 +37,30 @@ function Enable-AwayMode {
     }
 }
 
+function Get-CscCompiler {
+    $candidates = @(
+        (Join-Path ([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()) "csc.exe"),
+        "C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe",
+        "C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe"
+    )
+    foreach ($p in $candidates) {
+        if (Test-Path $p) { return $p }
+    }
+    return $null
+}
+
 function Launch-OpenLidGUI([string]$flag = "") {
     $csFile = Join-Path $scriptDir "OpenLidTray.cs"
     $exeFile = Join-Path $scriptDir "OpenLid.exe"
+    $icoFile = Join-Path $scriptDir "OpenLid.ico"
     
     if (-not (Test-Path $exeFile) -and (Test-Path $csFile)) {
-        Write-Host "🔨 Compiling OpenLid for Windows with csc.exe..." -ForegroundColor Cyan
-        $csc = Join-Path ([System.Runtime.InteropServices.RuntimeEnvironment]::GetRuntimeDirectory()) "csc.exe"
-        if (Test-Path $csc) {
-            & $csc /target:winexe /out:"$exeFile" /r:System.Windows.Forms.dll,System.Drawing.dll "$csFile" | Out-Null
+        $csc = Get-CscCompiler
+        if ($csc) {
+            Write-Host "🔨 Compiling OpenLid for Windows with native csc.exe..." -ForegroundColor Cyan
+            $iconArg = if (Test-Path $icoFile) { "/win32icon:`"$icoFile`"" } else { "" }
+            $compileCmd = "& `"$csc`" /target:winexe /optimize+ /out:`"$exeFile`" $iconArg /r:System.Windows.Forms.dll,System.Drawing.dll,Microsoft.CSharp.dll `"$csFile`""
+            Invoke-Expression $compileCmd | Out-Null
         }
     }
     
@@ -53,6 +71,119 @@ function Launch-OpenLidGUI([string]$flag = "") {
         Add-Type -Path $csFile -ReferencedAssemblies System.Windows.Forms,System.Drawing
         [OpenLid.Program]::Main(@($flag))
     }
+}
+
+function Install-OpenLid {
+    Write-Host "==========================================================" -ForegroundColor Cyan
+    Write-Host "  🚀 Installing OpenLid for Windows to Programs Folder   " -ForegroundColor Cyan
+    Write-Host "==========================================================" -ForegroundColor Cyan
+    
+    $targetDir = Join-Path $env:LOCALAPPDATA "Programs\OpenLid"
+    if (-not (Test-Path $targetDir)) {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+    }
+    
+    # Copy all essential files
+    $files = @("OpenLidTray.cs", "OpenLid.ps1", "Launch-OpenLid.cmd", "Install-OpenLid.cmd", "Uninstall-OpenLid.cmd", "openlid.cmd", "README.txt", "OpenLid.ico")
+    foreach ($f in $files) {
+        $src = Join-Path $scriptDir $f
+        if (Test-Path $src) {
+            Copy-Item -Path $src -Destination $targetDir -Force
+        }
+    }
+    
+    # Pre-compile the executable in target directory
+    $targetExe = Join-Path $targetDir "OpenLid.exe"
+    $targetCs = Join-Path $targetDir "OpenLidTray.cs"
+    $targetIco = Join-Path $targetDir "OpenLid.ico"
+    $csc = Get-CscCompiler
+    if ($csc -and (Test-Path $targetCs)) {
+        $iconArg = if (Test-Path $targetIco) { "/win32icon:`"$targetIco`"" } else { "" }
+        Invoke-Expression "& `"$csc`" /target:winexe /optimize+ /out:`"$targetExe`" $iconArg /r:System.Windows.Forms.dll,System.Drawing.dll,Microsoft.CSharp.dll `"$targetCs`"" | Out-Null
+    }
+    
+    # Create Desktop & Start Menu Shortcuts via WScript.Shell
+    try {
+        $wscript = New-Object -ComObject WScript.Shell
+        
+        # Desktop Shortcut
+        $desktopDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)
+        $deskShortcut = $wscript.CreateShortcut((Join-Path $desktopDir "OpenLid.lnk"))
+        $deskShortcut.TargetPath = if (Test-Path $targetExe) { $targetExe } else { Join-Path $targetDir "Launch-OpenLid.cmd" }
+        $deskShortcut.WorkingDirectory = $targetDir
+        if (Test-Path $targetIco) { $deskShortcut.IconLocation = "$targetIco,0" }
+        $deskShortcut.Description = "OpenLid - Keep your laptop running with lid closed"
+        $deskShortcut.Save()
+        
+        # Start Menu Shortcut
+        $startMenuDir = [Environment]::GetFolderPath([Environment+SpecialFolder]::Programs)
+        $startShortcut = $wscript.CreateShortcut((Join-Path $startMenuDir "OpenLid.lnk"))
+        $startShortcut.TargetPath = if (Test-Path $targetExe) { $targetExe } else { Join-Path $targetDir "Launch-OpenLid.cmd" }
+        $startShortcut.WorkingDirectory = $targetDir
+        if (Test-Path $targetIco) { $startShortcut.IconLocation = "$targetIco,0" }
+        $startShortcut.Description = "OpenLid - Keep your laptop running with lid closed"
+        $startShortcut.Save()
+    } catch {
+        Write-Warning "Could not create Windows shell shortcuts: $_"
+    }
+    
+    # Initialize configuration
+    $appDataDir = Join-Path $env:APPDATA "OpenLid"
+    if (-not (Test-Path $appDataDir)) { New-Item -ItemType Directory -Path $appDataDir -Force | Out-Null }
+    $configFile = Join-Path $appDataDir "config.ini"
+    if (-not (Test-Path $configFile)) {
+        "Mode=both`nOnboarded=False" | Set-Content $configFile
+    }
+    
+    Write-Host "✅ Installation successful!" -ForegroundColor Green
+    Write-Host "📍 Application Directory: $targetDir" -ForegroundColor White
+    Write-Host "📍 Desktop Shortcut:      $desktopDir\OpenLid.lnk" -ForegroundColor White
+    Write-Host "📍 Start Menu Shortcut:   $startMenuDir\OpenLid.lnk" -ForegroundColor White
+    Write-Host "`n🚀 Launching OpenLid..." -ForegroundColor Cyan
+    
+    if (Test-Path $targetExe) {
+        Start-Process $targetExe -ArgumentList "--app"
+    } else {
+        Start-Process (Join-Path $targetDir "Launch-OpenLid.cmd")
+    }
+}
+
+function Uninstall-OpenLid {
+    Write-Host "==========================================================" -ForegroundColor Yellow
+    Write-Host "  🛑 Uninstalling OpenLid for Windows                     " -ForegroundColor Yellow
+    Write-Host "==========================================================" -ForegroundColor Yellow
+    
+    # Restore default power settings
+    Set-LidAction 1
+    
+    # Terminate running OpenLid instances
+    Get-Process "OpenLid" -ErrorAction SilentlyContinue | Stop-Process -Force
+    
+    # Remove shortcuts
+    $desktopShortcut = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::Desktop)) "OpenLid.lnk"
+    if (Test-Path $desktopShortcut) { Remove-Item -Path $desktopShortcut -Force -ErrorAction SilentlyContinue }
+    
+    $startMenuShortcut = Join-Path ([Environment]::GetFolderPath([Environment+SpecialFolder]::Programs)) "OpenLid.lnk"
+    if (Test-Path $startMenuShortcut) { Remove-Item -Path $startMenuShortcut -Force -ErrorAction SilentlyContinue }
+    
+    # Remove program folder
+    $targetDir = Join-Path $env:LOCALAPPDATA "Programs\OpenLid"
+    if (Test-Path $targetDir) {
+        Remove-Item -Path $targetDir -Recurse -Force -ErrorAction SilentlyContinue
+    }
+    
+    Write-Host "✅ OpenLid has been cleanly uninstalled." -ForegroundColor Green
+    Write-Host "Normal Windows lid-close sleep behavior has been restored." -ForegroundColor White
+}
+
+if ($Install -or $MoveToApplications) {
+    Install-OpenLid
+    exit
+}
+
+if ($Uninstall) {
+    Uninstall-OpenLid
+    exit
 }
 
 if ($App -or $Gui) {

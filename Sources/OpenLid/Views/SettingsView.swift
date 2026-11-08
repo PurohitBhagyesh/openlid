@@ -102,6 +102,29 @@ struct SettingsView: View {
                         .foregroundColor(.secondary)
                 }
                 
+                Section(header: Text("Application Location").font(.headline)) {
+                    HStack {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(ApplicationMover.isInstalledInApplications() ? "Applications Folder" : "Outside Applications Folder")
+                                .fontWeight(.medium)
+                            Text(ApplicationMover.isInstalledInApplications() ? "OpenLid is correctly installed in your Applications directory." : "Move OpenLid to /Applications for optimal performance and system persistence.")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                        }
+                        Spacer()
+                        if !ApplicationMover.isInstalledInApplications() {
+                            Button("Move to Applications") {
+                                ApplicationMover.requestManualMoveToApplications()
+                            }
+                            .buttonStyle(.borderedProminent)
+                            .controlSize(.small)
+                        } else {
+                            Image(systemName: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        }
+                    }
+                }
+                
                 Section(header: Text("Thermal Safety Guard").font(.headline)) {
                     Toggle("Thermal Overheating Guard", isOn: Binding(
                         get: { powerManager.thermal.thermalProtectionEnabled },
