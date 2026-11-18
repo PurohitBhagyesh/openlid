@@ -116,27 +116,25 @@ public struct LiquidToggle: View {
     }
     
     public var body: some View {
-        Button(action: {
+        ZStack {
+            Capsule()
+                .fill(isOn ? Color.white : Color.white.opacity(0.12))
+                .frame(width: 34, height: 19)
+                .overlay(
+                    Capsule()
+                        .stroke(isOn ? Color.clear : Color.white.opacity(0.18), lineWidth: 0.75)
+                )
+            Circle()
+                .fill(isOn ? Color.black : Color.white.opacity(0.75))
+                .frame(width: 13.5, height: 13.5)
+                .offset(x: isOn ? 7.5 : -7.5)
+        }
+        .contentShape(Capsule())
+        .onTapGesture {
             withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
                 isOn.toggle()
             }
-        }) {
-            ZStack {
-                Capsule()
-                    .fill(isOn ? Color.white : Color.white.opacity(0.12))
-                    .frame(width: 34, height: 19)
-                    .overlay(
-                        Capsule()
-                            .stroke(isOn ? Color.clear : Color.white.opacity(0.18), lineWidth: 0.75)
-                    )
-                Circle()
-                    .fill(isOn ? Color.black : Color.white.opacity(0.75))
-                    .frame(width: 13.5, height: 13.5)
-                    .offset(x: isOn ? 7.5 : -7.5)
-            }
-            .contentShape(Capsule())
         }
-        .buttonStyle(.plain)
     }
 }
 

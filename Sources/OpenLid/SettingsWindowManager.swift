@@ -23,9 +23,10 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         })
         
         let hostingController = NSHostingController(rootView: settingsView)
+        hostingController.sizingOptions = []
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 360, height: 318),
+            contentRect: NSRect(x: 0, y: 0, width: 360, height: 316),
             styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -39,6 +40,7 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
         window.contentViewController = hostingController
+        window.setContentSize(NSSize(width: 360, height: 316))
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
         window.collectionBehavior = [.fullScreenNone]

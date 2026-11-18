@@ -31,9 +31,10 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
             self?.closeWindow()
         }
         let hostingController = NSHostingController(rootView: view)
+        hostingController.sizingOptions = []
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 380, height: 300),
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 286),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -47,6 +48,7 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
         window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
         window.contentViewController = hostingController
+        window.setContentSize(NSSize(width: 380, height: 286))
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
         window.collectionBehavior = [.fullScreenNone, .moveToActiveSpace]

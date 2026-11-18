@@ -37,6 +37,7 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         
         let mainView = MainWindowView()
         let hostingController = NSHostingController(rootView: mainView)
+        hostingController.sizingOptions = []
         
         let window = NSWindow(
             contentRect: NSRect(x: 0, y: 0, width: 380, height: 396),
@@ -53,6 +54,7 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
         window.contentViewController = hostingController
+        window.setContentSize(NSSize(width: 380, height: 396))
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
         window.collectionBehavior = [.fullScreenNone]

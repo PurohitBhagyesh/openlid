@@ -39,7 +39,8 @@ public struct MainWindowView: View {
                     .transition(.opacity)
             }
         }
-        .frame(width: 380, height: 396)
+        .ignoresSafeArea()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
@@ -135,7 +136,7 @@ public struct MainWindowView: View {
                 .clipped()
                 .animation(.spring(response: 0.34, dampingFraction: 0.84), value: selectedTab)
             }
-            .ignoresSafeArea(.container, edges: .top)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
             // Non-shifting floating glass toast for errors / notices
             if let notice = powerManager.lastError ?? powerManager.stopReason ?? toastMessage {

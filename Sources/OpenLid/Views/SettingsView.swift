@@ -174,7 +174,7 @@ struct SettingsView: View {
                 .padding(.top, 12)
                 .padding(.bottom, 14)
             }
-            .ignoresSafeArea(.container, edges: .top)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             
             // Non-shifting floating toast if needed
             if let msg = toastMessage {
@@ -191,7 +191,8 @@ struct SettingsView: View {
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
         }
-        .frame(width: 360, height: 318)
+        .ignoresSafeArea()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()

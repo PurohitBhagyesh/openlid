@@ -136,9 +136,10 @@ public struct MoveToApplicationsView: View {
                 .padding(.horizontal, 22)
                 .padding(.bottom, 18)
             }
-            .ignoresSafeArea(.container, edges: .top)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         }
-        .frame(width: 380, height: 300)
+        .ignoresSafeArea()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
         .preferredColorScheme(.dark)
         .onReceive(timer) { _ in
             chevronPhase = (chevronPhase + 1) % 3
