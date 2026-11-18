@@ -12,7 +12,6 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
         super.init()
     }
     
-    /// Shows the modern Move-to-Applications SwiftUI sheet window if needed (or unconditionally when `force == true`).
     @MainActor
     public func showPrompt(force: Bool = false, onDismiss: (() -> Void)? = nil) {
         if !force && !ApplicationMover.shouldPromptOnLaunch() {
@@ -34,7 +33,7 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: view)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 400, height: 330),
+            contentRect: NSRect(x: 0, y: 0, width: 380, height: 300),
             styleMask: [.titled, .closable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -44,8 +43,9 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
+        window.isOpaque = false
+        window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(red: 0.045, green: 0.055, blue: 0.075, alpha: 1.0)
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
@@ -77,4 +77,3 @@ public final class MoveToApplicationsWindowManager: NSObject, NSWindowDelegate {
         }
     }
 }
-

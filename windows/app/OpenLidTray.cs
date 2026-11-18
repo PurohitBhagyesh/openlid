@@ -62,8 +62,8 @@ namespace OpenLid
     public class RoundedPanel : Panel
     {
         private int _cornerRadius = 12;
-        private Color _fillColor = Color.FromArgb(20, 24, 33);
-        private Color _borderColor = Color.FromArgb(38, 46, 62);
+        private Color _fillColor = Color.FromArgb(18, 18, 21);
+        private Color _borderColor = Color.FromArgb(52, 52, 58);
 
         public int CornerRadius { get { return _cornerRadius; } set { _cornerRadius = value; Invalidate(); } }
         public Color FillColor { get { return _fillColor; } set { _fillColor = value; Invalidate(); } }
@@ -93,9 +93,9 @@ namespace OpenLid
     public class ModernButton : Control
     {
         private int _cornerRadius = 9;
-        private Color _normalBack = Color.FromArgb(16, 185, 129);
-        private Color _hoverBack = Color.FromArgb(34, 211, 153);
-        private Color _pressBack = Color.FromArgb(12, 155, 108);
+        private Color _normalBack = Color.FromArgb(245, 245, 247);
+        private Color _hoverBack = Color.FromArgb(255, 255, 255);
+        private Color _pressBack = Color.FromArgb(215, 215, 220);
         private Color _borderColor = Color.Transparent;
         private bool _hovered = false;
         private bool _pressed = false;
@@ -639,8 +639,8 @@ namespace OpenLid
                 g.SmoothingMode = SmoothingMode.AntiAlias;
                 g.Clear(Color.Transparent);
 
-                Color eyeColor = active ? Color.FromArgb(16, 185, 129) : Color.FromArgb(120, 130, 145);
-                Color pupilColor = active ? Color.FromArgb(6, 182, 212) : Color.FromArgb(80, 90, 105);
+                Color eyeColor = active ? Color.FromArgb(245, 245, 247) : Color.FromArgb(120, 130, 145);
+                Color pupilColor = active ? Color.FromArgb(220, 220, 225) : Color.FromArgb(80, 90, 105);
 
                 using (Pen pen = new Pen(eyeColor, 3f))
                 {
@@ -785,7 +785,7 @@ namespace OpenLid
                     glowPath.AddEllipse(4, 4, w - 8, h - 8);
                     using (PathGradientBrush pgb = new PathGradientBrush(glowPath))
                     {
-                        pgb.CenterColor = Color.FromArgb(65, 16, 185, 129);
+                        pgb.CenterColor = Color.FromArgb(40, 255, 255, 255);
                         pgb.SurroundColors = new Color[] { Color.Transparent };
                         g.FillPath(pgb, glowPath);
                     }
@@ -805,7 +805,7 @@ namespace OpenLid
 
                 float irisR = Math.Min(eyeW, eyeH) * 0.38f;
                 float pupilX = cx + (_pupilOffset * (eyeW * 0.17f));
-                using (SolidBrush iris = new SolidBrush(Color.FromArgb(16, 185, 129)))
+                using (SolidBrush iris = new SolidBrush(Color.FromArgb(245, 245, 247)))
                 {
                     g.FillEllipse(iris, pupilX - irisR, cy - irisR, irisR * 2f, irisR * 2f);
                 }
@@ -820,7 +820,7 @@ namespace OpenLid
                 }
             }
 
-            Color outline = _isAwake ? Color.FromArgb(16, 185, 129) : Color.FromArgb(95, 105, 122);
+            Color outline = _isAwake ? Color.FromArgb(245, 245, 247) : Color.FromArgb(95, 105, 122);
             using (Pen pen = new Pen(outline, 2.5f))
             {
                 g.DrawEllipse(pen, eyeRect);
@@ -860,8 +860,8 @@ namespace OpenLid
             // Left Tile: OpenLid App
             Rectangle leftBox = new Rectangle(40, 4, 68, 68);
             using (GraphicsPath lp = NativeUI.CreateRoundedRect(leftBox, 16))
-            using (SolidBrush lb = new SolidBrush(Color.FromArgb(20, 26, 36)))
-            using (Pen lpen = new Pen(Color.FromArgb(80, 16, 185, 129), 1.5f))
+            using (SolidBrush lb = new SolidBrush(Color.FromArgb(22, 22, 26)))
+            using (Pen lpen = new Pen(Color.FromArgb(70, 255, 255, 255), 1.5f))
             {
                 g.FillPath(lb, lp);
                 g.DrawPath(lpen, lp);
@@ -876,7 +876,7 @@ namespace OpenLid
             {
                 int cx = 142 + i * 20;
                 int cy = 38;
-                Color c = (_phase == i) ? Color.FromArgb(34, 211, 153) : Color.FromArgb(70, 90, 110);
+                Color c = (_phase == i) ? Color.FromArgb(255, 255, 255) : Color.FromArgb(70, 90, 110);
                 using (Pen cp = new Pen(c, 2.6f))
                 {
                     cp.StartCap = LineCap.Round;
@@ -889,15 +889,15 @@ namespace OpenLid
             // Right Tile: Programs Folder
             Rectangle rightBox = new Rectangle(232, 4, 68, 68);
             using (GraphicsPath rp = NativeUI.CreateRoundedRect(rightBox, 16))
-            using (SolidBrush rb = new SolidBrush(Color.FromArgb(20, 26, 36)))
-            using (Pen rpen = new Pen(Color.FromArgb(80, 56, 152, 255), 1.5f))
+            using (SolidBrush rb = new SolidBrush(Color.FromArgb(22, 22, 26)))
+            using (Pen rpen = new Pen(Color.FromArgb(55, 255, 255, 255), 1.5f))
             {
                 g.FillPath(rb, rp);
                 g.DrawPath(rpen, rp);
             }
             // Draw crisp vector folder icon
-            using (SolidBrush tabBrush = new SolidBrush(Color.FromArgb(56, 152, 255)))
-            using (SolidBrush bodyBrush = new SolidBrush(Color.FromArgb(86, 174, 255)))
+            using (SolidBrush tabBrush = new SolidBrush(Color.FromArgb(200, 200, 205)))
+            using (SolidBrush bodyBrush = new SolidBrush(Color.FromArgb(235, 235, 240)))
             {
                 using (GraphicsPath tabPath = NativeUI.CreateRoundedRect(new Rectangle(248, 22, 16, 10), 3))
                     g.FillPath(tabBrush, tabPath);
@@ -929,7 +929,7 @@ namespace OpenLid
             MaximizeBox = false;
             MinimizeBox = false;
             ShowInTaskbar = true;
-            BackColor = Color.FromArgb(11, 13, 18);
+            BackColor = Color.FromArgb(10, 10, 12);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 9.5f);
             Icon = Program.CreateEyeIcon(true);
@@ -939,12 +939,12 @@ namespace OpenLid
             badge.Size = new Size(210, 26);
             badge.Location = new Point(125, 22);
             badge.CornerRadius = 13;
-            badge.FillColor = Color.FromArgb(16, 38, 34);
-            badge.BorderColor = Color.FromArgb(30, 105, 80);
+            badge.FillColor = Color.FromArgb(24, 24, 28);
+            badge.BorderColor = Color.FromArgb(60, 60, 68);
             Label lblBadge = new Label();
             lblBadge.Text = "RUNNING FROM " + Program.GetCurrentLocationLabel().ToUpper();
             lblBadge.Font = new Font("Consolas", 8f, FontStyle.Bold);
-            lblBadge.ForeColor = Color.FromArgb(95, 230, 175);
+            lblBadge.ForeColor = Color.FromArgb(215, 215, 220);
             lblBadge.TextAlign = ContentAlignment.MiddleCenter;
             lblBadge.Dock = DockStyle.Fill;
             badge.Controls.Add(lblBadge);
@@ -997,8 +997,8 @@ namespace OpenLid
             card.Location = new Point(28, 256);
             card.Size = new Size(404, 118);
             card.CornerRadius = 12;
-            card.FillColor = Color.FromArgb(18, 22, 30);
-            card.BorderColor = Color.FromArgb(34, 42, 56);
+            card.FillColor = Color.FromArgb(18, 18, 21);
+            card.BorderColor = Color.FromArgb(46, 46, 52);
 
             AddBenefitRow(card, 14, "Keeps Downloads tidy", "Relocates to %LOCALAPPDATA%\\Programs\\OpenLid");
             AddBenefitRow(card, 49, "Start Menu & Desktop shortcuts", "Creates native branded shortcuts with OpenLid icon");
@@ -1007,7 +1007,7 @@ namespace OpenLid
 
             _lblError = new Label();
             _lblError.Visible = false;
-            _lblError.ForeColor = Color.FromArgb(251, 146, 60);
+            _lblError.ForeColor = Color.FromArgb(215, 215, 220);
             _lblError.Font = new Font("Segoe UI", 8.5f);
             _lblError.Location = new Point(28, 378);
             _lblError.Size = new Size(404, 20);
@@ -1019,9 +1019,9 @@ namespace OpenLid
             _btnMove.Location = new Point(28, 398);
             _btnMove.Size = new Size(404, 40);
             _btnMove.CornerRadius = 10;
-            _btnMove.NormalBack = Color.FromArgb(16, 185, 129);
-            _btnMove.HoverBack = Color.FromArgb(34, 211, 153);
-            _btnMove.PressBack = Color.FromArgb(12, 155, 108);
+            _btnMove.NormalBack = Color.FromArgb(245, 245, 247);
+            _btnMove.HoverBack = Color.FromArgb(255, 255, 255);
+            _btnMove.PressBack = Color.FromArgb(215, 215, 220);
             _btnMove.ForeColor = Color.Black;
             _btnMove.Click += delegate { PerformMove(); };
             Controls.Add(_btnMove);
@@ -1041,9 +1041,9 @@ namespace OpenLid
             _btnCancel.Size = new Size(100, 30);
             _btnCancel.CornerRadius = 8;
             _btnCancel.NormalBack = Color.FromArgb(26, 31, 42);
-            _btnCancel.HoverBack = Color.FromArgb(38, 46, 62);
+            _btnCancel.HoverBack = Color.FromArgb(52, 52, 58);
             _btnCancel.PressBack = Color.FromArgb(20, 24, 34);
-            _btnCancel.BorderColor = Color.FromArgb(46, 56, 74);
+            _btnCancel.BorderColor = Color.FromArgb(58, 58, 66);
             _btnCancel.ForeColor = Color.FromArgb(210, 218, 230);
             _btnCancel.Font = new Font("Segoe UI", 9f, FontStyle.Regular);
             _btnCancel.Click += delegate { DialogResult = DialogResult.Cancel; Close(); };
@@ -1061,7 +1061,7 @@ namespace OpenLid
             Label dot = new Label();
             dot.Text = "\u2713";
             dot.Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
-            dot.ForeColor = Color.FromArgb(16, 185, 129);
+            dot.ForeColor = Color.FromArgb(245, 245, 247);
             dot.Location = new Point(14, y);
             dot.Size = new Size(20, 20);
             parent.Controls.Add(dot);
@@ -1116,7 +1116,7 @@ namespace OpenLid
             FormBorderStyle = FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
-            BackColor = Color.FromArgb(11, 13, 18);
+            BackColor = Color.FromArgb(10, 10, 12);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 9.5f);
             Icon = Program.CreateEyeIcon(true);
@@ -1147,7 +1147,7 @@ namespace OpenLid
             for (int i = 1; i <= 3; i++)
             {
                 int w = (_step == i) ? 24 : 8;
-                Color c = (_step == i) ? Color.FromArgb(16, 185, 129) : Color.FromArgb(50, 58, 72);
+                Color c = (_step == i) ? Color.FromArgb(245, 245, 247) : Color.FromArgb(50, 58, 72);
                 using (GraphicsPath p = NativeUI.CreateRoundedRect(new Rectangle(startX, 16, w, 6), 3))
                 using (SolidBrush b = new SolidBrush(c))
                 {
@@ -1248,7 +1248,7 @@ namespace OpenLid
                 {
                     Program.SetAwakeState(true);
                     lblStatus.Text = "\u2713 Verified! Clamshell sleep prevention is active.";
-                    lblStatus.ForeColor = Color.FromArgb(34, 211, 153);
+                    lblStatus.ForeColor = Color.FromArgb(255, 255, 255);
                     btnTest.Text = "Verified";
                     btnTest.Enabled = false;
                 };
@@ -1322,7 +1322,7 @@ namespace OpenLid
             Label t = new Label();
             t.Text = "\u25CF  " + title;
             t.Font = new Font("Segoe UI", 9.5f, FontStyle.Bold);
-            t.ForeColor = Color.FromArgb(34, 211, 153);
+            t.ForeColor = Color.FromArgb(255, 255, 255);
             t.Location = new Point(20, y);
             t.Size = new Size(408, 20);
             card.Controls.Add(t);
@@ -1371,7 +1371,7 @@ namespace OpenLid
             MaximizeBox = false;
             ShowInTaskbar = true;
             Icon = Program.CreateEyeIcon(Program.IsAwake);
-            BackColor = Color.FromArgb(11, 13, 18);
+            BackColor = Color.FromArgb(10, 10, 12);
             ForeColor = Color.White;
             Font = new Font("Segoe UI", 9.5f);
 
@@ -1379,7 +1379,7 @@ namespace OpenLid
             Panel pnlHeader = new Panel();
             pnlHeader.Dock = DockStyle.Top;
             pnlHeader.Height = 64;
-            pnlHeader.BackColor = Color.FromArgb(16, 19, 27);
+            pnlHeader.BackColor = Color.FromArgb(15, 15, 18);
 
             AnimatedEyeControl headerEye = new AnimatedEyeControl();
             headerEye.Location = new Point(16, 12);
@@ -1421,8 +1421,8 @@ namespace OpenLid
                 banner.Location = new Point(22, curY);
                 banner.Size = new Size(516, 54);
                 banner.CornerRadius = 11;
-                banner.FillColor = Color.FromArgb(15, 34, 30);
-                banner.BorderColor = Color.FromArgb(26, 98, 76);
+                banner.FillColor = Color.FromArgb(22, 22, 26);
+                banner.BorderColor = Color.FromArgb(58, 58, 66);
 
                 Label lblBTitle = new Label();
                 lblBTitle.Text = "Running from " + Program.GetCurrentLocationLabel();
@@ -1435,7 +1435,7 @@ namespace OpenLid
                 Label lblBSub = new Label();
                 lblBSub.Text = "Install to Programs folder for Start Menu & Desktop shortcuts.";
                 lblBSub.Font = new Font("Segoe UI", 8.2f);
-                lblBSub.ForeColor = Color.FromArgb(150, 200, 180);
+                lblBSub.ForeColor = Color.FromArgb(165, 165, 172);
                 lblBSub.Location = new Point(14, 28);
                 lblBSub.Size = new Size(340, 18);
                 banner.Controls.Add(lblBSub);
@@ -1458,8 +1458,8 @@ namespace OpenLid
             heroCard.Location = new Point(22, curY);
             heroCard.Size = new Size(516, 126);
             heroCard.CornerRadius = 14;
-            heroCard.FillColor = Color.FromArgb(18, 22, 31);
-            heroCard.BorderColor = Color.FromArgb(34, 42, 58);
+            heroCard.FillColor = Color.FromArgb(18, 18, 21);
+            heroCard.BorderColor = Color.FromArgb(46, 46, 52);
 
             _heroEye = new AnimatedEyeControl();
             _heroEye.Location = new Point(22, 34);
@@ -1547,10 +1547,10 @@ namespace OpenLid
             btnSettings.Location = new Point(22, curY);
             btnSettings.Size = new Size(250, 38);
             btnSettings.CornerRadius = 9;
-            btnSettings.NormalBack = Color.FromArgb(24, 29, 40);
-            btnSettings.HoverBack = Color.FromArgb(34, 41, 56);
-            btnSettings.PressBack = Color.FromArgb(18, 22, 31);
-            btnSettings.BorderColor = Color.FromArgb(44, 54, 72);
+            btnSettings.NormalBack = Color.FromArgb(22, 22, 26);
+            btnSettings.HoverBack = Color.FromArgb(36, 36, 42);
+            btnSettings.PressBack = Color.FromArgb(18, 18, 21);
+            btnSettings.BorderColor = Color.FromArgb(54, 54, 60);
             btnSettings.ForeColor = Color.White;
             btnSettings.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
             btnSettings.Click += delegate
@@ -1564,11 +1564,11 @@ namespace OpenLid
             btnWebsite.Location = new Point(288, curY);
             btnWebsite.Size = new Size(250, 38);
             btnWebsite.CornerRadius = 9;
-            btnWebsite.NormalBack = Color.FromArgb(24, 29, 40);
-            btnWebsite.HoverBack = Color.FromArgb(34, 41, 56);
-            btnWebsite.PressBack = Color.FromArgb(18, 22, 31);
-            btnWebsite.BorderColor = Color.FromArgb(44, 54, 72);
-            btnWebsite.ForeColor = Color.FromArgb(34, 211, 153);
+            btnWebsite.NormalBack = Color.FromArgb(22, 22, 26);
+            btnWebsite.HoverBack = Color.FromArgb(36, 36, 42);
+            btnWebsite.PressBack = Color.FromArgb(18, 18, 21);
+            btnWebsite.BorderColor = Color.FromArgb(54, 54, 60);
+            btnWebsite.ForeColor = Color.FromArgb(255, 255, 255);
             btnWebsite.Font = new Font("Segoe UI", 9f, FontStyle.Bold);
             btnWebsite.Click += delegate { Program.OpenUrl("https://openlid.devs.li"); };
             Controls.Add(btnWebsite);
@@ -1610,15 +1610,15 @@ namespace OpenLid
             if (_lblStatusPill != null)
             {
                 _lblStatusPill.Text = Program.IsAwake ? "AWAKE" : "STANDBY";
-                _lblStatusPill.BackColor = Program.IsAwake ? Color.FromArgb(16, 48, 38) : Color.FromArgb(32, 37, 48);
-                _lblStatusPill.ForeColor = Program.IsAwake ? Color.FromArgb(34, 211, 153) : Color.FromArgb(150, 160, 178);
+                _lblStatusPill.BackColor = Program.IsAwake ? Color.FromArgb(245, 245, 247) : Color.FromArgb(32, 37, 48);
+                _lblStatusPill.ForeColor = Program.IsAwake ? Color.Black : Color.FromArgb(150, 160, 178);
             }
             if (_btnToggle != null)
             {
                 _btnToggle.Text = Program.IsAwake ? "Restore Normal Sleep" : "Keep Laptop Awake";
-                _btnToggle.NormalBack = Program.IsAwake ? Color.FromArgb(16, 185, 129) : Color.FromArgb(34, 41, 56);
-                _btnToggle.HoverBack = Program.IsAwake ? Color.FromArgb(34, 211, 153) : Color.FromArgb(46, 56, 74);
-                _btnToggle.PressBack = Program.IsAwake ? Color.FromArgb(12, 155, 108) : Color.FromArgb(26, 32, 44);
+                _btnToggle.NormalBack = Program.IsAwake ? Color.FromArgb(245, 245, 247) : Color.FromArgb(36, 36, 42);
+                _btnToggle.HoverBack = Program.IsAwake ? Color.FromArgb(255, 255, 255) : Color.FromArgb(58, 58, 66);
+                _btnToggle.PressBack = Program.IsAwake ? Color.FromArgb(215, 215, 220) : Color.FromArgb(24, 24, 28);
                 _btnToggle.ForeColor = Program.IsAwake ? Color.Black : Color.White;
             }
         }
@@ -1630,10 +1630,10 @@ namespace OpenLid
             {
                 bool selected = (_presetMinutes[i] == Program.ActiveDurationMinutes);
                 ModernButton pb = _presetButtons[i];
-                pb.NormalBack = selected ? Color.FromArgb(16, 185, 129) : Color.FromArgb(26, 32, 44);
-                pb.HoverBack = selected ? Color.FromArgb(34, 211, 153) : Color.FromArgb(38, 46, 62);
-                pb.PressBack = selected ? Color.FromArgb(12, 155, 108) : Color.FromArgb(20, 25, 34);
-                pb.BorderColor = selected ? Color.Transparent : Color.FromArgb(44, 54, 72);
+                pb.NormalBack = selected ? Color.FromArgb(245, 245, 247) : Color.FromArgb(24, 24, 28);
+                pb.HoverBack = selected ? Color.FromArgb(255, 255, 255) : Color.FromArgb(52, 52, 58);
+                pb.PressBack = selected ? Color.FromArgb(215, 215, 220) : Color.FromArgb(20, 25, 34);
+                pb.BorderColor = selected ? Color.Transparent : Color.FromArgb(54, 54, 60);
                 pb.ForeColor = selected ? Color.Black : Color.White;
             }
         }

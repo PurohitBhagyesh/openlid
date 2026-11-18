@@ -39,7 +39,7 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: mainView)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 480, height: 560),
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 440),
             styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
@@ -49,8 +49,9 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
+        window.isOpaque = false
+        window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(red: 0.047, green: 0.055, blue: 0.071, alpha: 1.0)
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false

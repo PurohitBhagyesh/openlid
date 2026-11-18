@@ -6,9 +6,8 @@ public struct AnimatedEyeView: View {
     public let isScanning: Bool
     
     @State private var pupilOffset: CGFloat = -0.35
-    @State private var eyeBlink: CGFloat = 1.0
     
-    public init(size: CGFloat = 80, isAwake: Bool = true, isScanning: Bool = true) {
+    public init(size: CGFloat = 64, isAwake: Bool = true, isScanning: Bool = true) {
         self.size = size
         self.isAwake = isAwake
         self.isScanning = isScanning
@@ -16,100 +15,82 @@ public struct AnimatedEyeView: View {
     
     public var body: some View {
         let width = size
-        let height = size * 0.6
-        let pupilSize = height * 0.52
-        let maxHorizontalShift = (width - pupilSize) * 0.28
+        let height = size * 0.58
+        let irisSize = height * 0.56
+        let maxHorizontalShift = (width - irisSize) * 0.25
         
         ZStack {
-            // Ambient Vigilance Glow (3D Depth)
-            if isAwake {
-                Ellipse()
-                    .fill(
-                        RadialGradient(
-                            colors: [Color.green.opacity(0.35), Color.clear],
-                            center: .center,
-                            startRadius: pupilSize * 0.5,
-                            endRadius: width * 0.75
-                        )
-                    )
-                    .frame(width: width * 1.5, height: height * 1.7)
-                    .blur(radius: 6)
-            }
-            
-            // Outer 3D Sclera / Eye Base
+            // Subtle monochrome glass luminance (inside fixed frame, never changes layout bounds)
             EyeShape()
                 .fill(
                     LinearGradient(
-                        colors: isAwake ? [Color(white: 0.95), Color(white: 0.82)] : [Color(white: 0.35), Color(white: 0.2)],
+                        colors: isAwake
+                            ? [Color.white, Color(white: 0.86)]
+                            : [Color.white.opacity(0.14), Color.white.opacity(0.06)],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
                 .frame(width: width, height: height)
                 .overlay(
-                    // Inner shadow and rim highlight
                     EyeShape()
                         .stroke(
                             LinearGradient(
-                                colors: isAwake ? [Color.green.opacity(0.8), Color.green.opacity(0.3)] : [Color.gray.opacity(0.5), Color.gray.opacity(0.2)],
+                                colors: isAwake
+                                    ? [Color.white.opacity(0.9), Color.white.opacity(0.25)]
+                                    : [Color.white.opacity(0.32), Color.white.opacity(0.10)],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             ),
-                            lineWidth: max(1.5, size * 0.04)
+                            lineWidth: max(1.0, size * 0.025)
                         )
                 )
-                .shadow(color: isAwake ? Color.green.opacity(0.4) : Color.black.opacity(0.3), radius: 8, x: 0, y: 3)
+                .shadow(
+                    color: isAwake ? Color.white.opacity(0.22) : Color.clear,
+                    radius: 10,
+                    x: 0,
+                    y: 0
+                )
                 .clipShape(EyeShape())
                 .overlay(
-                    // Moving Eyeball / Iris / Pupil
                     ZStack {
                         if isAwake {
-                            // Iris Outer Glow
+                            // Monochrome obsidian iris + pupil + crisp glass specular reflection
                             Circle()
-                                .fill(
-                                    RadialGradient(
-                                        colors: [Color.green, Color.teal.opacity(0.85), Color(red: 0.05, green: 0.3, blue: 0.2)],
-                                        center: .center,
-                                        startRadius: 2,
-                                        endRadius: pupilSize * 0.5
-                                    )
-                                )
-                                .frame(width: pupilSize, height: pupilSize)
-                                .shadow(color: Color.green.opacity(0.8), radius: 4)
+                                .fill(Color(white: 0.08))
+                                .frame(width: irisSize, height: irisSize)
                             
-                            // Pupil
+                            Circle()
+                                .stroke(Color.white.opacity(0.18), lineWidth: 1)
+                                .frame(width: irisSize * 0.82, height: irisSize * 0.82)
+                            
                             Circle()
                                 .fill(Color.black)
-                                .frame(width: pupilSize * 0.48, height: pupilSize * 0.48)
+                                .frame(width: irisSize * 0.46, height: irisSize * 0.46)
                             
-                            // Specular Light Reflection (3D Glass Look)
                             Circle()
-                                .fill(Color.white.opacity(0.85))
-                                .frame(width: pupilSize * 0.2, height: pupilSize * 0.2)
-                                .offset(x: -pupilSize * 0.15, y: -pupilSize * 0.15)
+                                .fill(Color.white.opacity(0.92))
+                                .frame(width: irisSize * 0.22, height: irisSize * 0.22)
+                                .offset(x: -irisSize * 0.16, y: -irisSize * 0.16)
                         } else {
-                            // Asleep: Centered muted pupil
                             Circle()
-                                .fill(Color.secondary.opacity(0.5))
-                                .frame(width: pupilSize * 0.6, height: pupilSize * 0.6)
-                            Circle()
-                                .fill(Color.black.opacity(0.7))
-                                .frame(width: pupilSize * 0.3, height: pupilSize * 0.3)
+                                .fill(Color.white.opacity(0.22))
+                                .frame(width: irisSize * 0.54, height: irisSize * 0.54)
                         }
                     }
                     .offset(x: isAwake && isScanning ? pupilOffset * maxHorizontalShift : 0, y: 0)
                 )
-                .scaleEffect(y: eyeBlink, anchor: .center)
             
-            // Slashed bar when asleep
+            // Minimal monochrome slash when standby (contained within fixed bounds)
             if !isAwake {
-                Rectangle()
-                    .fill(Color.red.opacity(0.85))
-                    .frame(width: width * 1.15, height: max(2.5, size * 0.06))
-                    .rotationEffect(.degrees(-35))
-                    .shadow(color: Color.black.opacity(0.5), radius: 2)
+                Capsule()
+                    .fill(Color.white.opacity(0.55))
+                    .frame(width: width * 0.88, height: max(1.75, size * 0.036))
+                    .rotationEffect(.degrees(-28))
             }
         }
+        .frame(width: width, height: height)
+        .animation(.easeInOut(duration: 0.25), value: isAwake)
         .onAppear {
             if isAwake && isScanning {
                 startScanningAnimation()
@@ -118,18 +99,22 @@ public struct AnimatedEyeView: View {
         .onChange(of: isAwake) { awake in
             if awake && isScanning {
                 startScanningAnimation()
+            } else {
+                withAnimation(.easeOut(duration: 0.2)) {
+                    pupilOffset = 0
+                }
             }
         }
     }
     
     private func startScanningAnimation() {
-        pupilOffset = -1.0
+        pupilOffset = -0.85
         withAnimation(
             Animation
-                .easeInOut(duration: 1.8)
+                .easeInOut(duration: 2.2)
                 .repeatForever(autoreverses: true)
         ) {
-            pupilOffset = 1.0
+            pupilOffset = 0.85
         }
     }
 }
@@ -145,20 +130,17 @@ public struct EyeShape: Shape {
         let endPoint = CGPoint(x: width, y: height * 0.5)
         
         path.move(to: startPoint)
-        // Upper lid curve
         path.addCurve(
             to: endPoint,
-            control1: CGPoint(x: width * 0.28, y: -height * 0.18),
-            control2: CGPoint(x: width * 0.72, y: -height * 0.18)
+            control1: CGPoint(x: width * 0.28, y: -height * 0.16),
+            control2: CGPoint(x: width * 0.72, y: -height * 0.16)
         )
-        // Lower lid curve
         path.addCurve(
             to: startPoint,
-            control1: CGPoint(x: width * 0.72, y: height * 1.18),
-            control2: CGPoint(x: width * 0.28, y: height * 1.18)
+            control1: CGPoint(x: width * 0.72, y: height * 1.16),
+            control2: CGPoint(x: width * 0.28, y: height * 1.16)
         )
         path.closeSubpath()
         return path
     }
 }
-

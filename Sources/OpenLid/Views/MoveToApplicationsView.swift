@@ -12,7 +12,6 @@ public struct MoveToApplicationsView: View {
     
     private let locationName = ApplicationMover.currentLocationDescription()
     private let timer = Timer.publish(every: 0.45, on: .main, in: .common).autoconnect()
-    private let emerald = Color(red: 0.063, green: 0.725, blue: 0.506)
     
     private var isMoving: Bool {
         switch stage {
@@ -26,9 +25,9 @@ public struct MoveToApplicationsView: View {
     private var statusText: String {
         switch stage {
         case .idle: return ""
-        case .copying: return "Moving to /Applications..."
-        case .authorizing: return "Waiting for authorization..."
-        case .cleaningUp: return "Finishing up..."
+        case .copying: return "Moving..."
+        case .authorizing: return "Authorizing..."
+        case .cleaningUp: return "Finishing..."
         case .relaunching: return "Relaunching..."
         case .failed(let message): return message
         }
@@ -40,96 +39,76 @@ public struct MoveToApplicationsView: View {
     
     public var body: some View {
         ZStack {
-            Color(red: 0.047, green: 0.055, blue: 0.071)
-                .ignoresSafeArea()
+            LiquidGlassCanvas()
             
-            RadialGradient(
-                gradient: Gradient(colors: [emerald.opacity(0.14), Color.clear]),
-                center: .top,
-                startRadius: 8,
-                endRadius: 220
-            )
-            .ignoresSafeArea()
-            
-            VStack(spacing: 18) {
-                // Visual transfer icons
-                HStack(spacing: 18) {
-                    iconTile(
-                        image: NSApplication.shared.applicationIconImage,
-                        label: "OpenLid",
-                        borderColor: emerald.opacity(0.32)
-                    )
+            VStack(spacing: 16) {
+                HStack(spacing: 16) {
+                    iconTile(image: NSApplication.shared.applicationIconImage, label: "OpenLid")
                     
                     HStack(spacing: 3) {
                         ForEach(0..<3, id: \.self) { idx in
                             Image(systemName: "chevron.right")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(chevronPhase == idx ? emerald : Color.white.opacity(0.20))
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(chevronPhase == idx ? .white : Color.white.opacity(0.22))
                                 .animation(.easeInOut(duration: 0.25), value: chevronPhase)
                         }
                     }
                     .padding(.bottom, 16)
                     
-                    iconTile(
-                        image: NSWorkspace.shared.icon(forFile: "/Applications"),
-                        label: "Applications",
-                        borderColor: Color.white.opacity(0.14)
-                    )
+                    iconTile(image: NSWorkspace.shared.icon(forFile: "/Applications"), label: "Applications")
                 }
-                .padding(.top, 32)
+                .padding(.top, 28)
                 
-                // Concise copy
-                VStack(spacing: 6) {
-                    Text("Move to Applications?")
-                        .font(.system(size: 18, weight: .bold))
+                VStack(spacing: 5) {
+                    Text("Move to Applications")
+                        .font(.system(size: 17, weight: .semibold))
                         .foregroundColor(.white)
                     
-                    Text("OpenLid is running from \(locationName). Move it to your Applications folder to keep Launch at Login and updates working cleanly.")
+                    Text("Running from \(locationName). Move OpenLid to Applications for Launch at Login and updates.")
                         .font(.system(size: 12))
-                        .foregroundColor(Color.white.opacity(0.58))
+                        .foregroundColor(Color.white.opacity(0.55))
                         .multilineTextAlignment(.center)
                         .lineSpacing(2)
-                        .frame(maxWidth: 320)
+                        .frame(maxWidth: 300)
                 }
                 
                 if case .failed(let errorMsg) = stage {
-                    VStack(spacing: 6) {
+                    VStack(spacing: 4) {
                         Text(errorMsg)
                             .font(.system(size: 11))
-                            .foregroundColor(.orange)
+                            .foregroundColor(Color.white.opacity(0.8))
                             .multilineTextAlignment(.center)
                             .lineLimit(2)
-                        Button("Open /Applications in Finder") {
+                        Button("Open Applications Folder") {
                             NSWorkspace.shared.open(URL(fileURLWithPath: "/Applications"))
                         }
-                        .buttonStyle(.link)
                         .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(.white)
+                        .buttonStyle(.plain)
                     }
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, 20)
                 }
                 
                 Spacer(minLength: 0)
                 
-                // Actions
-                VStack(spacing: 12) {
+                VStack(spacing: 10) {
                     Button(action: startMove) {
-                        HStack(spacing: 8) {
+                        HStack(spacing: 7) {
                             if isMoving {
                                 ProgressView()
-                                    .scaleEffect(0.6)
-                                    .colorInvert()
+                                    .scaleEffect(0.55)
                                 Text(statusText)
                                     .font(.system(size: 13, weight: .semibold))
                             } else {
                                 Text("Move to Applications")
-                                    .font(.system(size: 13, weight: .bold))
+                                    .font(.system(size: 13, weight: .semibold))
                             }
                         }
                         .foregroundColor(.black)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 10)
-                        .background(emerald)
-                        .cornerRadius(9)
+                        .frame(height: 36)
+                        .background(Color.white)
+                        .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
                     .disabled(isMoving)
@@ -139,7 +118,7 @@ public struct MoveToApplicationsView: View {
                         Toggle(isOn: $dontAskAgain) {
                             Text("Don't ask again")
                                 .font(.system(size: 11.5))
-                                .foregroundColor(Color.white.opacity(0.50))
+                                .foregroundColor(Color.white.opacity(0.48))
                         }
                         .toggleStyle(.checkbox)
                         .disabled(isMoving)
@@ -148,51 +127,47 @@ public struct MoveToApplicationsView: View {
                         
                         Button("Not Now", action: handleNotNow)
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundColor(Color.white.opacity(0.65))
+                            .foregroundColor(Color.white.opacity(0.62))
                             .buttonStyle(.plain)
                             .disabled(isMoving)
                             .keyboardShortcut(.cancelAction)
                     }
                 }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 22)
+                .padding(.horizontal, 22)
+                .padding(.bottom, 18)
             }
         }
-        .frame(width: 400, height: 330)
+        .frame(width: 380, height: 300)
         .preferredColorScheme(.dark)
         .onReceive(timer) { _ in
             chevronPhase = (chevronPhase + 1) % 3
         }
     }
     
-    private func iconTile(image: NSImage?, label: String, borderColor: Color) -> some View {
-        VStack(spacing: 6) {
+    private func iconTile(image: NSImage?, label: String) -> some View {
+        VStack(spacing: 5) {
             ZStack {
-                RoundedRectangle(cornerRadius: 16)
-                    .fill(Color.white.opacity(0.04))
-                    .frame(width: 66, height: 66)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 16)
-                            .stroke(borderColor, lineWidth: 1)
-                    )
                 if let img = image {
                     Image(nsImage: img)
                         .resizable()
                         .interpolation(.high)
                         .aspectRatio(contentMode: .fit)
-                        .frame(width: 48, height: 48)
+                        .frame(width: 44, height: 44)
                 }
             }
+            .frame(width: 62, height: 62)
+            .liquidGlassCard(cornerRadius: 15, elevated: false)
+            
             Text(label)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundColor(Color.white.opacity(0.60))
+                .font(.system(size: 11))
+                .foregroundColor(Color.white.opacity(0.55))
         }
     }
     
     private func startMove() {
         ApplicationMover.relocateToApplications(
             onStageChange: { newStage in
-                withAnimation(.easeInOut(duration: 0.2)) {
+                withAnimation(.easeInOut(duration: 0.18)) {
                     self.stage = newStage
                 }
             },

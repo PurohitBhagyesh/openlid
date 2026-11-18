@@ -16,356 +16,242 @@ public struct OnboardingView: View {
     
     public var body: some View {
         ZStack {
-            // Dark futuristic backdrop
-            Color(red: 0.05, green: 0.06, blue: 0.08)
-                .ignoresSafeArea()
+            LiquidGlassCanvas()
             
             VStack(spacing: 0) {
-                // Progress indicator dots
-                HStack(spacing: 8) {
+                // Step indicators
+                HStack(spacing: 6) {
                     ForEach(1...3, id: \.self) { i in
                         Capsule()
-                            .fill(step == i ? Color.green : Color.secondary.opacity(0.3))
-                            .frame(width: step == i ? 24 : 8, height: 6)
-                            .animation(.spring(), value: step)
+                            .fill(step == i ? Color.white : Color.white.opacity(0.20))
+                            .frame(width: step == i ? 20 : 6, height: 5)
+                            .animation(.easeInOut(duration: 0.2), value: step)
                     }
                 }
-                .padding(.top, 24)
+                .padding(.top, 26)
                 
-                Spacer()
+                Spacer(minLength: 0)
                 
                 Group {
                     switch step {
-                    case 1:
-                        welcomeStepView
-                    case 2:
-                        permissionsStepView
-                    default:
-                        presentationModeStepView
+                    case 1: welcomeStep
+                    case 2: permissionsStep
+                    default: modeStep
                     }
                 }
-                .transition(.asymmetric(insertion: .move(edge: .trailing).combined(with: .opacity),
-                                        removal: .move(edge: .leading).combined(with: .opacity)))
+                .padding(.horizontal, 26)
                 
-                Spacer()
+                Spacer(minLength: 0)
             }
-            .padding(.horizontal, 24)
         }
-        .frame(width: 480, height: 560)
+        .frame(width: 420, height: 440)
+        .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
         }
     }
     
-    // MARK: - Step 1: Welcome Screen
-    private var welcomeStepView: some View {
-        VStack(spacing: 16) {
-            // 3D Animated Vigilant Eye with Eyeballs Scanning Left to Right
-            AnimatedEyeView(size: 86, isAwake: true, isScanning: true)
-                .padding(.bottom, 2)
+    private var welcomeStep: some View {
+        VStack(spacing: 18) {
+            AnimatedEyeView(size: 70, isAwake: true, isScanning: true)
             
-            VStack(spacing: 8) {
+            VStack(spacing: 6) {
                 Text("OpenLid")
-                    .font(.system(size: 26, weight: .bold))
+                    .font(.system(size: 22, weight: .semibold))
                     .foregroundColor(.white)
                 
-                Text("Keep your laptop running with the lid closed — safely, smoothly, and without external monitors.")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.7))
+                Text("Keep your Mac running with the lid closed, cleanly and without external displays.")
+                    .font(.system(size: 12.5))
+                    .foregroundColor(Color.white.opacity(0.55))
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: 440)
+                    .frame(maxWidth: 320)
             }
             
-            // Feature Highlights
-            VStack(alignment: .leading, spacing: 12) {
-                featureBullet(
-                    icon: "bolt.fill",
-                    title: "Full Clamshell Execution",
-                    desc: "Audio, rendering, long compiles, and downloads continue uninterrupted."
-                )
-                featureBullet(
-                    icon: "shield.checkerboard",
-                    title: "Automated Hardware Sentinels",
-                    desc: "Guards against overheating and halts sleep prevention if battery drops below 15%."
-                )
-                featureBullet(
-                    icon: "display",
-                    title: "Zero Dongles or External Displays",
-                    desc: "Operate your laptop headlessly anywhere without dummy HDMI plugs."
-                )
+            VStack(spacing: 0) {
+                featureLine("Runs uninterrupted with lid closed")
+                hairline
+                featureLine("Automatic thermal safety protection")
+                hairline
+                featureLine("No external monitor or dongle needed")
             }
-            .padding(18)
-            .background(Color.white.opacity(0.04))
-            .cornerRadius(12)
-            .overlay(
-                RoundedRectangle(cornerRadius: 12)
-                    .stroke(Color.white.opacity(0.08), lineWidth: 1)
-            )
-            .frame(maxWidth: 480)
+            .liquidGlassCard(cornerRadius: 13, elevated: false)
             
-            Button(action: {
-                withAnimation(.easeInOut(duration: 0.3)) {
-                    step = 2
-                }
-            }) {
-                HStack(spacing: 8) {
-                    Text("Get Started")
-                        .font(.system(size: 14, weight: .bold))
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 12, weight: .bold))
-                }
-                .foregroundColor(.black)
-                .frame(maxWidth: 240)
-                .padding(.vertical, 12)
-                .background(Color.green)
-                .cornerRadius(10)
-                .shadow(color: Color.green.opacity(0.4), radius: 10, y: 3)
+            Button("Continue") {
+                withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
             }
+            .font(.system(size: 13, weight: .semibold))
+            .foregroundColor(.black)
+            .frame(width: 196, height: 38)
+            .background(Color.white)
+            .clipShape(Capsule())
             .buttonStyle(.plain)
-            .padding(.top, 8)
+            .padding(.top, 4)
         }
     }
     
-    // MARK: - Step 2: Permissions Screen
-    private var permissionsStepView: some View {
+    private var permissionsStep: some View {
         VStack(spacing: 18) {
-            Image(systemName: "lock.shield.fill")
-                .font(.system(size: 48))
-                .foregroundColor(.green)
-                .padding(.bottom, 2)
-            
             VStack(spacing: 6) {
-                Text("Required Permissions")
-                    .font(.system(size: 22, weight: .bold))
+                Text("Instant Toggle")
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
                 
-                Text("OpenLid requires system-level authorization to modify macOS power management and prevent lid-close sleep.")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.7))
+                Text("Authorize once so OpenLid can toggle sleep prevention without password prompts.")
+                    .font(.system(size: 12.5))
+                    .foregroundColor(Color.white.opacity(0.55))
                     .multilineTextAlignment(.center)
-                    .frame(maxWidth: 460)
+                    .frame(maxWidth: 320)
             }
             
-            VStack(spacing: 10) {
-                permissionRow(
-                    icon: "terminal.fill",
-                    title: "Privileged Sleep Override",
-                    desc: "Installs a scoped sudoers rule (/etc/sudoers.d/openlid) to allow passwordless toggling.",
-                    isGranted: helperInstalled
-                )
+            VStack(spacing: 12) {
+                Text(helperInstalled ? "Instant Toggle Helper is active." : "Optional — you can also authorize per toggle.")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color.white.opacity(helperInstalled ? 0.88 : 0.50))
                 
-                permissionRow(
-                    icon: "bell.badge.fill",
-                    title: "Safety Notifications",
-                    desc: "Alerts you when thermal pressure is high or safety events occur.",
-                    isGranted: true
-                )
-                
-                permissionRow(
-                    icon: "battery.100.bolt",
-                    title: "IOPS Hardware Sentinel",
-                    desc: "Monitors AppleClamshellState and power source changes continuously.",
-                    isGranted: true
-                )
-            }
-            .frame(maxWidth: 480)
-            
-            if let err = installError {
-                Text(err)
-                    .font(.system(size: 11))
-                    .foregroundColor(.red)
-                    .padding(.horizontal)
-            }
-            
-            HStack(spacing: 14) {
-                if !helperInstalled {
-                    Button(action: installHelper) {
-                        HStack(spacing: 6) {
-                            if isInstallingHelper {
-                                ProgressView()
-                                    .scaleEffect(0.6)
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .black))
-                            } else {
-                                Image(systemName: "touchid")
-                            }
-                            Text("Authorize & Install Helper")
-                                .font(.system(size: 13, weight: .bold))
-                        }
-                        .foregroundColor(.black)
-                        .padding(.horizontal, 16)
-                        .padding(.vertical, 11)
-                        .background(Color.green)
-                        .cornerRadius(8)
-                    }
-                    .buttonStyle(.plain)
-                    .disabled(isInstallingHelper)
+                if let err = installError {
+                    Text(err)
+                        .font(.system(size: 11))
+                        .foregroundColor(Color.white.opacity(0.75))
+                        .multilineTextAlignment(.center)
                 }
                 
-                Button(action: {
-                    withAnimation(.easeInOut(duration: 0.3)) {
-                        step = 3
+                Button(action: installHelper) {
+                    HStack(spacing: 6) {
+                        if isInstallingHelper {
+                            ProgressView().scaleEffect(0.55)
+                            Text("Authorizing...")
+                        } else {
+                            Text(helperInstalled ? "Authorized" : "Authorize Helper")
+                        }
                     }
-                }) {
-                    Text(helperInstalled ? "Continue →" : "Continue Anyway →")
-                        .font(.system(size: 13, weight: .semibold))
-                        .foregroundColor(helperInstalled ? .black : .white)
-                        .padding(.horizontal, 20)
-                        .padding(.vertical, 11)
-                        .background(helperInstalled ? Color.green : Color.white.opacity(0.12))
-                        .cornerRadius(8)
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundColor(helperInstalled ? Color.white.opacity(0.6) : .black)
+                    .frame(width: 196, height: 36)
+                    .background(helperInstalled ? Color.white.opacity(0.10) : Color.white)
+                    .clipShape(Capsule())
                 }
                 .buttonStyle(.plain)
+                .disabled(helperInstalled || isInstallingHelper)
             }
-            .padding(.top, 6)
+            .padding(20)
+            .frame(maxWidth: .infinity)
+            .liquidGlassCard(cornerRadius: 14, elevated: false)
+            
+            HStack(spacing: 16) {
+                Button("Back") {
+                    withAnimation(.easeInOut(duration: 0.2)) { step = 1 }
+                }
+                .font(.system(size: 12.5))
+                .foregroundColor(Color.white.opacity(0.55))
+                .buttonStyle(.plain)
+                
+                Button(helperInstalled ? "Continue" : "Skip") {
+                    withAnimation(.easeInOut(duration: 0.2)) { step = 3 }
+                }
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.black)
+                .frame(width: 150, height: 36)
+                .background(Color.white)
+                .clipShape(Capsule())
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 4)
         }
     }
     
-    // MARK: - Step 3: Choose Mode
-    private var presentationModeStepView: some View {
+    private var modeStep: some View {
         VStack(spacing: 18) {
-            Image(systemName: "slider.horizontal.3")
-                .font(.system(size: 42))
-                .foregroundColor(.green)
-            
             VStack(spacing: 6) {
-                Text("Choose Presentation Mode")
-                    .font(.system(size: 22, weight: .bold))
+                Text("Display Mode")
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
                 
-                Text("Select where you would like OpenLid to appear. You can adjust this anytime in Settings.")
-                    .font(.system(size: 13))
-                    .foregroundColor(Color(white: 0.7))
-                    .multilineTextAlignment(.center)
-                    .frame(maxWidth: 440)
+                Text("Choose how OpenLid appears on your Mac.")
+                    .font(.system(size: 12.5))
+                    .foregroundColor(Color.white.opacity(0.55))
             }
             
-            VStack(spacing: 10) {
-                ForEach(AppPresentationMode.allCases) { mode in
-                    Button(action: {
-                        preferences.presentationMode = mode
-                    }) {
-                        HStack(spacing: 14) {
-                            ZStack {
-                                Circle()
-                                    .fill(preferences.presentationMode == mode ? Color.green.opacity(0.2) : Color.white.opacity(0.05))
-                                    .frame(width: 38, height: 38)
-                                Image(systemName: modeIcon(mode))
-                                    .foregroundColor(preferences.presentationMode == mode ? .green : .secondary)
-                            }
-                            
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(mode.title)
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(.white)
-                                Text(mode.subtitle)
-                                    .font(.system(size: 11))
-                                    .foregroundColor(Color(white: 0.65))
-                            }
-                            
-                            Spacer()
-                            
-                            Image(systemName: preferences.presentationMode == mode ? "circle.inset.filled" : "circle")
-                                .font(.system(size: 20))
-                                .foregroundColor(preferences.presentationMode == mode ? .green : Color.white.opacity(0.25))
-                        }
-                        .padding(14)
-                        .background(preferences.presentationMode == mode ? Color.green.opacity(0.08) : Color.white.opacity(0.03))
-                        .cornerRadius(10)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 10)
-                                .stroke(preferences.presentationMode == mode ? Color.green.opacity(0.5) : Color.white.opacity(0.08), lineWidth: 1.5)
-                        )
+            VStack(spacing: 0) {
+                modeRow(.both, title: "Menu Bar & Window", subtitle: "Quick toggle in menu bar plus full window")
+                hairline
+                modeRow(.menuBarOnly, title: "Menu Bar Only", subtitle: "Minimal icon in the top menu bar")
+                hairline
+                modeRow(.windowedApp, title: "Window Only", subtitle: "Standard Dock application window")
+            }
+            .liquidGlassCard(cornerRadius: 14, elevated: false)
+            
+            HStack(spacing: 16) {
+                Button("Back") {
+                    withAnimation(.easeInOut(duration: 0.2)) { step = 2 }
+                }
+                .font(.system(size: 12.5))
+                .foregroundColor(Color.white.opacity(0.55))
+                .buttonStyle(.plain)
+                
+                Button("Get Started") {
+                    onComplete()
+                }
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(.black)
+                .frame(width: 170, height: 38)
+                .background(Color.white)
+                .clipShape(Capsule())
+                .buttonStyle(.plain)
+            }
+            .padding(.top, 4)
+        }
+    }
+    
+    private var hairline: some View {
+        Rectangle()
+            .fill(Color.white.opacity(0.07))
+            .frame(height: 0.5)
+            .padding(.leading, 14)
+    }
+    
+    private func featureLine(_ text: String) -> some View {
+        HStack {
+            Circle()
+                .fill(Color.white.opacity(0.75))
+                .frame(width: 4, height: 4)
+            Text(text)
+                .font(.system(size: 12.5))
+                .foregroundColor(Color.white.opacity(0.82))
+            Spacer()
+        }
+        .padding(.horizontal, 14)
+        .frame(height: 38)
+    }
+    
+    private func modeRow(_ mode: AppPresentationMode, title: String, subtitle: String) -> some View {
+        let selected = preferences.presentationMode == mode
+        return Button(action: { preferences.presentationMode = mode }) {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 12.5, weight: .medium))
+                        .foregroundColor(.white)
+                    Text(subtitle)
+                        .font(.system(size: 11))
+                        .foregroundColor(Color.white.opacity(0.45))
+                }
+                Spacer()
+                ZStack {
+                    Circle()
+                        .stroke(selected ? Color.white : Color.white.opacity(0.25), lineWidth: 1.25)
+                        .frame(width: 16, height: 16)
+                    if selected {
+                        Circle()
+                            .fill(Color.white)
+                            .frame(width: 8, height: 8)
                     }
-                    .buttonStyle(.plain)
                 }
             }
-            .frame(maxWidth: 480)
-            
-            Button(action: {
-                preferences.hasCompletedOnboarding = true
-                onComplete()
-            }) {
-                Text("Enter OpenLid")
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(.black)
-                    .frame(maxWidth: 240)
-                    .padding(.vertical, 12)
-                    .background(Color.green)
-                    .cornerRadius(10)
-                    .shadow(color: Color.green.opacity(0.4), radius: 10, y: 3)
-            }
-            .buttonStyle(.plain)
-            .padding(.top, 10)
+            .padding(.horizontal, 14)
+            .frame(height: 50)
+            .contentShape(Rectangle())
         }
-    }
-    
-    // MARK: - Helpers
-    private func featureBullet(icon: String, title: String, desc: String) -> some View {
-        HStack(alignment: .top, spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(.green)
-                .frame(width: 20)
-                .padding(.top, 2)
-            
-            VStack(alignment: .leading, spacing: 1) {
-                Text(title)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.white)
-                Text(desc)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color(white: 0.65))
-            }
-        }
-    }
-    
-    private func permissionRow(icon: String, title: String, desc: String, isGranted: Bool) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundColor(isGranted ? .green : .secondary)
-                .frame(width: 24)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.white)
-                Text(desc)
-                    .font(.system(size: 11))
-                    .foregroundColor(Color(white: 0.65))
-            }
-            
-            Spacer()
-            
-            if isGranted {
-                Text("Granted")
-                    .font(.system(size: 10, weight: .bold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.green.opacity(0.2))
-                    .foregroundColor(.green)
-                    .clipShape(Capsule())
-            } else {
-                Text("Needed")
-                    .font(.system(size: 10, weight: .bold))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(Color.orange.opacity(0.2))
-                    .foregroundColor(.orange)
-                    .clipShape(Capsule())
-            }
-        }
-        .padding(12)
-        .background(Color.white.opacity(0.03))
-        .cornerRadius(8)
-    }
-    
-    private func modeIcon(_ mode: AppPresentationMode) -> String {
-        switch mode {
-        case .menuBarOnly: return "menubar.rectangle"
-        case .windowedApp: return "macwindow"
-        case .both: return "square.split.2x1"
-        }
+        .buttonStyle(.plain)
     }
     
     private func installHelper() {
@@ -387,4 +273,3 @@ public struct OnboardingView: View {
         }
     }
 }
-

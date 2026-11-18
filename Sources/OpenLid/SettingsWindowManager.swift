@@ -25,18 +25,19 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: settingsView)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 460, height: 540),
+            contentRect: NSRect(x: 0, y: 0, width: 420, height: 440),
             styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         
-        window.title = "OpenLid Settings"
+        window.title = "Settings"
         window.titleVisibility = .hidden
         window.titlebarAppearsTransparent = true
         window.isMovableByWindowBackground = true
+        window.isOpaque = false
+        window.backgroundColor = .clear
         window.appearance = NSAppearance(named: .darkAqua)
-        window.backgroundColor = NSColor(red: 0.047, green: 0.055, blue: 0.071, alpha: 1.0)
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
@@ -58,6 +59,6 @@ final class SettingsWindowManager: NSObject, NSWindowDelegate {
     }
     
     func windowWillClose(_ notification: Notification) {
-        // Keep window controller available for reopening
+        // Keep window controller available
     }
 }
