@@ -154,35 +154,26 @@ struct MenuBarView: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(height: 0.5)
                 
-                // Quiet Monochrome Footer
-                HStack {
-                    Button("Window") {
-                        MainWindowManager.shared.showMainWindow()
-                    }
-                    .font(.system(size: 11.5, weight: .medium))
-                    .foregroundColor(.white)
-                    .buttonStyle(.plain)
-                    
-                    Spacer()
-                    
-                    Button("Settings") {
+                // Minimal Monochrome Icon Footer (labels pop smoothly on hover)
+                HStack(spacing: 0) {
+                    GlassIconHoverButton(systemImage: "gearshape", label: "Settings") {
                         SettingsWindowManager.shared.showSettings()
                     }
-                    .font(.system(size: 11.5))
-                    .foregroundColor(Color.white.opacity(0.58))
-                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
                     
-                    Spacer()
+                    GlassIconHoverButton(systemImage: "macwindow", label: "Window") {
+                        MainWindowManager.shared.showMainWindow()
+                    }
+                    .frame(maxWidth: .infinity)
                     
-                    Button("Quit") {
+                    GlassIconHoverButton(systemImage: "power", label: "Quit") {
                         powerManager.cleanup()
                         NSApplication.shared.terminate(nil)
                     }
-                    .font(.system(size: 11.5))
-                    .foregroundColor(Color.white.opacity(0.42))
-                    .buttonStyle(.plain)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, 4)
+                .frame(height: 28)
+                .zIndex(20)
             }
             .padding(12)
         }
