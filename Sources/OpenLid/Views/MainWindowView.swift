@@ -13,7 +13,9 @@ public struct MainWindowView: View {
     @State private var isRefreshingHardware: Bool = false
     @State private var isResettingAssertions: Bool = false
     
-    public enum MainTab: String, CaseIterable, Identifiable {
+    @Namespace private var topTabNamespace
+    
+    public enum MainTab: String, CaseIterable, Identifiable, Hashable {
         case home = "Home"
         case settings = "Settings"
         public var id: String { rawValue }
@@ -25,12 +27,16 @@ public struct MainWindowView: View {
         Group {
             if !preferences.hasCompletedOnboarding || showOnboarding {
                 OnboardingView(onComplete: {
-                    preferences.hasCompletedOnboarding = true
-                    showOnboarding = false
-                    selectedTab = .home
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
+                        preferences.hasCompletedOnboarding = true
+                        showOnboarding = false
+                        selectedTab = .home
+                    }
                 })
+                .transition(.opacity)
             } else {
                 mainAppContent
+                    .transition(.opacity)
             }
         }
         .frame(width: 420, height: 440)
@@ -69,22 +75,28 @@ public struct MainWindowView: View {
                     
                     Spacer()
                     
-                    // Minimal Liquid Glass segmented tab bar
+                    // Fluid sliding Liquid Glass tab switcher
                     HStack(spacing: 2) {
                         ForEach(MainTab.allCases) { tab in
                             let active = selectedTab == tab
                             Button(action: {
-                                withAnimation(.easeInOut(duration: 0.16)) {
+                                withAnimation(.spring(response: 0.34, dampingFraction: 0.80)) {
                                     selectedTab = tab
                                 }
                             }) {
                                 Text(tab.rawValue)
                                     .font(.system(size: 11.5, weight: active ? .semibold : .regular))
                                     .foregroundColor(active ? .black : Color.white.opacity(0.62))
-                                    .padding(.horizontal, 11)
+                                    .padding(.horizontal, 12)
                                     .padding(.vertical, 4)
-                                    .background(active ? Color.white : Color.clear)
-                                    .clipShape(Capsule())
+                                    .background {
+                                        if active {
+                                            Capsule()
+                                                .fill(Color.white)
+                                                .matchedGeometryEffect(id: "topTabPill", in: topTabNamespace)
+                                        }
+                                    }
+                                    .contentShape(Capsule())
                             }
                             .buttonStyle(.plain)
                         }
@@ -103,11 +115,24 @@ public struct MainWindowView: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(height: 0.5)
                 
-                if selectedTab == .home {
-                    homeTab
-                } else {
-                    settingsTab
+                // Smooth horizontal cross-slide between Home and Settings
+                ZStack {
+                    if selectedTab == .home {
+                        homeTab
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .leading).combined(with: .opacity),
+                                removal: .move(edge: .leading).combined(with: .opacity)
+                            ))
+                    } else {
+                        settingsTab
+                            .transition(.asymmetric(
+                                insertion: .move(edge: .trailing).combined(with: .opacity),
+                                removal: .move(edge: .trailing).combined(with: .opacity)
+                            ))
+                    }
                 }
+                .clipped()
+                .animation(.spring(response: 0.34, dampingFraction: 0.84), value: selectedTab)
             }
             
             // Non-shifting floating glass toast for errors / notices
@@ -121,9 +146,11 @@ public struct MainWindowView: View {
                             .lineLimit(2)
                         Spacer(minLength: 4)
                         Button(action: {
-                            powerManager.lastError = nil
-                            powerManager.stopReason = nil
-                            toastMessage = nil
+                            withAnimation(.easeOut(duration: 0.18)) {
+                                powerManager.lastError = nil
+                                powerManager.stopReason = nil
+                                toastMessage = nil
+                            }
                         }) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 9.5, weight: .semibold))
@@ -142,10 +169,10 @@ public struct MainWindowView: View {
         }
     }
     
-    // MARK: - Home Tab (Zero layout shift, zero dead gap)
+    // MARK: - Home Tab (Zero layout shift, fluid spring motion)
     private var homeTab: some View {
         VStack(spacing: 12) {
-            // Hero Liquid Glass Stage (fills cleanly, fixed internal heights so ON/OFF never shifts)
+            // Hero Liquid Glass Stage
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 
@@ -157,48 +184,67 @@ public struct MainWindowView: View {
                     .font(.system(size: 21, weight: .semibold))
                     .foregroundColor(.white)
                     .frame(height: 26)
+                    .contentTransition(.interpolate)
+                    .animation(.spring(response: 0.32, dampingFraction: 0.82), value: powerManager.isEnabled)
                 
                 Spacer().frame(height: 4)
                 
-                // Fixed-height 20pt subtitle/timer line -> ZERO jump on toggle
-                HStack(spacing: 6) {
+                // Fixed-height 20pt rolling timer / status line -> ZERO jump on toggle
+                ZStack {
                     if powerManager.isEnabled {
                         if powerManager.timer.isTimerRunning {
-                            Text(powerManager.timer.formattedRemainingTime)
-                                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                                .foregroundColor(Color.white.opacity(0.85))
-                            Text("remaining")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color.white.opacity(0.45))
-                            Button("Clear") {
-                                powerManager.selectPreset(.indefinite)
+                            HStack(spacing: 6) {
+                                Text(powerManager.timer.formattedRemainingTime)
+                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .foregroundColor(Color.white.opacity(0.88))
+                                    .smoothNumericTransition(countsDown: true)
+                                    .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.remainingSeconds)
+                                Text("remaining")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color.white.opacity(0.45))
+                                Button("Clear") {
+                                    withAnimation(.spring(response: 0.32, dampingFraction: 0.80)) {
+                                        powerManager.selectPreset(.indefinite)
+                                    }
+                                }
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.68))
+                                .buttonStyle(.plain)
                             }
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(Color.white.opacity(0.65))
-                            .buttonStyle(.plain)
+                            .transition(.opacity.combined(with: .scale(scale: 0.94)))
                         } else {
-                            Text(powerManager.timer.formattedElapsedTime)
-                                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                                .foregroundColor(Color.white.opacity(0.80))
-                            Text("·")
-                                .foregroundColor(Color.white.opacity(0.35))
-                            Text("Lid sleep disabled")
-                                .font(.system(size: 12))
-                                .foregroundColor(Color.white.opacity(0.48))
+                            HStack(spacing: 6) {
+                                Text(powerManager.timer.formattedElapsedTime)
+                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .foregroundColor(Color.white.opacity(0.84))
+                                    .smoothNumericTransition(countsDown: false)
+                                    .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.elapsedSeconds)
+                                Text("·")
+                                    .foregroundColor(Color.white.opacity(0.35))
+                                Text("Lid sleep disabled")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(Color.white.opacity(0.48))
+                            }
+                            .transition(.opacity.combined(with: .scale(scale: 0.94)))
                         }
                     } else {
                         Text("Normal macOS sleep behavior")
                             .font(.system(size: 12))
                             .foregroundColor(Color.white.opacity(0.42))
+                            .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     }
                 }
                 .frame(height: 20)
+                .animation(.spring(response: 0.32, dampingFraction: 0.84), value: powerManager.isEnabled)
+                .animation(.spring(response: 0.32, dampingFraction: 0.84), value: powerManager.timer.isTimerRunning)
                 
                 Spacer().frame(height: 18)
                 
-                // Monochrome Primary Action Pill (fixed 38pt height)
+                // Monochrome Primary Action Pill (smoothly morphs between Solid White and Frosted Glass)
                 Button(action: {
-                    powerManager.toggle(preset: powerManager.selectedPreset)
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.80)) {
+                        powerManager.toggle(preset: powerManager.selectedPreset)
+                    }
                 }) {
                     HStack(spacing: 7) {
                         if powerManager.isBusy {
@@ -225,6 +271,7 @@ public struct MainWindowView: View {
                                 lineWidth: 0.75
                             )
                     )
+                    .animation(.spring(response: 0.32, dampingFraction: 0.82), value: powerManager.isEnabled)
                 }
                 .buttonStyle(.plain)
                 .disabled(powerManager.isBusy)
@@ -234,36 +281,24 @@ public struct MainWindowView: View {
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             .liquidGlassCard(cornerRadius: 16, elevated: powerManager.isEnabled)
             
-            // Duration Segmented Liquid Glass Capsule (fixed 38pt height)
-            HStack(spacing: 3) {
-                ForEach(SessionPreset.allCases) { preset in
-                    let selected = powerManager.selectedPreset == preset
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.16)) {
-                            powerManager.selectPreset(preset)
-                        }
-                    }) {
-                        Text(shortLabel(preset))
-                            .font(.system(size: 11.5, weight: selected ? .semibold : .regular))
-                            .foregroundColor(selected ? .black : Color.white.opacity(0.64))
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                            .background(selected ? Color.white : Color.clear)
-                            .clipShape(Capsule())
-                    }
-                    .buttonStyle(.plain)
-                }
+            // Fluid Sliding Duration Liquid Glass Capsule
+            LiquidSegmentedControl(
+                options: SessionPreset.allCases,
+                selection: powerManager.selectedPreset,
+                height: 38,
+                fontSize: 11.5,
+                label: shortLabel
+            ) { preset in
+                powerManager.selectPreset(preset)
             }
-            .padding(3)
-            .frame(height: 38)
-            .liquidGlassCard(cornerRadius: 19, elevated: false)
             
-            // Minimal 3-Column Monochrome Telemetry Bar (fixed 54pt height)
+            // Minimal 3-Column Monochrome Telemetry Bar with smooth numeric rolling
             HStack(spacing: 0) {
-                statCell(label: "Lid", value: powerManager.clamshell.isLidClosed ? "Closed" : "Open")
+                statCell(label: "Lid", value: powerManager.clamshell.isLidClosed ? "Closed" : "Open", numeric: false)
                 glassDivider
-                statCell(label: powerManager.battery.isOnACPower ? "AC" : "Battery", value: "\(powerManager.battery.batteryPercent)%")
+                statCell(label: powerManager.battery.isOnACPower ? "AC" : "Battery", value: "\(powerManager.battery.batteryPercent)%", numeric: true)
                 glassDivider
-                statCell(label: "Thermal", value: shortThermal(powerManager.thermal.thermalState))
+                statCell(label: "Thermal", value: shortThermal(powerManager.thermal.thermalState), numeric: false)
                 glassDivider
                 Button(action: refreshHardwareMonitors) {
                     Image(systemName: "arrow.clockwise")
@@ -282,32 +317,20 @@ public struct MainWindowView: View {
         .padding(16)
     }
     
-    // MARK: - Settings Tab (Pure monochrome Liquid Glass rows)
+    // MARK: - Settings Tab
     private var settingsTab: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 12) {
-                // Display Mode Capsule
-                HStack(spacing: 3) {
-                    ForEach(AppPresentationMode.allCases) { mode in
-                        let active = preferences.presentationMode == mode
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.16)) {
-                                preferences.presentationMode = mode
-                            }
-                        }) {
-                            Text(shortModeTitle(mode))
-                                .font(.system(size: 11.5, weight: active ? .semibold : .regular))
-                                .foregroundColor(active ? .black : Color.white.opacity(0.64))
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(active ? Color.white : Color.clear)
-                                .clipShape(Capsule())
-                        }
-                        .buttonStyle(.plain)
-                    }
+                // Fluid Sliding Display Mode Capsule
+                LiquidSegmentedControl(
+                    options: AppPresentationMode.allCases,
+                    selection: preferences.presentationMode,
+                    height: 36,
+                    fontSize: 11.5,
+                    label: shortModeTitle
+                ) { mode in
+                    preferences.presentationMode = mode
                 }
-                .padding(3)
-                .frame(height: 36)
-                .liquidGlassCard(cornerRadius: 18, elevated: false)
                 
                 // Switches Card
                 VStack(spacing: 0) {
@@ -376,7 +399,11 @@ public struct MainWindowView: View {
                         trailing: "Show",
                         primary: false,
                         disabled: false,
-                        action: { showOnboarding = true }
+                        action: {
+                            withAnimation(.spring(response: 0.34, dampingFraction: 0.85)) {
+                                showOnboarding = true
+                            }
+                        }
                     )
                 }
                 .liquidGlassCard(cornerRadius: 14, elevated: false)
@@ -418,14 +445,25 @@ public struct MainWindowView: View {
             .padding(.leading, 14)
     }
     
-    private func statCell(label: String, value: String) -> some View {
+    @ViewBuilder
+    private func statCell(label: String, value: String, numeric: Bool) -> some View {
         VStack(spacing: 2) {
             Text(label)
                 .font(.system(size: 10.5))
                 .foregroundColor(Color.white.opacity(0.42))
-            Text(value)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.white)
+            if numeric {
+                Text(value)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+                    .smoothNumericTransition()
+                    .animation(.spring(response: 0.30, dampingFraction: 0.84), value: value)
+            } else {
+                Text(value)
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(.white)
+                    .contentTransition(.interpolate)
+                    .animation(.easeInOut(duration: 0.22), value: value)
+            }
         }
         .frame(maxWidth: .infinity)
     }
@@ -555,11 +593,11 @@ public struct MainWindowView: View {
     }
     
     private func showTransientToast(_ message: String) {
-        withAnimation(.easeInOut(duration: 0.2)) {
+        withAnimation(.spring(response: 0.30, dampingFraction: 0.84)) {
             toastMessage = message
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2.8) {
-            withAnimation(.easeInOut(duration: 0.2)) {
+            withAnimation(.easeOut(duration: 0.22)) {
                 if toastMessage == message { toastMessage = nil }
             }
         }

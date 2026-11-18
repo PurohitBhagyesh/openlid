@@ -50,28 +50,16 @@ struct SettingsView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 12) {
-                        // Display Mode Capsule
-                        HStack(spacing: 3) {
-                            ForEach(AppPresentationMode.allCases) { mode in
-                                let active = preferences.presentationMode == mode
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.16)) {
-                                        preferences.presentationMode = mode
-                                    }
-                                }) {
-                                    Text(shortModeTitle(mode))
-                                        .font(.system(size: 11.5, weight: active ? .semibold : .regular))
-                                        .foregroundColor(active ? .black : Color.white.opacity(0.64))
-                                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                        .background(active ? Color.white : Color.clear)
-                                        .clipShape(Capsule())
-                                }
-                                .buttonStyle(.plain)
-                            }
+                        // Fluid Sliding Display Mode Capsule
+                        LiquidSegmentedControl(
+                            options: AppPresentationMode.allCases,
+                            selection: preferences.presentationMode,
+                            height: 36,
+                            fontSize: 11.5,
+                            label: shortModeTitle
+                        ) { mode in
+                            preferences.presentationMode = mode
                         }
-                        .padding(3)
-                        .frame(height: 36)
-                        .liquidGlassCard(cornerRadius: 18, elevated: false)
                         
                         // Switches Card
                         VStack(spacing: 0) {

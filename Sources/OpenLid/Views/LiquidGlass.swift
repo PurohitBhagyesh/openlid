@@ -87,6 +87,7 @@ public struct LiquidGlassCardModifier: ViewModifier {
                     )
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+            .animation(.easeInOut(duration: 0.28), value: elevated)
     }
 }
 
@@ -94,61 +95,171 @@ public extension View {
     func liquidGlassCard(cornerRadius: CGFloat = 14, elevated: Bool = false) -> some View {
         modifier(LiquidGlassCardModifier(cornerRadius: cornerRadius, elevated: elevated))
     }
+    
+    /// Smoothly morphs numeric digits (e.g., timer ticks and battery percentage) across macOS 13+.
+    @ViewBuilder
+    func smoothNumericTransition(countsDown: Bool = false) -> some View {
+        if #available(macOS 14.0, *) {
+            self.contentTransition(.numericText(countsDown: countsDown))
+        } else {
+            self.contentTransition(.numericText())
+        }
+    }
 }
 
-/// Minimal monochrome icon button whose label pops smoothly in a crisp white pill on hover.
-public struct GlassIconHoverButton: View {
-    let systemImage: String
-    let label: String
-    let action: () -> Void
+/// Smooth Liquid Glass segmented capsule where the active white pill glides fluidly via matchedGeometryEffect.
+public struct LiquidSegmentedControl<Option: Identifiable & Hashable>: View {
+    let options: [Option]
+    let selection: Option
+    let label: (Option) -> String
+    let height: CGFloat
+    let fontSize: CGFloat
+    let onSelect: (Option) -> Void
     
-    @State private var isHovered: Bool = false
+    @Namespace private var pillNamespace
+    @State private var hoveredOption: Option? = nil
     
-    public init(systemImage: String, label: String, action: @escaping () -> Void) {
-        self.systemImage = systemImage
+    public init(
+        options: [Option],
+        selection: Option,
+        height: CGFloat = 36,
+        fontSize: CGFloat = 11.5,
+        label: @escaping (Option) -> String,
+        onSelect: @escaping (Option) -> Void
+    ) {
+        self.options = options
+        self.selection = selection
+        self.height = height
+        self.fontSize = fontSize
         self.label = label
-        self.action = action
+        self.onSelect = onSelect
     }
     
     public var body: some View {
-        Button(action: action) {
-            Image(systemName: systemImage)
-                .font(.system(size: 13, weight: .medium))
-                .foregroundColor(isHovered ? .white : Color.white.opacity(0.55))
-                .frame(width: 36, height: 28)
-                .background(
-                    Capsule()
-                        .fill(isHovered ? Color.white.opacity(0.14) : Color.clear)
-                )
-                .overlay(
-                    Capsule()
-                        .stroke(isHovered ? Color.white.opacity(0.24) : Color.clear, lineWidth: 0.75)
-                )
-                .contentShape(Rectangle())
-        }
-        .buttonStyle(.plain)
-        .onHover { hovering in
-            withAnimation(.spring(response: 0.22, dampingFraction: 0.78)) {
-                isHovered = hovering
+        HStack(spacing: 2) {
+            ForEach(options) { option in
+                let isSelected = option == selection
+                let isHovered = hoveredOption == option
+                Button(action: {
+                    withAnimation(.spring(response: 0.34, dampingFraction: 0.78)) {
+                        onSelect(option)
+                    }
+                }) {
+                    Text(label(option))
+                        .font(.system(size: fontSize, weight: isSelected ? .semibold : .regular))
+                        .foregroundColor(
+                            isSelected
+                                ? .black
+                                : (isHovered ? Color.white.opacity(0.92) : Color.white.opacity(0.58))
+                        )
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+                        .background {
+                            if isSelected {
+                                Capsule()
+                                    .fill(Color.white)
+                                    .shadow(color: Color.white.opacity(0.18), radius: 6, x: 0, y: 1)
+                                    .matchedGeometryEffect(id: "liquidActivePill", in: pillNamespace)
+                            } else if isHovered {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.07))
+                                    .transition(.opacity)
+                            }
+                        }
+                        .contentShape(Capsule())
+                }
+                .buttonStyle(.plain)
+                .onHover { hovering in
+                    withAnimation(.easeOut(duration: 0.16)) {
+                        hoveredOption = hovering ? option : (hoveredOption == option ? nil : hoveredOption)
+                    }
+                }
             }
         }
-        .overlay(alignment: .top) {
-            if isHovered {
-                Text(label)
-                    .font(.system(size: 10.5, weight: .semibold))
-                    .foregroundColor(.black)
-                    .fixedSize()
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3.5)
-                    .background(Color.white)
-                    .clipShape(Capsule())
-                    .shadow(color: Color.black.opacity(0.35), radius: 6, x: 0, y: 2)
-                    .offset(y: -28)
-                    .allowsHitTesting(false)
-                    .transition(.opacity.combined(with: .scale(scale: 0.88, anchor: .bottom)))
-            }
-        }
-        .zIndex(isHovered ? 20 : 0)
+        .padding(3)
+        .frame(height: height)
+        .liquidGlassCard(cornerRadius: height / 2, elevated: false)
     }
 }
 
+/// Interactive monochrome icon bar where both the frosted highlight and floating label glide smoothly across icons on hover.
+public struct LiquidFooterAction: Identifiable, Hashable {
+    public let id: String
+    public let systemImage: String
+    public let label: String
+    
+    public init(id: String, systemImage: String, label: String) {
+        self.id = id
+        self.systemImage = systemImage
+        self.label = label
+    }
+}
+
+public struct LiquidIconDock: View {
+    let actions: [LiquidFooterAction]
+    let onTrigger: (LiquidFooterAction) -> Void
+    
+    @State private var hoveredID: String? = nil
+    @Namespace private var dockNamespace
+    
+    public init(actions: [LiquidFooterAction], onTrigger: @escaping (LiquidFooterAction) -> Void) {
+        self.actions = actions
+        self.onTrigger = onTrigger
+    }
+    
+    public var body: some View {
+        HStack(spacing: 0) {
+            ForEach(actions) { item in
+                let isHovered = hoveredID == item.id
+                Button(action: { onTrigger(item) }) {
+                    Image(systemName: item.systemImage)
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(isHovered ? .white : Color.white.opacity(0.54))
+                        .scaleEffect(isHovered ? 1.08 : 1.0)
+                        .frame(width: 38, height: 28)
+                        .background {
+                            if isHovered {
+                                Capsule()
+                                    .fill(Color.white.opacity(0.14))
+                                    .overlay(
+                                        Capsule().stroke(Color.white.opacity(0.24), lineWidth: 0.75)
+                                    )
+                                    .matchedGeometryEffect(id: "dockHighlight", in: dockNamespace)
+                            }
+                        }
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .frame(maxWidth: .infinity)
+                .onHover { hovering in
+                    withAnimation(.spring(response: 0.28, dampingFraction: 0.76)) {
+                        if hovering {
+                            hoveredID = item.id
+                        } else if hoveredID == item.id {
+                            hoveredID = nil
+                        }
+                    }
+                }
+                .overlay(alignment: .top) {
+                    if isHovered {
+                        Text(item.label)
+                            .font(.system(size: 10.5, weight: .semibold))
+                            .foregroundColor(.black)
+                            .fixedSize()
+                            .padding(.horizontal, 9)
+                            .padding(.vertical, 3.5)
+                            .background(Color.white)
+                            .clipShape(Capsule())
+                            .shadow(color: Color.black.opacity(0.35), radius: 8, x: 0, y: 3)
+                            .offset(y: -28)
+                            .allowsHitTesting(false)
+                            .matchedGeometryEffect(id: "dockTooltip", in: dockNamespace)
+                            .transition(.opacity.combined(with: .scale(scale: 0.88, anchor: .bottom)))
+                    }
+                }
+                .zIndex(isHovered ? 20 : 0)
+            }
+        }
+        .frame(height: 28)
+        .zIndex(20)
+    }
+}

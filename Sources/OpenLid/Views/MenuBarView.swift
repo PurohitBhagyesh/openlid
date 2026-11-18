@@ -5,6 +5,12 @@ struct MenuBarView: View {
     @ObservedObject var powerManager = PowerManager.shared
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     
+    private let footerActions: [LiquidFooterAction] = [
+        LiquidFooterAction(id: "settings", systemImage: "gearshape", label: "Settings"),
+        LiquidFooterAction(id: "window", systemImage: "macwindow", label: "Window"),
+        LiquidFooterAction(id: "quit", systemImage: "power", label: "Quit")
+    ]
+    
     var body: some View {
         ZStack {
             LiquidGlassBackdrop(material: .popover, blendingMode: .behindWindow)
@@ -13,9 +19,11 @@ struct MenuBarView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 10) {
-                // Hero Liquid Glass Toggle Card (fixed height -> ZERO jump when toggled ON/OFF)
+                // Hero Liquid Glass Toggle Card (fixed height -> ZERO jump, fluid motion)
                 Button(action: {
-                    powerManager.toggle(preset: powerManager.selectedPreset)
+                    withAnimation(.spring(response: 0.32, dampingFraction: 0.80)) {
+                        powerManager.toggle(preset: powerManager.selectedPreset)
+                    }
                 }) {
                     HStack(spacing: 12) {
                         ZStack {
@@ -33,22 +41,37 @@ struct MenuBarView: View {
                             Text(powerManager.isEnabled ? "Awake" : "Standby")
                                 .font(.system(size: 13.5, weight: .semibold))
                                 .foregroundColor(.white)
+                                .contentTransition(.interpolate)
+                                .animation(.spring(response: 0.30, dampingFraction: 0.82), value: powerManager.isEnabled)
                                 .frame(height: 17, alignment: .leading)
                             
-                            Group {
+                            ZStack(alignment: .leading) {
                                 if powerManager.isEnabled {
-                                    Text(powerManager.timer.isTimerRunning
-                                         ? "\(powerManager.timer.formattedRemainingTime) left"
-                                         : powerManager.timer.formattedElapsedTime)
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(Color.white.opacity(0.72))
+                                    if powerManager.timer.isTimerRunning {
+                                        Text("\(powerManager.timer.formattedRemainingTime) left")
+                                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                            .foregroundColor(Color.white.opacity(0.76))
+                                            .smoothNumericTransition(countsDown: true)
+                                            .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.remainingSeconds)
+                                            .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .leading)))
+                                    } else {
+                                        Text(powerManager.timer.formattedElapsedTime)
+                                            .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                            .foregroundColor(Color.white.opacity(0.76))
+                                            .smoothNumericTransition(countsDown: false)
+                                            .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.elapsedSeconds)
+                                            .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .leading)))
+                                    }
                                 } else {
                                     Text("Lid sleep normal")
                                         .font(.system(size: 11))
                                         .foregroundColor(Color.white.opacity(0.45))
+                                        .transition(.opacity.combined(with: .scale(scale: 0.94, anchor: .leading)))
                                 }
                             }
                             .frame(height: 14, alignment: .leading)
+                            .animation(.spring(response: 0.30, dampingFraction: 0.84), value: powerManager.isEnabled)
+                            .animation(.spring(response: 0.30, dampingFraction: 0.84), value: powerManager.timer.isTimerRunning)
                         }
                         
                         Spacer()
@@ -62,8 +85,8 @@ struct MenuBarView: View {
                                 .fill(powerManager.isEnabled ? Color.black : Color.white.opacity(0.78))
                                 .frame(width: 14, height: 14)
                                 .offset(x: powerManager.isEnabled ? 8 : -8)
-                                .animation(.spring(response: 0.22, dampingFraction: 0.82), value: powerManager.isEnabled)
                         }
+                        .animation(.spring(response: 0.28, dampingFraction: 0.78), value: powerManager.isEnabled)
                     }
                     .padding(.horizontal, 12)
                     .frame(height: 58)
@@ -72,36 +95,24 @@ struct MenuBarView: View {
                 .buttonStyle(.plain)
                 .disabled(powerManager.isBusy)
                 
-                // Duration Segmented Liquid Glass Capsule
-                HStack(spacing: 2) {
-                    ForEach(SessionPreset.allCases) { preset in
-                        let selected = powerManager.selectedPreset == preset
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.15)) {
-                                powerManager.selectPreset(preset)
-                            }
-                        }) {
-                            Text(presetShortTitle(preset))
-                                .font(.system(size: 11, weight: selected ? .semibold : .regular))
-                                .foregroundColor(selected ? .black : Color.white.opacity(0.62))
-                                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                                .background(selected ? Color.white : Color.clear)
-                                .clipShape(Capsule())
-                        }
-                        .buttonStyle(.plain)
-                    }
+                // Fluid Sliding Duration Liquid Glass Capsule
+                LiquidSegmentedControl(
+                    options: SessionPreset.allCases,
+                    selection: powerManager.selectedPreset,
+                    height: 32,
+                    fontSize: 11,
+                    label: presetShortTitle
+                ) { preset in
+                    powerManager.selectPreset(preset)
                 }
-                .padding(2.5)
-                .frame(height: 32)
-                .liquidGlassCard(cornerRadius: 16, elevated: false)
                 
                 // Monochrome 3-Stat Telemetry Strip
                 HStack(spacing: 0) {
-                    statItem(label: "Lid", value: powerManager.clamshell.isLidClosed ? "Closed" : "Open")
+                    statItem(label: "Lid", value: powerManager.clamshell.isLidClosed ? "Closed" : "Open", numeric: false)
                     dividerLine
-                    statItem(label: powerManager.battery.isOnACPower ? "AC" : "Battery", value: "\(powerManager.battery.batteryPercent)%")
+                    statItem(label: powerManager.battery.isOnACPower ? "AC" : "Battery", value: "\(powerManager.battery.batteryPercent)%", numeric: true)
                     dividerLine
-                    statItem(label: "Thermal", value: thermalShortTitle(powerManager.thermal.thermalState))
+                    statItem(label: "Thermal", value: thermalShortTitle(powerManager.thermal.thermalState), numeric: false)
                 }
                 .frame(height: 44)
                 .liquidGlassCard(cornerRadius: 12, elevated: false)
@@ -114,8 +125,10 @@ struct MenuBarView: View {
                             .lineLimit(2)
                         Spacer()
                         Button(action: {
-                            powerManager.lastError = nil
-                            powerManager.stopReason = nil
+                            withAnimation(.easeOut(duration: 0.16)) {
+                                powerManager.lastError = nil
+                                powerManager.stopReason = nil
+                            }
                         }) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 9, weight: .semibold))
@@ -154,26 +167,20 @@ struct MenuBarView: View {
                     .fill(Color.white.opacity(0.08))
                     .frame(height: 0.5)
                 
-                // Minimal Monochrome Icon Footer (labels pop smoothly on hover)
-                HStack(spacing: 0) {
-                    GlassIconHoverButton(systemImage: "gearshape", label: "Settings") {
+                // Fluid Gliding Monochrome Icon Footer (highlight & label glide across icons on hover)
+                LiquidIconDock(actions: footerActions) { action in
+                    switch action.id {
+                    case "settings":
                         SettingsWindowManager.shared.showSettings()
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    GlassIconHoverButton(systemImage: "macwindow", label: "Window") {
+                    case "window":
                         MainWindowManager.shared.showMainWindow()
-                    }
-                    .frame(maxWidth: .infinity)
-                    
-                    GlassIconHoverButton(systemImage: "power", label: "Quit") {
+                    case "quit":
                         powerManager.cleanup()
                         NSApplication.shared.terminate(nil)
+                    default:
+                        break
                     }
-                    .frame(maxWidth: .infinity)
                 }
-                .frame(height: 28)
-                .zIndex(20)
             }
             .padding(12)
         }
@@ -191,15 +198,27 @@ struct MenuBarView: View {
             .frame(width: 0.75, height: 20)
     }
     
-    private func statItem(label: String, value: String) -> some View {
+    @ViewBuilder
+    private func statItem(label: String, value: String, numeric: Bool) -> some View {
         VStack(spacing: 1) {
             Text(label)
                 .font(.system(size: 9.5))
                 .foregroundColor(Color.white.opacity(0.40))
-            Text(value)
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white)
-                .lineLimit(1)
+            if numeric {
+                Text(value)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .smoothNumericTransition()
+                    .animation(.spring(response: 0.30, dampingFraction: 0.84), value: value)
+            } else {
+                Text(value)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .contentTransition(.interpolate)
+                    .animation(.easeInOut(duration: 0.22), value: value)
+            }
         }
         .frame(maxWidth: .infinity)
     }
