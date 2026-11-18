@@ -32,6 +32,11 @@ public struct MainWindowView: View {
                         showOnboarding = false
                         selectedTab = .home
                     }
+                    if preferences.presentationMode == .menuBarOnly {
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                            MainWindowManager.shared.closeMainWindow()
+                        }
+                    }
                 })
                 .transition(.opacity)
             } else {

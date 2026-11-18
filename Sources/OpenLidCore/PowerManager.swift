@@ -164,8 +164,10 @@ public final class PowerManager: ObservableObject {
             task.waitUntilExit()
             let data = pipe.fileHandleForReading.readDataToEndOfFile()
             let output = String(data: data, encoding: .utf8) ?? ""
-            return output.localizedCaseInsensitiveContains("SleepDisabled 1") ||
-                   output.localizedCaseInsensitiveContains("disablesleep 1")
+            return output.range(
+                of: #"(?:SleepDisabled|disablesleep)\s+1\b"#,
+                options: [.regularExpression, .caseInsensitive]
+            ) != nil
         } catch {
             return false
         }

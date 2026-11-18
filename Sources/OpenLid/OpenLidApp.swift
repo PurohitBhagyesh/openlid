@@ -60,9 +60,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 struct OpenLidApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
     @StateObject private var powerManager = PowerManager.shared
+    @StateObject private var preferences = AppPreferences.shared
     
     var body: some Scene {
-        MenuBarExtra {
+        MenuBarExtra(
+            isInserted: Binding(
+                get: { preferences.presentationMode != .windowedApp },
+                set: { _ in }
+            )
+        ) {
             MenuBarView()
         } label: {
             StatusIconView(powerManager: powerManager)
