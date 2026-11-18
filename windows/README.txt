@@ -1,80 +1,43 @@
-================================================================================
-   OpenLid for Windows (v1.0.0) — Clamshell Sleep Prevention Manager
-   Website: https://openlid.devs.li  •  GitHub: https://github.com/PurohitBhagyesh/openlid
-================================================================================
+========================================================================
+  OpenLid for Windows (v1.0.0) -- Clamshell Sleep Prevention
+  https://openlid.devs.li  |  https://github.com/PurohitBhagyesh/openlid
+========================================================================
 
-Keep your Windows laptop running with the lid closed — smoothly, safely, and
-without requiring external displays or dummy plugs.
+Keep your Windows laptop running with the lid closed -- safely, cleanly,
+and without requiring external displays or HDMI dummy plugs.
 
---------------------------------------------------------------------------------
-1. QUICK START
---------------------------------------------------------------------------------
-• Double-click "Launch-OpenLid.cmd" to immediately start OpenLid in the background.
-  An animated eye icon will appear in your system tray (next to the clock)
-  and the main dashboard window will open.
+QUICK START
+-----------
+  1. Extract this ZIP archive to any folder.
+  2. Double-click "OpenLid.cmd" to launch OpenLid immediately.
+     (On first run from Downloads, OpenLid will offer to move itself
+      into your Programs folder and create Desktop & Start Menu shortcuts.)
+  3. Or double-click "Install OpenLid.cmd" directly to install into
+     %LOCALAPPDATA%\Programs\OpenLid right away.
 
-• Double-click "Install-OpenLid.cmd" to permanently install OpenLid to your
-  user Programs directory (%LOCALAPPDATA%\Programs\OpenLid) and create handy
-  Desktop and Start Menu shortcuts.
+INCLUDED FILES
+--------------
+  OpenLid.cmd            Launch OpenLid Dashboard & System Tray
+  Install OpenLid.cmd    Install to Programs + Desktop & Start Menu shortcuts
+  Uninstall OpenLid.cmd  Cleanly uninstall & restore default Windows lid sleep
+  app\                   Native engine, icon, and CLI helpers
 
---------------------------------------------------------------------------------
-2. MOVE TO APPLICATIONS (PROGRAMS) FOLDER
---------------------------------------------------------------------------------
-OpenLid offers seamless relocation when launched from your Downloads folder.
-Clicking "Yes" when prompted automatically:
-  [✓] Copies all files to %LOCALAPPDATA%\Programs\OpenLid
-  [✓] Creates a Desktop shortcut with the custom OpenLid icon
-  [✓] Adds OpenLid to your Start Menu
-  [✓] Cleans up transient temporary files
-  [✓] Relaunches cleanly without command prompt windows
+COMMAND-LINE USAGE
+------------------
+  OpenLid.cmd on               Enable closed-lid sleep prevention
+  OpenLid.cmd off              Restore normal lid-close sleep
+  OpenLid.cmd status           Show current status
+  OpenLid.cmd tray             Start minimized in System Tray
+  OpenLid.cmd install          Install to user Programs folder
+  OpenLid.cmd uninstall        Remove installation & restore sleep
 
---------------------------------------------------------------------------------
-3. PRESENTATION MODES
---------------------------------------------------------------------------------
-OpenLid supports 3 presentation modes:
-  1. System Tray Only — Sits discreetly next to your Windows clock
-  2. Standalone Application Window — Full dashboard with live telemetry
-  3. Both (Recommended) — System tray icon + full windowed dashboard
+REQUIREMENTS
+------------
+  Windows 10 or Windows 11 (x64 or ARM64). Zero external dependencies.
 
-You can switch modes anytime via the "Presentation Mode & Preferences..." button.
-
---------------------------------------------------------------------------------
-4. COMMAND-LINE INTERFACE (CLI)
---------------------------------------------------------------------------------
-Run via Command Prompt or PowerShell:
-  openlid on                Enable sleep prevention indefinitely
-  openlid on -Duration 30   Enable sleep prevention for 30 minutes
-  openlid off               Disengage sleep prevention and restore default sleep
-  openlid status            Display current power & lid telemetry
-  openlid app               Launch full GUI dashboard
-  openlid tray              Launch in system tray only
-  openlid install           Install to user Programs folder
-  openlid uninstall         Cleanly uninstall and restore default power rules
-
---------------------------------------------------------------------------------
-5. ARCHITECTURAL DETAILS & SAFETY
---------------------------------------------------------------------------------
-• Kernel AwayMode: Calls SetThreadExecutionState(ES_CONTINUOUS | ES_AWAYMODE_REQUIRED
-  | ES_SYSTEM_REQUIRED) to keep CPU, network, downloads, and background servers
-  active while allowing the display backlight to turn off cleanly.
-• Hardware LIDACTION Override: Dynamically programs powercfg SUB_BUTTONS LIDACTION
-  to prevent Windows ACPI lid closure from triggering Modern Standby or S3 sleep.
-• Zero Bloat: Runs purely via native .NET / PowerShell components already built
-  into Windows 10 and 11. No heavy electron runtimes or external dependencies.
-
---------------------------------------------------------------------------------
-6. UNINSTALLATION
---------------------------------------------------------------------------------
-Double-click "Uninstall-OpenLid.cmd" or run:
-  .\OpenLid.ps1 -Uninstall
-This immediately restores default Windows lid sleep settings and removes all
-shortcuts and application files.
-
---------------------------------------------------------------------------------
-SUPPORT & COMMUNITY
---------------------------------------------------------------------------------
-• Official Website: https://openlid.devs.li
-• GitHub:          https://github.com/PurohitBhagyesh/openlid
-• Issue Tracker:   https://github.com/PurohitBhagyesh/openlid/issues
-• Support Email:   purohitunofficialbhagyesh@gmail.com
-================================================================================
+SUPPORT
+-------
+  Website: https://openlid.devs.li
+  GitHub:  https://github.com/PurohitBhagyesh/openlid
+  Email:   purohitunofficialbhagyesh@gmail.com
+========================================================================

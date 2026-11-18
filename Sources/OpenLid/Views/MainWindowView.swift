@@ -116,6 +116,50 @@ public struct MainWindowView: View {
     // MARK: - Dashboard Tab (Timer runs exclusively in Menu Bar Taskbar)
     private var dashboardView: some View {
         VStack(spacing: 16) {
+            if !ApplicationMover.isInstalledInApplications() && !ApplicationMover.isDevOrBuildEnvironment() {
+                HStack(spacing: 12) {
+                    ZStack {
+                        RoundedRectangle(cornerRadius: 9)
+                            .fill(Color.green.opacity(0.16))
+                            .frame(width: 34, height: 34)
+                        Image(systemName: "folder.badge.plus")
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(.green)
+                    }
+                    
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Running from \(ApplicationMover.currentLocationDescription())")
+                            .font(.system(size: 12.5, weight: .bold))
+                            .foregroundColor(.primary)
+                        Text("Move OpenLid to /Applications for reliable Launch at Login & updates.")
+                            .font(.system(size: 11))
+                            .foregroundColor(.secondary)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        MoveToApplicationsWindowManager.shared.showPrompt(force: true)
+                    }) {
+                        Text("Move to Applications")
+                            .font(.system(size: 11.5, weight: .bold))
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 6)
+                            .background(Color.green)
+                            .cornerRadius(7)
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(12)
+                .background(Color.green.opacity(0.08))
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.green.opacity(0.28), lineWidth: 1)
+                )
+            }
+            
             // Hero Toggle Card
             Button(action: {
                 powerManager.toggle(preset: selectedPreset)

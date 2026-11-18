@@ -17,16 +17,23 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         // Handle auto-awake on user login
         LaunchAtLoginManager.shared.handleAppLaunch()
         
-        // Offer to move to /Applications if launched from Downloads
-        ApplicationMover.promptToMoveToApplicationsIfNecessary()
-        
         // Apply user's presentation mode preference (menu bar vs windowed vs both)
         AppPreferences.shared.applyPresentationMode()
         
-        // If onboarding is not completed, or if mode is windowedApp or both, show the main window
-        if !AppPreferences.shared.hasCompletedOnboarding ||
+        let shouldShowMainWindow = !AppPreferences.shared.hasCompletedOnboarding ||
             AppPreferences.shared.presentationMode == .windowedApp ||
-            AppPreferences.shared.presentationMode == .both {
+            AppPreferences.shared.presentationMode == .both
+        
+        // Offer modern Move-to-Applications flow first if running outside /Applications
+        if ApplicationMover.shouldPromptOnLaunch() {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                MoveToApplicationsWindowManager.shared.showPrompt(force: false) {
+                    if shouldShowMainWindow {
+                        MainWindowManager.shared.showMainWindow()
+                    }
+                }
+            }
+        } else if shouldShowMainWindow {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 MainWindowManager.shared.showMainWindow()
             }

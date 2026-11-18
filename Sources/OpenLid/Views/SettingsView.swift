@@ -114,7 +114,7 @@ struct SettingsView: View {
                         Spacer()
                         if !ApplicationMover.isInstalledInApplications() {
                             Button("Move to Applications") {
-                                ApplicationMover.requestManualMoveToApplications()
+                                MoveToApplicationsWindowManager.shared.showPrompt(force: true)
                             }
                             .buttonStyle(.borderedProminent)
                             .controlSize(.small)

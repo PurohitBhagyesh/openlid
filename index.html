@@ -328,7 +328,7 @@
               </svg>
               Download ZIP (.zip)
             </a>
-            <span class="card-note">Includes OpenLidTray.exe + PowerShell scripts</span>
+            <span class="card-note">Includes OpenLid.cmd + 1-click Installer + Dark UI</span>
             <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Windows%20Support%20(x64)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Windows%20(x64):%0D%0A-%20Laptop%20Model:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email Windows Support ↗</a>
           </div>
         </div>
@@ -357,8 +357,8 @@
 
       <div class="code-box">
         <span class="code-label">PowerShell</span>
-        <code>powershell -Command ".\OpenLid.ps1 -On"</code>
-        <button class="code-copy" onclick="navigator.clipboard.writeText('powershell -Command &quot;.\\OpenLid.ps1 -On&quot;'); this.innerText='Copied'">Copy</button>
+        <code>powershell -ExecutionPolicy Bypass -File ".\app\OpenLid.ps1" -App</code>
+        <button class="code-copy" onclick="navigator.clipboard.writeText('powershell -ExecutionPolicy Bypass -File &quot;.\\app\\OpenLid.ps1&quot; -App'); this.innerText='Copied'">Copy</button>
       </div>
     </div>
   </section>

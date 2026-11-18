@@ -139,17 +139,17 @@ brew install openlid
 
 | Architecture | Standalone Archive | Target Hardware | Contents |
 | :--- | :---: | :--- | :--- |
-| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `Launch-OpenLid.cmd` + `Install-OpenLid.cmd` + `OpenLid.ico` + `OpenLidTray.cs` + `OpenLid.ps1` |
-| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `Launch-OpenLid.cmd` + `Install-OpenLid.cmd` + `OpenLid.ico` + `OpenLidTray.cs` + `OpenLid.ps1` |
+| **Windows x64** | [Download `.zip`](downloads/OpenLid-Windows-x64.zip) | Intel Core & AMD Ryzen Laptops | `OpenLid.cmd` + `Install OpenLid.cmd` + `Uninstall OpenLid.cmd` + `app/` |
+| **Windows ARM64** | [Download `.zip`](downloads/OpenLid-Windows-ARM64.zip) | Snapdragon X Elite, Surface Pro ARM | `OpenLid.cmd` + `Install OpenLid.cmd` + `Uninstall OpenLid.cmd` + `app/` |
 
 ```powershell
 # Windows One-Click Launch (GUI & System Tray)
-# Double-click "Launch-OpenLid.cmd" or run:
-powershell -ExecutionPolicy Bypass -Command ".\windows\OpenLid.ps1 -App"
+# Double-click "OpenLid.cmd" or run:
+powershell -ExecutionPolicy Bypass -File ".\windows\app\OpenLid.ps1" -App
 
 # Permanent User Installation (Desktop & Start Menu Shortcuts)
-# Double-click "Install-OpenLid.cmd" or run:
-powershell -ExecutionPolicy Bypass -Command ".\windows\OpenLid.ps1 -Install"
+# Double-click "Install OpenLid.cmd" or run:
+powershell -ExecutionPolicy Bypass -File ".\windows\app\OpenLid.ps1" -Install
 ```
 
 > [!TIP]

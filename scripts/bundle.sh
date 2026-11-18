@@ -89,11 +89,12 @@ ln -sf /Applications "$TMP_X86/Applications"
 rm -rf "$TMP_X86"
 rm -f "$DIST_DIR/Applications"
 
-echo "🪟 Creating Windows release archives (with installer, shortcuts & native icon)..."
+echo "🪟 Creating Windows release archives (clean layout with installer, dark UI & icon)..."
 WIN_SRC="$DIR/windows"
 TMP_WIN="$DIR/.build/tmp_pkg_win"
 rm -rf "$TMP_WIN" && mkdir -p "$TMP_WIN"
-cp "$WIN_SRC"/* "$TMP_WIN/" 2>/dev/null || true
+cp -R "$WIN_SRC"/. "$TMP_WIN/"
+find "$TMP_WIN" -name ".DS_Store" -delete
 (cd "$TMP_WIN" && zip -rq "$DIST_DIR/OpenLid-Windows-x64.zip" .)
 (cd "$TMP_WIN" && zip -rq "$DIST_DIR/OpenLid-Windows-ARM64.zip" .)
 rm -rf "$TMP_WIN"
@@ -102,6 +103,8 @@ echo "🔄 Synchronizing release archives to downloads/ and website/downloads/..
 mkdir -p "$DIR/downloads" "$DIR/website/downloads"
 cp "$DIST_DIR"/*.zip "$DIR/downloads/"
 cp "$DIST_DIR"/*.zip "$DIR/website/downloads/"
+cp "$WIN_SRC/app/OpenLid.ps1" "$DIR/downloads/OpenLid.ps1"
+cp "$WIN_SRC/app/OpenLidTray.cs" "$DIR/downloads/OpenLidTray.cs"
 
 # Calculate new universal sha256 and update Homebrew Cask
 UNIVERSAL_ZIP="$DIR/downloads/OpenLid-Universal.zip"
