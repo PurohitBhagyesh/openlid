@@ -1,5 +1,5 @@
 ========================================================================
-  OpenLid for Windows (v1.0.0) -- Clamshell Sleep Prevention
+  OpenLid for Windows (v2.0.0) -- Clamshell Sleep Prevention
   https://openlid.devs.li  |  https://github.com/PurohitBhagyesh/openlid
 ========================================================================
 

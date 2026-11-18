@@ -54,7 +54,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0OpenLid.ps1" -Stat
 exit /b 0
 
 :do_help
-echo OpenLid for Windows v1.0.0 -- Clamshell Sleep Prevention
+echo OpenLid for Windows v2.0.0 -- Clamshell Sleep Prevention
 echo.
 echo Usage:
 echo   OpenLid.cmd            Launch OpenLid GUI and System Tray

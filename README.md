@@ -13,11 +13,11 @@
 
 **Keep your laptop awake, running, and vigilant — even when the lid is closed.**
 
-[![Platform](https://img.shields.io/badge/Platforms-macOS%2013%2B%20%7C%20Windows%2011%2F10-black?style=for-the-badge&logo=apple&logoColor=white)](https://openlid.devs.li)
-[![Swift](https://img.shields.io/badge/Swift-6.0-F05138?style=for-the-badge&logo=swift&logoColor=white)](https://swift.org)
-[![Size](https://img.shields.io/badge/Size-%3C%202.5%20MB%20(Universal)-10b981?style=for-the-badge)](https://openlid.devs.li)
-[![License: MIT](https://img.shields.io/badge/License-MIT-10b981?style=for-the-badge)](LICENSE)
-[![Website](https://img.shields.io/badge/Website-openlid.devs.li-06b6d4?style=for-the-badge)](https://openlid.devs.li)
+[![Version](https://img.shields.io/badge/Version-2.0.0-ffffff?style=for-the-badge&labelColor=09090b)](https://github.com/PurohitBhagyesh/openlid/releases)
+[![Platform](https://img.shields.io/badge/Platforms-macOS%2013%2B%20%7C%20Windows%2011%2F10-09090b?style=for-the-badge&logo=apple&logoColor=white)](https://openlid.devs.li)
+[![Size](https://img.shields.io/badge/Size-1.5%20MB%20Universal-09090b?style=for-the-badge)](https://openlid.devs.li)
+[![License: MIT](https://img.shields.io/badge/License-MIT-09090b?style=for-the-badge)](LICENSE)
+[![Website](https://img.shields.io/badge/Website-openlid.devs.li-09090b?style=for-the-badge)](https://openlid.devs.li)
 
 Developed with precision by **[Bhagyesh Purohit](https://github.com/PurohitBhagyesh)**
 

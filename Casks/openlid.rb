@@ -1,6 +1,6 @@
 cask "openlid" do
-  version "1.0.0"
-  sha256 "b6d4516709c9ccebace83360093be20c0b459e05b03e09ec0db8eb8cf5eb5cab"
+  version "2.0.0"
+  sha256 "5042baeb85bcb1ce9f09f5cbc92565aafefa5d57f5ea544577049d11c19e8d1c"
 
   url "https://openlid.devs.li/downloads/OpenLid-Universal.zip"
   name "OpenLid"

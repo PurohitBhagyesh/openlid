@@ -1,0 +1,31 @@
+name: Publish Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Publish Release with Prebuilt Archives
+        uses: softprops/action-gh-release@v2
+        with:
+          name: OpenLid ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            downloads/OpenLid-Universal.zip
+            downloads/OpenLid-AppleSilicon.zip
+            downloads/OpenLid-Intel.zip
+            downloads/OpenLid-Windows-x64.zip
+            downloads/OpenLid-Windows-ARM64.zip
+

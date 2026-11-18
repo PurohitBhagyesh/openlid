@@ -245,7 +245,7 @@ namespace OpenLid
 
             // Build Tray Context Menu
             TrayMenu = new ContextMenuStrip();
-            TrayMenu.Items.Add("OpenLid for Windows (v1.0.0)").Enabled = false;
+            TrayMenu.Items.Add("OpenLid for Windows (v2.0.0)").Enabled = false;
             TrayMenu.Items.Add(new ToolStripSeparator());
 
             ToolStripMenuItem openAppItem = new ToolStripMenuItem("Open OpenLid Dashboard", null, delegate { ShowMainWindow(); });
@@ -700,7 +700,7 @@ namespace OpenLid
             }
             else if (cmd == "status")
             {
-                Console.WriteLine("OpenLid for Windows v1.0.0 | Mode: " + PresentationMode);
+                Console.WriteLine("OpenLid for Windows v2.0.0 | Mode: " + PresentationMode);
                 return true;
             }
             else if (cmd == "app" || cmd == "gui")
@@ -1396,7 +1396,7 @@ namespace OpenLid
             pnlHeader.Controls.Add(lblTitle);
 
             Label lblVer = new Label();
-            lblVer.Text = "v1.0.0  \u2022  Windows Clamshell Manager";
+            lblVer.Text = "v2.0.0  \u2022  Windows Clamshell Manager";
             lblVer.Font = new Font("Segoe UI", 8.5f);
             lblVer.ForeColor = Color.FromArgb(132, 144, 164);
             lblVer.Location = new Point(79, 36);

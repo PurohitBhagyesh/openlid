@@ -153,7 +153,7 @@ struct SettingsView: View {
                     
                     // Quiet Footer Row
                     HStack(spacing: 12) {
-                        Text("v1.0.0")
+                        Text("v2.0.0")
                             .font(.system(size: 10.5, design: .monospaced))
                             .foregroundColor(Color.white.opacity(0.32))
                         Spacer()

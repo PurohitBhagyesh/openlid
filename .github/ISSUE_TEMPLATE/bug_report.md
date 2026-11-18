@@ -20,7 +20,7 @@ A clear description of what you expected to happen.
 ### System Information
 - macOS Version: (e.g. macOS 14.5 Sonoma, macOS 15.0 Sequoia)
 - Mac Model: (e.g. MacBook Pro 16" M3 Max)
-- OpenLid Version: (e.g. 1.0.0)
+- OpenLid Version: (e.g. 2.0.0)
 - Battery or AC Power:
 
 ### Additional Context
