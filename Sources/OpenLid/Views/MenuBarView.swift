@@ -3,323 +3,210 @@ import OpenLidCore
 
 struct MenuBarView: View {
     @ObservedObject var powerManager = PowerManager.shared
-    @State private var selectedPreset: SessionPreset = .indefinite
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     @State private var isRefreshingHardware: Bool = false
-    @State private var hardwareRefreshedJustNow: Bool = false
+    
+    private let bgColor = Color(red: 0.055, green: 0.065, blue: 0.082)
+    private let cardBg = Color.white.opacity(0.04)
+    private let cardBorder = Color.white.opacity(0.08)
+    private let emerald = Color(red: 0.063, green: 0.725, blue: 0.506)
     
     var body: some View {
-        mainView
-            .frame(width: 360)
-            .onAppear {
-                helperInstalled = PrivilegeManager.shared.isHelperInstalled()
-                refreshHardwareMonitors()
-            }
-    }
-    
-    private var mainView: some View {
         VStack(spacing: 12) {
-            // Header
-            HStack(alignment: .center) {
-                HStack(spacing: 8) {
-                    AnimatedEyeView(size: 24, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
+            // Compact Hero Toggle Card
+            Button(action: {
+                powerManager.toggle(preset: powerManager.selectedPreset)
+            }) {
+                HStack(spacing: 12) {
+                    ZStack {
+                        if powerManager.isBusy {
+                            ProgressView()
+                                .scaleEffect(0.6)
+                                .colorInvert()
+                                .frame(width: 40, height: 40)
+                        } else {
+                            AnimatedEyeView(size: 40, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
+                        }
+                    }
                     
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("OpenLid")
-                            .font(.system(size: 15, weight: .bold))
-                        Text(powerManager.isEnabled ? "Awake & Vigilant" : "Normal Sleep Mode")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                }
-                
-                Spacer()
-                
-                // Status badge
-                Text(powerManager.isEnabled ? "AWAKE" : "ASLEEP")
-                    .font(.system(size: 10, weight: .heavy))
-                    .padding(.horizontal, 8)
-                    .padding(.vertical, 3)
-                    .background(powerManager.isEnabled ? Color.green.opacity(0.2) : Color.secondary.opacity(0.15))
-                    .foregroundColor(powerManager.isEnabled ? .green : .secondary)
-                    .clipShape(Capsule())
-            }
-            .padding(.horizontal, 14)
-            .padding(.top, 14)
-            
-            Divider()
-                .padding(.horizontal, 10)
-            
-            // Hero Toggle Card
-            VStack(spacing: 10) {
-                Button(action: {
-                    powerManager.toggle(preset: selectedPreset)
-                }) {
-                    HStack(spacing: 12) {
-                        ZStack {
-                            if powerManager.isBusy {
-                                ProgressView()
-                                    .scaleEffect(0.6)
-                                    .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                                    .frame(width: 38, height: 38)
-                            } else {
-                                AnimatedEyeView(size: 38, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
-                            }
-                        }
-                        
-                        VStack(alignment: .leading, spacing: 3) {
-                            Text(powerManager.isEnabled ? "Mac is Awake (Eye Vigilant)" : "Keep Awake with Lid Closed")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(.primary)
-                            Text(powerManager.isEnabled ? "Mac continues running even if lid is closed" : "Click to keep Mac awake when closing lid")
-                                .font(.system(size: 11))
-                                .foregroundColor(.secondary)
-                                .lineLimit(2)
-                                .fixedSize(horizontal: false, vertical: true)
-                        }
-                        
-                        Spacer()
-                    }
-                    .padding(10)
-                    .background(powerManager.isEnabled ? Color.green.opacity(0.1) : Color.primary.opacity(0.04))
-                    .cornerRadius(10)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(powerManager.isEnabled ? Color.green.opacity(0.3) : Color.secondary.opacity(0.1), lineWidth: 1)
-                    )
-                }
-                .buttonStyle(.plain)
-            }
-            .padding(.horizontal, 14)
-            
-            // Real-Time Live Timer Banner (Always updates every second)
-            if powerManager.isEnabled {
-                if powerManager.timer.isTimerRunning {
-                    HStack(spacing: 8) {
-                        Image(systemName: "timer")
-                            .font(.system(size: 13, weight: .semibold))
-                            .foregroundColor(.orange)
-                        Text("Session ends in:")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.secondary)
-                        Text(powerManager.timer.formattedRemainingTime)
-                            .font(.system(size: 13, weight: .bold, design: .monospaced))
-                            .foregroundColor(.orange)
-                        
-                        Spacer()
-                        
-                        Button("Stop") {
-                            powerManager.timer.stop()
-                        }
-                        .font(.system(size: 11, weight: .semibold))
-                        .buttonStyle(.bordered)
-                        .controlSize(.small)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .background(Color.orange.opacity(0.12))
-                    .cornerRadius(8)
-                    .padding(.horizontal, 14)
-                } else {
-                    // Indefinite / Always mode: real-time active elapsed timer
-                    HStack(spacing: 8) {
-                        Circle()
-                            .fill(Color.green)
-                            .frame(width: 8, height: 8)
-                        Text("Active Vigilant Session:")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(.secondary)
-                        Text(powerManager.timer.formattedElapsedTime)
-                            .font(.system(size: 12, weight: .bold, design: .monospaced))
-                            .foregroundColor(.green)
-                        
-                        Spacer()
-                        
-                        Text("Always")
-                            .font(.system(size: 10, weight: .semibold))
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.green.opacity(0.15))
-                            .foregroundColor(.green)
-                            .cornerRadius(4)
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .background(Color.green.opacity(0.08))
-                    .cornerRadius(8)
-                    .padding(.horizontal, 14)
-                }
-            }
-            
-            // Session Preset Duration Selector (Zero truncation!)
-            VStack(alignment: .leading, spacing: 6) {
-                Text("Session Duration")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.secondary)
-                
-                HStack(spacing: 6) {
-                    ForEach([SessionPreset.indefinite, .min15, .min30, .hour1, .hour2], id: \.self) { preset in
-                        Button(action: {
-                            selectedPreset = preset
+                    VStack(alignment: .leading, spacing: 2) {
+                        HStack(spacing: 6) {
+                            Text(powerManager.isEnabled ? "Awake" : "Standby")
+                                .font(.system(size: 14, weight: .bold))
+                                .foregroundColor(.white)
+                            
                             if powerManager.isEnabled {
-                                powerManager.timer.start(preset: preset)
+                                Text(powerManager.timer.isTimerRunning ? powerManager.timer.formattedRemainingTime : powerManager.timer.formattedElapsedTime)
+                                    .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                                    .foregroundColor(powerManager.timer.isTimerRunning ? .orange : Color(red: 0.45, green: 0.90, blue: 0.72))
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background((powerManager.timer.isTimerRunning ? Color.orange : emerald).opacity(0.14))
+                                    .clipShape(Capsule())
                             }
-                        }) {
-                            Text(presetShortTitle(preset))
-                                .font(.system(size: 11, weight: selectedPreset == preset ? .bold : .medium))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.85)
-                                .padding(.horizontal, 4)
-                                .padding(.vertical, 6)
-                                .frame(maxWidth: .infinity)
-                                .background(selectedPreset == preset ? Color.accentColor : Color.secondary.opacity(0.12))
-                                .foregroundColor(selectedPreset == preset ? .white : .primary)
-                                .cornerRadius(6)
                         }
-                        .buttonStyle(.plain)
+                        
+                        Text(powerManager.isEnabled ? "Lid close sleep disabled" : "Click to keep Mac awake")
+                            .font(.system(size: 11))
+                            .foregroundColor(Color.white.opacity(0.50))
+                    }
+                    
+                    Spacer()
+                    
+                    // Tactile Power Pill
+                    ZStack {
+                        Capsule()
+                            .fill(powerManager.isEnabled ? emerald : Color.white.opacity(0.12))
+                            .frame(width: 38, height: 22)
+                        Circle()
+                            .fill(powerManager.isEnabled ? Color.black : Color.white.opacity(0.75))
+                            .frame(width: 16, height: 16)
+                            .offset(x: powerManager.isEnabled ? 8 : -8)
+                            .animation(.spring(response: 0.25, dampingFraction: 0.8), value: powerManager.isEnabled)
                     }
                 }
+                .padding(12)
+                .background(powerManager.isEnabled ? emerald.opacity(0.09) : cardBg)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(powerManager.isEnabled ? emerald.opacity(0.32) : cardBorder, lineWidth: 1)
+                )
             }
-            .padding(.horizontal, 14)
+            .buttonStyle(.plain)
+            .disabled(powerManager.isBusy)
             
-            // Hardware Telemetry Header with Instant Refresh Action
-            HStack {
-                Text("HARDWARE MONITORS")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.secondary)
-                
-                Spacer()
-                
-                Button(action: refreshHardwareMonitors) {
-                    HStack(spacing: 4) {
-                        Image(systemName: "arrow.clockwise")
-                            .font(.system(size: 9, weight: .bold))
-                            .rotationEffect(.degrees(isRefreshingHardware ? 360 : 0))
-                            .animation(isRefreshingHardware ? Animation.linear(duration: 0.6).repeatForever(autoreverses: false) : .default, value: isRefreshingHardware)
-                        Text(hardwareRefreshedJustNow ? "Synced" : "Refresh")
-                            .font(.system(size: 10, weight: .medium))
+            // Duration Pills (Unified Emerald)
+            HStack(spacing: 5) {
+                ForEach(SessionPreset.allCases) { preset in
+                    let selected = powerManager.selectedPreset == preset
+                    Button(action: {
+                        powerManager.selectPreset(preset)
+                    }) {
+                        Text(presetShortTitle(preset))
+                            .font(.system(size: 11, weight: selected ? .bold : .medium))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 6)
+                            .background(selected ? emerald : cardBg)
+                            .foregroundColor(selected ? .black : Color.white.opacity(0.75))
+                            .cornerRadius(7)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 7)
+                                    .stroke(selected ? Color.clear : cardBorder, lineWidth: 1)
+                            )
                     }
-                    .foregroundColor(hardwareRefreshedJustNow ? .green : .secondary)
+                    .buttonStyle(.plain)
                 }
-                .buttonStyle(.plain)
             }
-            .padding(.horizontal, 14)
-            .padding(.top, 2)
             
-            // Hardware Telemetry Strip
-            HStack(spacing: 8) {
-                // Lid State
-                TelemetryCard(
-                    icon: powerManager.clamshell.isLidClosed ? "lock.fill" : "book.closed",
-                    title: "Lid",
+            // Clean 3-Stat Telemetry Strip
+            HStack(spacing: 0) {
+                miniStat(
+                    icon: powerManager.clamshell.isLidClosed ? "laptopcomputer.and.arrow.down" : "laptopcomputer",
                     value: powerManager.clamshell.isLidClosed ? "Closed" : "Open",
-                    color: powerManager.clamshell.isLidClosed ? .orange : .green
+                    tint: powerManager.clamshell.isLidClosed ? .orange : emerald
                 )
-                
-                // Battery
-                TelemetryCard(
+                Divider().frame(height: 20).background(Color.white.opacity(0.08))
+                miniStat(
                     icon: powerManager.battery.isOnACPower ? "bolt.fill" : "battery.75",
-                    title: powerManager.battery.isOnACPower ? "Power" : "Battery",
                     value: "\(powerManager.battery.batteryPercent)%",
-                    color: powerManager.battery.batteryPercent <= 20 ? .red : .blue
+                    tint: powerManager.battery.batteryPercent <= 20 ? .red : emerald
                 )
-                
-                // Thermal
-                TelemetryCard(
+                Divider().frame(height: 20).background(Color.white.opacity(0.08))
+                miniStat(
                     icon: "thermometer.medium",
-                    title: "Thermal",
                     value: thermalShortTitle(powerManager.thermal.thermalState),
-                    color: powerManager.thermal.isDangerous ? .red : .green
+                    tint: powerManager.thermal.isDangerous ? .red : emerald
                 )
             }
-            .padding(.horizontal, 14)
+            .padding(.vertical, 9)
+            .background(cardBg)
+            .cornerRadius(10)
+            .overlay(
+                RoundedRectangle(cornerRadius: 10)
+                    .stroke(cardBorder, lineWidth: 1)
+            )
             
-            // Error or Stop Reason Alert
-            if let error = powerManager.lastError {
+            // Optional inline alert (error or stop reason)
+            if let notice = powerManager.lastError ?? powerManager.stopReason {
+                let isErr = powerManager.lastError != nil
                 HStack(spacing: 6) {
-                    Image(systemName: "exclamationmark.circle.fill")
-                        .foregroundColor(.red)
-                    Text(error)
+                    Image(systemName: isErr ? "exclamationmark.circle.fill" : "info.circle.fill")
                         .font(.system(size: 11))
-                        .foregroundColor(.red)
+                        .foregroundColor(isErr ? .red : .orange)
+                    Text(notice)
+                        .font(.system(size: 11))
+                        .foregroundColor(Color.white.opacity(0.85))
+                        .lineLimit(2)
                     Spacer()
-                    Button(action: { powerManager.lastError = nil }) {
+                    Button(action: {
+                        powerManager.lastError = nil
+                        powerManager.stopReason = nil
+                    }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 9))
+                            .font(.system(size: 9, weight: .bold))
+                            .foregroundColor(Color.white.opacity(0.45))
                     }
                     .buttonStyle(.plain)
                 }
-                .padding(8)
-                .background(Color.red.opacity(0.1))
-                .cornerRadius(6)
-                .padding(.horizontal, 14)
-            } else if let reason = powerManager.stopReason {
-                HStack(spacing: 6) {
-                    Image(systemName: "info.circle.fill")
-                        .foregroundColor(.orange)
-                    Text(reason)
-                        .font(.system(size: 11))
-                        .foregroundColor(.orange)
-                    Spacer()
-                    Button(action: { powerManager.stopReason = nil }) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 9))
-                    }
-                    .buttonStyle(.plain)
-                }
-                .padding(8)
-                .background(Color.orange.opacity(0.1))
-                .cornerRadius(6)
-                .padding(.horizontal, 14)
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background((isErr ? Color.red : Color.orange).opacity(0.12))
+                .cornerRadius(8)
             }
             
-            // Helper Quick Notice (if not installed)
+            // Optional compact helper notice
             if !helperInstalled {
                 HStack(spacing: 8) {
-                    Image(systemName: "bolt.badge.clock")
-                        .foregroundColor(.accentColor)
-                    VStack(alignment: .leading, spacing: 1) {
-                        Text("Instant Toggle Mode")
-                            .font(.system(size: 11, weight: .semibold))
-                        Text("Authorize once to skip password popups")
-                            .font(.system(size: 9))
-                            .foregroundColor(.secondary)
-                    }
+                    Image(systemName: "bolt.shield.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(emerald)
+                    Text("Enable Instant Toggle")
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.82))
                     Spacer()
-                    Button("Install") {
+                    Button("Enable") {
                         installHelperQuick()
                     }
-                    .font(.system(size: 10, weight: .bold))
-                    .buttonStyle(.borderedProminent)
-                    .controlSize(.small)
+                    .font(.system(size: 10.5, weight: .bold))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 4)
+                    .background(emerald)
+                    .cornerRadius(5)
+                    .buttonStyle(.plain)
                 }
-                .padding(8)
-                .background(Color.accentColor.opacity(0.08))
+                .padding(.horizontal, 10)
+                .padding(.vertical, 7)
+                .background(emerald.opacity(0.08))
                 .cornerRadius(8)
-                .padding(.horizontal, 14)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 8)
+                        .stroke(emerald.opacity(0.22), lineWidth: 1)
+                )
             }
             
-            Divider()
-                .padding(.horizontal, 10)
+            Divider().background(Color.white.opacity(0.07))
             
-            // Footer Controls (Clean, spacious, zero personal exposure)
+            // Minimal Footer
             HStack {
-                Button(action: {
-                    SettingsWindowManager.shared.showSettings()
-                }) {
-                    Label("Settings...", systemImage: "gearshape")
-                        .font(.system(size: 11))
-                }
-                .buttonStyle(.plain)
-                
-                Spacer()
-                
                 Button(action: {
                     MainWindowManager.shared.showMainWindow()
                 }) {
-                    Label("App Window", systemImage: "macwindow")
-                        .font(.system(size: 11, weight: .medium))
-                        .foregroundColor(.green)
+                    Label("Open", systemImage: "macwindow")
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.85))
+                }
+                .buttonStyle(.plain)
+                
+                Spacer()
+                
+                Button(action: {
+                    SettingsWindowManager.shared.showSettings()
+                }) {
+                    Label("Settings", systemImage: "gearshape")
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.65))
                 }
                 .buttonStyle(.plain)
                 
@@ -330,15 +217,34 @@ struct MenuBarView: View {
                     NSApplication.shared.terminate(nil)
                 }) {
                     Text("Quit")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.45))
                 }
                 .buttonStyle(.plain)
             }
-            .padding(.horizontal, 14)
-            .padding(.bottom, 12)
+            .padding(.horizontal, 2)
         }
-        .frame(width: 360)
+        .padding(14)
+        .frame(width: 312)
+        .background(bgColor)
+        .preferredColorScheme(.dark)
+        .onAppear {
+            helperInstalled = PrivilegeManager.shared.isHelperInstalled()
+            refreshHardwareMonitors()
+        }
+    }
+    
+    private func miniStat(icon: String, value: String, tint: Color) -> some View {
+        HStack(spacing: 5) {
+            Image(systemName: icon)
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundColor(tint)
+            Text(value)
+                .font(.system(size: 11.5, weight: .semibold))
+                .foregroundColor(.white)
+                .lineLimit(1)
+        }
+        .frame(maxWidth: .infinity)
     }
     
     private func presetShortTitle(_ preset: SessionPreset) -> String {
@@ -353,7 +259,7 @@ struct MenuBarView: View {
     
     private func thermalShortTitle(_ state: ProcessInfo.ThermalState) -> String {
         switch state {
-        case .nominal: return "Nominal"
+        case .nominal: return "Cool"
         case .fair: return "Fair"
         case .serious: return "Warm"
         case .critical: return "Hot"
@@ -363,19 +269,12 @@ struct MenuBarView: View {
     
     private func refreshHardwareMonitors() {
         isRefreshingHardware = true
-        hardwareRefreshedJustNow = false
-        
         DispatchQueue.global(qos: .userInitiated).async {
             self.powerManager.clamshell.updateLidState()
             self.powerManager.battery.updateBatteryState()
             self.powerManager.thermal.updateThermalState()
-            
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 self.isRefreshingHardware = false
-                self.hardwareRefreshedJustNow = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    self.hardwareRefreshedJustNow = false
-                }
             }
         }
     }
@@ -393,35 +292,5 @@ struct MenuBarView: View {
                 }
             }
         }
-    }
-}
-
-// Reusable Telemetry Card
-struct TelemetryCard: View {
-    let icon: String
-    let title: String
-    let value: String
-    let color: Color
-    
-    var body: some View {
-        VStack(spacing: 4) {
-            HStack(spacing: 4) {
-                Image(systemName: icon)
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(color)
-                Text(title)
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(.secondary)
-            }
-            Text(value)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundColor(.primary)
-                .lineLimit(1)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
-        .padding(.horizontal, 4)
-        .background(Color.secondary.opacity(0.08))
-        .cornerRadius(8)
     }
 }

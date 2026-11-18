@@ -49,9 +49,9 @@ public struct OnboardingView: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 32)
+            .padding(.horizontal, 24)
         }
-        .frame(width: 580, height: 620)
+        .frame(width: 480, height: 560)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
         }
@@ -59,10 +59,10 @@ public struct OnboardingView: View {
     
     // MARK: - Step 1: Welcome Screen
     private var welcomeStepView: some View {
-        VStack(spacing: 20) {
+        VStack(spacing: 16) {
             // 3D Animated Vigilant Eye with Eyeballs Scanning Left to Right
-            AnimatedEyeView(size: 110, isAwake: true, isScanning: true)
-                .padding(.bottom, 6)
+            AnimatedEyeView(size: 86, isAwake: true, isScanning: true)
+                .padding(.bottom, 2)
             
             VStack(spacing: 8) {
                 Text("OpenLid")

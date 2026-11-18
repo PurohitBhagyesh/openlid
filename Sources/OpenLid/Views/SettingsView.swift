@@ -7,316 +7,314 @@ struct SettingsView: View {
     var onDismiss: (() -> Void)? = nil
     
     @ObservedObject var powerManager = PowerManager.shared
+    @ObservedObject var preferences = AppPreferences.shared
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
-    @State private var helperStatusMessage: String? = nil
+    @State private var statusBanner: String? = nil
     @State private var isProcessingHelper: Bool = false
-    @State private var copiedEmail: Bool = false
+    
+    private let bgColor = Color(red: 0.047, green: 0.055, blue: 0.071)
+    private let cardBg = Color.white.opacity(0.035)
+    private let cardBorder = Color.white.opacity(0.075)
+    private let emerald = Color(red: 0.063, green: 0.725, blue: 0.506)
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Header Bar
-            HStack(alignment: .center) {
-                HStack(spacing: 8) {
-                    Image(systemName: "eye.fill")
-                        .font(.system(size: 16, weight: .bold))
-                        .foregroundColor(.green)
-                    Text("OpenLid Settings")
-                        .font(.system(size: 15, weight: .bold))
-                    Text("v1.0.0")
-                        .font(.system(size: 10, weight: .medium, design: .monospaced))
-                        .padding(.horizontal, 6)
-                        .padding(.vertical, 2)
-                        .background(Color.secondary.opacity(0.12))
-                        .cornerRadius(4)
-                }
-                
-                Spacer()
-                
-                Button(action: {
-                    if let onDismiss = onDismiss {
-                        onDismiss()
-                    } else {
-                        dismiss()
-                        SettingsWindowManager.shared.closeSettings()
-                    }
-                }) {
-                    Text("Done")
-                        .font(.system(size: 12, weight: .semibold))
-                }
-                .buttonStyle(.borderedProminent)
-                .controlSize(.regular)
-                .keyboardShortcut(.defaultAction)
-            }
-            .padding(.horizontal, 18)
-            .padding(.top, 14)
-            .padding(.bottom, 10)
+        ZStack {
+            bgColor.ignoresSafeArea()
             
-            Divider()
-            
-            // Settings Form
-            Form {
-                Section(header: Text("App Presentation Mode").font(.headline)) {
-                    Picker("Run OpenLid in:", selection: Binding(
-                        get: { AppPreferences.shared.presentationMode },
-                        set: { AppPreferences.shared.presentationMode = $0 }
-                    )) {
-                        ForEach(AppPresentationMode.allCases) { mode in
-                            Text(mode.title).tag(mode)
-                        }
-                    }
-                    .pickerStyle(.radioGroup)
-                    
-                    Text(AppPreferences.shared.presentationMode.subtitle)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                    
-                    HStack(spacing: 16) {
-                        Button("Open Main App Window ↗") {
-                            MainWindowManager.shared.showMainWindow()
-                        }
-                        .buttonStyle(.link)
-                        
-                        Button("Tutorial & Permissions ↗") {
-                            AppPreferences.shared.resetOnboarding()
-                            MainWindowManager.shared.showMainWindow()
-                        }
-                        .buttonStyle(.link)
-                    }
-                    .padding(.top, 4)
-                }
-                
-                Section(header: Text("Startup & Login Behavior").font(.headline)) {
-                    Toggle("Launch OpenLid at Login", isOn: Binding(
-                        get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
-                        set: { newValue in
-                            try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: newValue)
-                        }
-                    ))
-                    
-                    Toggle("Auto-Awake on Login", isOn: Binding(
-                        get: { LaunchAtLoginManager.shared.awakeOnLogin },
-                        set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
-                    ))
-                    Text("When enabled, OpenLid automatically awakens your Mac in closed-lid mode as soon as you log in.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                
-                Section(header: Text("Application Location").font(.headline)) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(ApplicationMover.isInstalledInApplications() ? "Applications Folder" : "Outside Applications Folder")
-                                .fontWeight(.medium)
-                            Text(ApplicationMover.isInstalledInApplications() ? "OpenLid is correctly installed in your Applications directory." : "Move OpenLid to /Applications for optimal performance and system persistence.")
-                                .font(.caption)
-                                .foregroundColor(.secondary)
-                        }
-                        Spacer()
-                        if !ApplicationMover.isInstalledInApplications() {
-                            Button("Move to Applications") {
-                                MoveToApplicationsWindowManager.shared.showPrompt(force: true)
-                            }
-                            .buttonStyle(.borderedProminent)
-                            .controlSize(.small)
+            VStack(spacing: 0) {
+                // Single unified header aligned with traffic lights
+                HStack {
+                    Spacer().frame(width: 66)
+                    Text("Settings")
+                        .font(.system(size: 13.5, weight: .semibold))
+                        .foregroundColor(.white)
+                    Spacer()
+                    Button(action: {
+                        if let onDismiss = onDismiss {
+                            onDismiss()
                         } else {
-                            Image(systemName: "checkmark.circle.fill")
-                                .foregroundColor(.green)
+                            dismiss()
+                            SettingsWindowManager.shared.closeSettings()
                         }
+                    }) {
+                        Text("Done")
+                            .font(.system(size: 11.5, weight: .semibold))
+                            .foregroundColor(.black)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 5)
+                            .background(emerald)
+                            .cornerRadius(6)
                     }
+                    .buttonStyle(.plain)
+                    .keyboardShortcut(.defaultAction)
                 }
+                .padding(.horizontal, 18)
+                .padding(.top, 12)
+                .padding(.bottom, 12)
                 
-                Section(header: Text("Thermal Safety Guard").font(.headline)) {
-                    Toggle("Thermal Overheating Guard", isOn: Binding(
-                        get: { powerManager.thermal.thermalProtectionEnabled },
-                        set: { powerManager.thermal.thermalProtectionEnabled = $0 }
-                    ))
-                    Text("Disables sleep prevention immediately if CPU or chassis temperatures hit dangerous levels.")
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
+                Divider().background(Color.white.opacity(0.06))
                 
-                Section(header: Text("Privileges & Quick Toggle").font(.headline)) {
-                    VStack(alignment: .leading, spacing: 8) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Instant Toggle Helper")
-                                    .fontWeight(.medium)
-                                Text(helperInstalled ? "Installed (Passwordless instant toggling enabled)" : "Not installed (macOS prompts for admin password each toggle)")
-                                    .font(.caption)
-                                    .foregroundColor(helperInstalled ? .green : .orange)
-                            }
-                            Spacer()
-                            if isProcessingHelper {
-                                ProgressView()
-                                    .scaleEffect(0.7)
-                            } else {
-                                Button(helperInstalled ? "Uninstall Helper" : "Install Helper") {
-                                    toggleHelper()
+                ScrollView(showsIndicators: false) {
+                    VStack(spacing: 16) {
+                        // Mode
+                        VStack(alignment: .leading, spacing: 8) {
+                            sectionLabel("APPEARANCE")
+                            HStack(spacing: 6) {
+                                ForEach(AppPresentationMode.allCases) { mode in
+                                    let active = preferences.presentationMode == mode
+                                    Button(action: { preferences.presentationMode = mode }) {
+                                        Text(shortModeTitle(mode))
+                                            .font(.system(size: 12, weight: active ? .semibold : .medium))
+                                            .frame(maxWidth: .infinity)
+                                            .padding(.vertical, 8)
+                                            .background(active ? emerald : Color.white.opacity(0.04))
+                                            .foregroundColor(active ? .black : Color.white.opacity(0.75))
+                                            .cornerRadius(8)
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .stroke(active ? Color.clear : cardBorder, lineWidth: 1)
+                                            )
+                                    }
+                                    .buttonStyle(.plain)
                                 }
                             }
                         }
                         
-                        if let msg = helperStatusMessage {
+                        // Behavior
+                        VStack(alignment: .leading, spacing: 8) {
+                            sectionLabel("BEHAVIOR")
+                            VStack(spacing: 0) {
+                                toggleRow(
+                                    title: "Launch at Login",
+                                    subtitle: "Start OpenLid automatically when you sign in",
+                                    isOn: Binding(
+                                        get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
+                                        set: { try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: $0) }
+                                    )
+                                )
+                                rowDivider
+                                toggleRow(
+                                    title: "Auto-Awake on Login",
+                                    subtitle: "Enable closed-lid wake mode right at startup",
+                                    isOn: Binding(
+                                        get: { LaunchAtLoginManager.shared.awakeOnLogin },
+                                        set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
+                                    )
+                                )
+                                rowDivider
+                                toggleRow(
+                                    title: "Thermal Protection",
+                                    subtitle: "Restore sleep automatically on critical temperatures",
+                                    isOn: Binding(
+                                        get: { powerManager.thermal.thermalProtectionEnabled },
+                                        set: { powerManager.thermal.thermalProtectionEnabled = $0 }
+                                    )
+                                )
+                            }
+                            .background(cardBg)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(cardBorder, lineWidth: 1))
+                        }
+                        
+                        // System
+                        VStack(alignment: .leading, spacing: 8) {
+                            sectionLabel("SYSTEM")
+                            VStack(spacing: 0) {
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Instant Toggle Helper")
+                                            .font(.system(size: 12.5, weight: .medium))
+                                            .foregroundColor(.white)
+                                        Text(helperInstalled ? "Active — no password prompts" : "Authorize once for instant toggling")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(Color.white.opacity(0.48))
+                                    }
+                                    Spacer()
+                                    Button(action: toggleHelper) {
+                                        Text(isProcessingHelper ? "Working..." : (helperInstalled ? "Remove" : "Enable"))
+                                            .font(.system(size: 11.5, weight: .semibold))
+                                            .foregroundColor(helperInstalled ? Color.white.opacity(0.85) : .black)
+                                            .padding(.horizontal, 11)
+                                            .padding(.vertical, 5)
+                                            .background(helperInstalled ? Color.white.opacity(0.08) : emerald)
+                                            .cornerRadius(6)
+                                    }
+                                    .buttonStyle(.plain)
+                                    .disabled(isProcessingHelper)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 11)
+                                
+                                rowDivider
+                                
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Applications Folder")
+                                            .font(.system(size: 12.5, weight: .medium))
+                                            .foregroundColor(.white)
+                                        Text(ApplicationMover.isInstalledInApplications() ? "Installed in /Applications" : "Running from \(ApplicationMover.currentLocationDescription())")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(Color.white.opacity(0.48))
+                                    }
+                                    Spacer()
+                                    if ApplicationMover.isInstalledInApplications() {
+                                        HStack(spacing: 4) {
+                                            Image(systemName: "checkmark.circle.fill")
+                                                .font(.system(size: 12))
+                                            Text("Installed")
+                                                .font(.system(size: 11.5, weight: .medium))
+                                        }
+                                        .foregroundColor(emerald)
+                                    } else {
+                                        Button("Move") {
+                                            MoveToApplicationsWindowManager.shared.showPrompt(force: true)
+                                        }
+                                        .font(.system(size: 11.5, weight: .semibold))
+                                        .foregroundColor(.black)
+                                        .padding(.horizontal, 11)
+                                        .padding(.vertical, 5)
+                                        .background(emerald)
+                                        .cornerRadius(6)
+                                        .buttonStyle(.plain)
+                                    }
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 11)
+                                
+                                rowDivider
+                                
+                                HStack {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text("Welcome Guide")
+                                            .font(.system(size: 12.5, weight: .medium))
+                                            .foregroundColor(.white)
+                                        Text("Re-open onboarding & permissions setup")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(Color.white.opacity(0.48))
+                                    }
+                                    Spacer()
+                                    Button("Open") {
+                                        AppPreferences.shared.resetOnboarding()
+                                        MainWindowManager.shared.showMainWindow()
+                                    }
+                                    .font(.system(size: 11.5, weight: .semibold))
+                                    .foregroundColor(Color.white.opacity(0.85))
+                                    .padding(.horizontal, 11)
+                                    .padding(.vertical, 5)
+                                    .background(Color.white.opacity(0.08))
+                                    .cornerRadius(6)
+                                    .buttonStyle(.plain)
+                                }
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 11)
+                            }
+                            .background(cardBg)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(cardBorder, lineWidth: 1))
+                        }
+                        
+                        if let msg = statusBanner {
                             Text(msg)
-                                .font(.caption)
-                                .foregroundColor(.secondary)
+                                .font(.system(size: 11.5))
+                                .foregroundColor(emerald)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
+                        
+                        HStack(spacing: 14) {
+                            Text("v1.0.0")
+                                .font(.system(size: 11, design: .monospaced))
+                                .foregroundColor(Color.white.opacity(0.35))
+                            Spacer()
+                            Link("Website", destination: URL(string: "https://openlid.devs.li")!)
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.55))
+                            Link("GitHub", destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!)
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.55))
+                            Link("Report Issue", destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20(macOS)")!)
+                                .font(.system(size: 11.5, weight: .medium))
+                                .foregroundColor(emerald)
+                        }
+                        .padding(.top, 4)
                     }
-                }
-
-                // Support & Resources Section
-                Section(header: Text("Support & Community").font(.headline)) {
-                    VStack(alignment: .leading, spacing: 10) {
-                        // GitHub Link Option
-                        Link(destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!) {
-                            ContactOptionRow(
-                                iconName: "chevron.left.forwardslash.chevron.right",
-                                iconColor: .primary,
-                                iconBg: Color.primary.opacity(0.08),
-                                title: "GitHub Repository",
-                                detail: "Report bugs, star project, or view source code",
-                                actionBadge: "GitHub"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        // Website Link Option
-                        Link(destination: URL(string: "https://openlid.devs.li")!) {
-                            ContactOptionRow(
-                                iconName: "globe",
-                                iconColor: .blue,
-                                iconBg: Color.blue.opacity(0.12),
-                                title: "Official Website",
-                                detail: "Documentation, web preview & downloads",
-                                actionBadge: "Website"
-                            )
-                        }
-                        .buttonStyle(.plain)
-
-                        // Report a Problem / Email Option
-                        Link(destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Problem%20Report&body=Hi,%0D%0A%0D%0AI%20would%20like%20to%20report%20a%20problem%20with%20OpenLid:%0D%0A-%20Device:%20MacBook%0D%0A-%20macOS%20Version:%0D%0A-%20Description:%20%0D%0A")!) {
-                            ContactOptionRow(
-                                iconName: "envelope.fill",
-                                iconColor: .green,
-                                iconBg: Color.green.opacity(0.12),
-                                title: "Report a Problem",
-                                detail: "Send crash logs, hardware specs & issue reports",
-                                actionBadge: "Email"
-                            )
-                        }
-                        .buttonStyle(.plain)
-                    }
-                    .padding(.vertical, 4)
-                }
-                
-                Section(header: Text("Hardware Guidelines").font(.headline)) {
-                    VStack(alignment: .leading, spacing: 6) {
-                        Label("Airflow Warning", systemImage: "exclamationmark.triangle.fill")
-                            .foregroundColor(.orange)
-                            .font(.subheadline.bold())
-                        Text("MacBooks dissipate heat partially through the keyboard and hinge assembly. Never leave your Mac running with the lid closed inside a tightly zipped backpack, sleeve, or enclosed container.")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.vertical, 4)
+                    .padding(20)
                 }
             }
-            .formStyle(.grouped)
         }
-        .frame(width: 560, height: 680)
+        .frame(width: 460, height: 540)
+        .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
         }
     }
     
+    private func sectionLabel(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            .tracking(0.8)
+            .foregroundColor(Color.white.opacity(0.40))
+    }
+    
+    private var rowDivider: some View {
+        Divider()
+            .background(Color.white.opacity(0.06))
+            .padding(.leading, 14)
+    }
+    
+    private func toggleRow(title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundColor(.white)
+                Text(subtitle)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.48))
+            }
+            Spacer()
+            Toggle("", isOn: isOn)
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .labelsHidden()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+    
+    private func shortModeTitle(_ mode: AppPresentationMode) -> String {
+        switch mode {
+        case .menuBarOnly: return "Menu Bar"
+        case .windowedApp: return "Window"
+        case .both: return "Both"
+        }
+    }
+    
     private func toggleHelper() {
         isProcessingHelper = true
-        helperStatusMessage = nil
+        statusBanner = nil
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 if helperInstalled {
                     try PrivilegeManager.shared.uninstallHelper()
                     DispatchQueue.main.async {
                         self.helperInstalled = false
-                        self.helperStatusMessage = "Helper uninstalled successfully."
+                        self.statusBanner = "Instant toggle helper removed."
                         self.isProcessingHelper = false
                     }
                 } else {
                     try PrivilegeManager.shared.installHelper()
                     DispatchQueue.main.async {
                         self.helperInstalled = true
-                        self.helperStatusMessage = "Helper installed! Toggles will now be instantaneous."
+                        self.statusBanner = "Instant toggle helper enabled."
                         self.isProcessingHelper = false
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.helperStatusMessage = "Failed: \(error.localizedDescription)"
+                    self.statusBanner = error.localizedDescription
                     self.isProcessingHelper = false
                 }
             }
         }
-    }
-}
-
-// Reusable, spacious Contact Option Row
-struct ContactOptionRow: View {
-    let iconName: String
-    let iconColor: Color
-    let iconBg: Color
-    let title: String
-    let detail: String
-    let actionBadge: String
-    
-    @State private var isHovered: Bool = false
-    
-    var body: some View {
-        HStack(spacing: 12) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(iconBg)
-                    .frame(width: 32, height: 32)
-                Image(systemName: iconName)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(iconColor)
-            }
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(.primary)
-                Text(detail)
-                    .font(.system(size: 11, design: .monospaced))
-                    .foregroundColor(.secondary)
-                    .lineLimit(1)
-            }
-            
-            Spacer()
-            
-            HStack(spacing: 4) {
-                Text(actionBadge)
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(.secondary)
-                Image(systemName: "arrow.up.right")
-                    .font(.system(size: 10, weight: .bold))
-                    .foregroundColor(.secondary)
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(Color.secondary.opacity(isHovered ? 0.16 : 0.08))
-            .cornerRadius(6)
-        }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 8)
-        .background(Color.secondary.opacity(isHovered ? 0.08 : 0.03))
-        .cornerRadius(10)
-        .overlay(
-            RoundedRectangle(cornerRadius: 10)
-                .stroke(isHovered ? Color.green.opacity(0.4) : Color.secondary.opacity(0.1), lineWidth: 1)
-        )
-        .onHover { hovering in
-            isHovered = hovering
-        }
-        .contentShape(Rectangle())
     }
 }

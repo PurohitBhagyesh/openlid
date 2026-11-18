@@ -4,34 +4,25 @@ import OpenLidCore
 public struct MainWindowView: View {
     @ObservedObject var powerManager = PowerManager.shared
     @ObservedObject var preferences = AppPreferences.shared
-    @State private var selectedTab: MainTab = .dashboard
-    @State private var selectedPreset: SessionPreset = .indefinite
+    @State private var selectedTab: MainTab = .overview
     @State private var showOnboarding: Bool = false
     
-    // Controls Tab states
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     @State private var isProcessingHelper: Bool = false
-    @State private var helperMessage: String? = nil
+    @State private var statusBanner: String? = nil
     @State private var isRefreshingHardware: Bool = false
-    @State private var hardwareRefreshedJustNow: Bool = false
     @State private var isResettingAssertions: Bool = false
-    @State private var resetMessage: String? = nil
     
     public enum MainTab: String, CaseIterable, Identifiable {
-        case dashboard = "Dashboard"
-        case controls = "Controls"
+        case overview = "Overview"
         case settings = "Settings"
-        
         public var id: String { rawValue }
-        
-        public var icon: String {
-            switch self {
-            case .dashboard: return "waveform.path.ecg"
-            case .controls: return "wrench.and.screwdriver"
-            case .settings: return "gearshape"
-            }
-        }
     }
+    
+    private let bgColor = Color(red: 0.047, green: 0.055, blue: 0.071)
+    private let cardBg = Color.white.opacity(0.035)
+    private let cardBorder = Color.white.opacity(0.075)
+    private let emerald = Color(red: 0.063, green: 0.725, blue: 0.506)
     
     public init() {}
     
@@ -41,13 +32,14 @@ public struct MainWindowView: View {
                 OnboardingView(onComplete: {
                     preferences.hasCompletedOnboarding = true
                     showOnboarding = false
-                    selectedTab = .dashboard
+                    selectedTab = .overview
                 })
             } else {
                 mainAppContent
             }
         }
-        .frame(width: 580, height: 680)
+        .frame(width: 480, height: 560)
+        .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
             refreshHardwareMonitors()
@@ -55,462 +47,630 @@ public struct MainWindowView: View {
     }
     
     private var mainAppContent: some View {
-        VStack(spacing: 0) {
-            // App Navigation Header
-            HStack(spacing: 12) {
-                HStack(spacing: 8) {
-                    AnimatedEyeView(size: 28, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
+        ZStack {
+            bgColor.ignoresSafeArea()
+            
+            // Subtle ambient radial glow when active
+            RadialGradient(
+                gradient: Gradient(colors: [
+                    emerald.opacity(powerManager.isEnabled ? 0.14 : 0.0),
+                    Color.clear
+                ]),
+                center: .top,
+                startRadius: 10,
+                endRadius: 300
+            )
+            .ignoresSafeArea()
+            .animation(.easeInOut(duration: 0.45), value: powerManager.isEnabled)
+            
+            VStack(spacing: 0) {
+                // Single unified top bar aligned with window traffic lights
+                HStack(spacing: 10) {
+                    Spacer().frame(width: 66)
                     
-                    VStack(alignment: .leading, spacing: 1) {
-                        HStack(spacing: 6) {
-                            Text("OpenLid")
-                                .font(.system(size: 15, weight: .bold))
-                            Text("v1.0.0")
-                                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                                .padding(.horizontal, 5)
-                                .padding(.vertical, 2)
-                                .background(Color.secondary.opacity(0.15))
-                                .cornerRadius(4)
+                    HStack(spacing: 7) {
+                        Circle()
+                            .fill(powerManager.isEnabled ? emerald : Color.white.opacity(0.25))
+                            .frame(width: 7, height: 7)
+                        Text("OpenLid")
+                            .font(.system(size: 13.5, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    
+                    Spacer()
+                    
+                    // Minimal pill tab switcher
+                    HStack(spacing: 2) {
+                        ForEach(MainTab.allCases) { tab in
+                            Button(action: {
+                                withAnimation(.easeInOut(duration: 0.18)) {
+                                    selectedTab = tab
+                                }
+                            }) {
+                                Text(tab.rawValue)
+                                    .font(.system(size: 11.5, weight: selectedTab == tab ? .semibold : .medium))
+                                    .foregroundColor(selectedTab == tab ? .white : Color.white.opacity(0.55))
+                                    .padding(.horizontal, 12)
+                                    .padding(.vertical, 5)
+                                    .background(selectedTab == tab ? Color.white.opacity(0.11) : Color.clear)
+                                    .cornerRadius(6)
+                            }
+                            .buttonStyle(.plain)
                         }
-                        Text(powerManager.isEnabled ? "Awake & Vigilant (Clamshell Override)" : "Normal Sleep Allowed")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
                     }
+                    .padding(3)
+                    .background(Color.white.opacity(0.04))
+                    .cornerRadius(8)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(cardBorder, lineWidth: 1)
+                    )
                 }
+                .padding(.horizontal, 18)
+                .padding(.top, 12)
+                .padding(.bottom, 12)
                 
-                Spacer()
+                Divider().background(Color.white.opacity(0.06))
                 
-                // Tabs Picker
-                Picker("", selection: $selectedTab) {
-                    ForEach(MainTab.allCases) { tab in
-                        Label(tab.rawValue, systemImage: tab.icon).tag(tab)
-                    }
+                if selectedTab == .overview {
+                    overviewTab
+                } else {
+                    settingsTab
                 }
-                .pickerStyle(.segmented)
-                .frame(width: 260)
-            }
-            .padding(.horizontal, 20)
-            .padding(.vertical, 14)
-            .background(Color(NSColor.windowBackgroundColor))
-            
-            Divider()
-            
-            // Tab Content
-            ScrollView {
-                VStack(spacing: 16) {
-                    switch selectedTab {
-                    case .dashboard:
-                        dashboardView
-                    case .controls:
-                        controlsView
-                    case .settings:
-                        settingsEmbeddedView
-                    }
-                }
-                .padding(20)
             }
         }
-        .background(Color(NSColor.underPageBackgroundColor).opacity(0.5))
     }
     
-    // MARK: - Dashboard Tab (Timer runs exclusively in Menu Bar Taskbar)
-    private var dashboardView: some View {
+    // MARK: - Overview Tab
+    private var overviewTab: some View {
         VStack(spacing: 16) {
+            // Optional slim relocation pill
             if !ApplicationMover.isInstalledInApplications() && !ApplicationMover.isDevOrBuildEnvironment() {
-                HStack(spacing: 12) {
-                    ZStack {
-                        RoundedRectangle(cornerRadius: 9)
-                            .fill(Color.green.opacity(0.16))
-                            .frame(width: 34, height: 34)
-                        Image(systemName: "folder.badge.plus")
-                            .font(.system(size: 15, weight: .semibold))
-                            .foregroundColor(.green)
-                    }
-                    
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Running from \(ApplicationMover.currentLocationDescription())")
-                            .font(.system(size: 12.5, weight: .bold))
-                            .foregroundColor(.primary)
-                        Text("Move OpenLid to /Applications for reliable Launch at Login & updates.")
-                            .font(.system(size: 11))
-                            .foregroundColor(.secondary)
-                    }
-                    
+                HStack(spacing: 10) {
+                    Image(systemName: "folder.badge.plus")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(emerald)
+                    Text("Running from \(ApplicationMover.currentLocationDescription())")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.85))
                     Spacer()
-                    
-                    Button(action: {
+                    Button("Move to Applications") {
                         MoveToApplicationsWindowManager.shared.showPrompt(force: true)
-                    }) {
-                        Text("Move to Applications")
-                            .font(.system(size: 11.5, weight: .bold))
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 6)
-                            .background(Color.green)
-                            .cornerRadius(7)
                     }
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundColor(.black)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(emerald)
+                    .cornerRadius(6)
                     .buttonStyle(.plain)
                 }
-                .padding(12)
-                .background(Color.green.opacity(0.08))
-                .cornerRadius(12)
+                .padding(.horizontal, 12)
+                .padding(.vertical, 9)
+                .background(emerald.opacity(0.08))
+                .cornerRadius(10)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.green.opacity(0.28), lineWidth: 1)
+                    RoundedRectangle(cornerRadius: 10)
+                        .stroke(emerald.opacity(0.24), lineWidth: 1)
                 )
             }
             
-            // Hero Toggle Card
-            Button(action: {
-                powerManager.toggle(preset: selectedPreset)
-            }) {
-                HStack(spacing: 18) {
-                    AnimatedEyeView(size: 64, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
-                        .padding(.vertical, 4)
+            // Clean Hero Focus Card
+            VStack(spacing: 16) {
+                AnimatedEyeView(size: 72, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
+                    .padding(.top, 6)
+                
+                VStack(spacing: 5) {
+                    Text(powerManager.isEnabled ? "Mac is Awake" : "Normal Sleep")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
                     
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 8) {
-                            Text(powerManager.isEnabled ? "Mac is Awake (Eye Vigilant)" : "Keep Awake with Lid Closed")
-                                .font(.system(size: 16, weight: .bold))
-                                .foregroundColor(.primary)
-                            
-                            Text(powerManager.isEnabled ? "AWAKE" : "ASLEEP")
-                                .font(.system(size: 10, weight: .heavy))
-                                .padding(.horizontal, 8)
-                                .padding(.vertical, 3)
-                                .background(powerManager.isEnabled ? Color.green.opacity(0.2) : Color.secondary.opacity(0.15))
-                                .foregroundColor(powerManager.isEnabled ? .green : .secondary)
-                                .clipShape(Capsule())
-                        }
-                        
-                        Text(powerManager.isEnabled ? "Mac continues running even if lid is closed. Display sleeps naturally." : "Click to enable clamshell sleep bypass mode.")
-                            .font(.system(size: 12))
-                            .foregroundColor(.secondary)
-                            .lineLimit(2)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: powerManager.isEnabled ? "power.circle.fill" : "power.circle")
-                        .font(.system(size: 32))
-                        .foregroundColor(powerManager.isEnabled ? .green : .secondary)
-                }
-                .padding(18)
-                .background(powerManager.isEnabled ? Color.green.opacity(0.08) : Color.secondary.opacity(0.06))
-                .cornerRadius(12)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(powerManager.isEnabled ? Color.green.opacity(0.35) : Color.secondary.opacity(0.12), lineWidth: 1.5)
-                )
-            }
-            .buttonStyle(.plain)
-            
-            // Session Duration Presets
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Session Duration")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.secondary)
-                    Spacer()
-                    Text("Managed via Menu Bar Icon")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
+                    Text(powerManager.isEnabled ? "Stays running cleanly when the lid closes." : "Sleep prevention is off. Lid closes normally.")
+                        .font(.system(size: 12.5))
+                        .foregroundColor(Color.white.opacity(0.55))
                 }
                 
-                HStack(spacing: 8) {
-                    ForEach(SessionPreset.allCases) { preset in
-                        Button(action: {
-                            selectedPreset = preset
-                            if powerManager.isEnabled {
-                                powerManager.timer.start(preset: preset)
+                // Live session timer badge when active
+                if powerManager.isEnabled {
+                    HStack(spacing: 8) {
+                        if powerManager.timer.isTimerRunning {
+                            Image(systemName: "timer")
+                                .font(.system(size: 11, weight: .semibold))
+                                .foregroundColor(.orange)
+                            Text(powerManager.timer.formattedRemainingTime)
+                                .font(.system(size: 12.5, weight: .bold, design: .monospaced))
+                                .foregroundColor(.orange)
+                            Button("Clear") {
+                                powerManager.selectPreset(.indefinite)
                             }
+                            .font(.system(size: 10.5, weight: .semibold))
+                            .foregroundColor(Color.white.opacity(0.65))
+                            .buttonStyle(.plain)
+                        } else {
+                            Circle()
+                                .fill(emerald)
+                                .frame(width: 6, height: 6)
+                            Text(powerManager.timer.formattedElapsedTime)
+                                .font(.system(size: 12.5, weight: .semibold, design: .monospaced))
+                                .foregroundColor(Color(red: 0.45, green: 0.90, blue: 0.72))
+                            Text("• Always")
+                                .font(.system(size: 11, weight: .medium))
+                                .foregroundColor(Color.white.opacity(0.45))
+                        }
+                    }
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 5)
+                    .background(Color.white.opacity(0.05))
+                    .clipShape(Capsule())
+                    .overlay(
+                        Capsule().stroke(Color.white.opacity(0.08), lineWidth: 1)
+                    )
+                }
+                
+                // Primary Tactile Toggle Button
+                Button(action: {
+                    powerManager.toggle(preset: powerManager.selectedPreset)
+                }) {
+                    HStack(spacing: 8) {
+                        if powerManager.isBusy {
+                            ProgressView()
+                                .scaleEffect(0.6)
+                                .colorInvert()
+                            Text("Updating...")
+                                .font(.system(size: 13.5, weight: .semibold))
+                        } else {
+                            Image(systemName: powerManager.isEnabled ? "moon.zzz.fill" : "bolt.fill")
+                                .font(.system(size: 13, weight: .semibold))
+                            Text(powerManager.isEnabled ? "Restore Normal Sleep" : "Keep Awake")
+                                .font(.system(size: 13.5, weight: .bold))
+                        }
+                    }
+                    .foregroundColor(powerManager.isEnabled ? .white : .black)
+                    .frame(maxWidth: 220)
+                    .padding(.vertical, 10)
+                    .background(
+                        powerManager.isEnabled
+                            ? Color.white.opacity(0.10)
+                            : emerald
+                    )
+                    .cornerRadius(9)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 9)
+                            .stroke(powerManager.isEnabled ? Color.white.opacity(0.14) : Color.clear, lineWidth: 1)
+                    )
+                }
+                .buttonStyle(.plain)
+                .disabled(powerManager.isBusy)
+                .padding(.top, 2)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 24)
+            .padding(.horizontal, 20)
+            .background(cardBg)
+            .cornerRadius(14)
+            .overlay(
+                RoundedRectangle(cornerRadius: 14)
+                    .stroke(powerManager.isEnabled ? emerald.opacity(0.28) : cardBorder, lineWidth: 1)
+            )
+            
+            // Compact Session Duration Bar
+            VStack(alignment: .leading, spacing: 8) {
+                Text("DURATION")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .tracking(0.8)
+                    .foregroundColor(Color.white.opacity(0.40))
+                
+                HStack(spacing: 6) {
+                    ForEach(SessionPreset.allCases) { preset in
+                        let selected = powerManager.selectedPreset == preset
+                        Button(action: {
+                            powerManager.selectPreset(preset)
                         }) {
-                            Text(preset.title)
-                                .font(.system(size: 12, weight: selectedPreset == preset ? .bold : .medium))
-                                .lineLimit(1)
-                                .minimumScaleFactor(0.85)
+                            Text(shortLabel(preset))
+                                .font(.system(size: 12, weight: selected ? .bold : .medium))
                                 .frame(maxWidth: .infinity)
                                 .padding(.vertical, 8)
-                                .background(selectedPreset == preset ? Color.green : Color.secondary.opacity(0.1))
-                                .foregroundColor(selectedPreset == preset ? .black : .primary)
+                                .background(selected ? emerald : Color.white.opacity(0.04))
+                                .foregroundColor(selected ? .black : Color.white.opacity(0.78))
                                 .cornerRadius(8)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8)
+                                        .stroke(selected ? Color.clear : cardBorder, lineWidth: 1)
+                                )
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
-            .padding(16)
-            .background(Color.secondary.opacity(0.04))
-            .cornerRadius(10)
             
-            // Telemetry Grid with Hardware Refresh
-            VStack(alignment: .leading, spacing: 10) {
+            // Clean 3-Stat Telemetry Strip
+            VStack(alignment: .leading, spacing: 8) {
                 HStack {
-                    Text("Live System Telemetry")
-                        .font(.system(size: 12, weight: .bold))
-                        .foregroundColor(.secondary)
-                    
+                    Text("TELEMETRY")
+                        .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                        .tracking(0.8)
+                        .foregroundColor(Color.white.opacity(0.40))
                     Spacer()
-                    
                     Button(action: refreshHardwareMonitors) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "arrow.clockwise")
-                                .font(.system(size: 10, weight: .bold))
-                                .rotationEffect(.degrees(isRefreshingHardware ? 360 : 0))
-                                .animation(isRefreshingHardware ? Animation.linear(duration: 0.6).repeatForever(autoreverses: false) : .default, value: isRefreshingHardware)
-                            Text(hardwareRefreshedJustNow ? "Synced Just Now" : "Refresh Hardware")
-                                .font(.system(size: 11, weight: .medium))
-                        }
-                        .foregroundColor(hardwareRefreshedJustNow ? .green : .secondary)
+                        Image(systemName: "arrow.clockwise")
+                            .font(.system(size: 11, weight: .semibold))
+                            .foregroundColor(Color.white.opacity(0.45))
+                            .rotationEffect(.degrees(isRefreshingHardware ? 360 : 0))
+                            .animation(isRefreshingHardware ? .linear(duration: 0.6).repeatForever(autoreverses: false) : .default, value: isRefreshingHardware)
+                    }
+                    .buttonStyle(.plain)
+                    .help("Refresh hardware monitors")
+                }
+                
+                HStack(spacing: 0) {
+                    statColumn(
+                        icon: powerManager.clamshell.isLidClosed ? "laptopcomputer.and.arrow.down" : "laptopcomputer",
+                        label: "Lid",
+                        value: powerManager.clamshell.isLidClosed ? "Closed" : "Open",
+                        tint: powerManager.clamshell.isLidClosed ? .orange : emerald
+                    )
+                    Divider().frame(height: 32).background(Color.white.opacity(0.07))
+                    statColumn(
+                        icon: powerManager.battery.isOnACPower ? "bolt.fill" : "battery.75",
+                        label: powerManager.battery.isOnACPower ? "AC Power" : "Battery",
+                        value: "\(powerManager.battery.batteryPercent)%",
+                        tint: powerManager.battery.batteryPercent < 20 ? .red : emerald
+                    )
+                    Divider().frame(height: 32).background(Color.white.opacity(0.07))
+                    statColumn(
+                        icon: "thermometer.medium",
+                        label: "Thermal",
+                        value: shortThermal(powerManager.thermal.thermalState),
+                        tint: powerManager.thermal.isDangerous ? .red : emerald
+                    )
+                }
+                .padding(.vertical, 12)
+                .background(cardBg)
+                .cornerRadius(12)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(cardBorder, lineWidth: 1)
+                )
+            }
+            
+            // Optional inline error / stop reason notice
+            if let notice = powerManager.lastError ?? powerManager.stopReason {
+                let isErr = powerManager.lastError != nil
+                HStack(spacing: 8) {
+                    Image(systemName: isErr ? "exclamationmark.circle.fill" : "info.circle.fill")
+                        .font(.system(size: 12))
+                        .foregroundColor(isErr ? .red : .orange)
+                    Text(notice)
+                        .font(.system(size: 11.5))
+                        .foregroundColor(Color.white.opacity(0.85))
+                        .lineLimit(2)
+                    Spacer()
+                    Button(action: {
+                        powerManager.lastError = nil
+                        powerManager.stopReason = nil
+                    }) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(Color.white.opacity(0.5))
                     }
                     .buttonStyle(.plain)
                 }
-                
-                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 10) {
-                    telemetryCard(
-                        icon: powerManager.clamshell.isLidClosed ? "laptopcomputer.and.arrow.down" : "laptopcomputer",
-                        title: "Lid State",
-                        value: powerManager.clamshell.isLidClosed ? "Lid Closed" : "Lid Open",
-                        color: powerManager.clamshell.isLidClosed ? .orange : .green
-                    )
-                    
-                    telemetryCard(
-                        icon: powerManager.battery.isCharging ? "bolt.batteryblock.fill" : (powerManager.battery.isOnACPower ? "powerplug.fill" : "battery.100"),
-                        title: "Battery Level",
-                        value: "\(powerManager.battery.batteryPercent)% \(powerManager.battery.isOnACPower ? "(AC Connected)" : "(Battery Power)")",
-                        color: powerManager.battery.batteryPercent < 20 ? .red : .green
-                    )
-                    
-                    telemetryCard(
-                        icon: "thermometer.medium",
-                        title: "Thermal Pressure",
-                        value: powerManager.thermal.stateDescription,
-                        color: powerManager.thermal.thermalState == .critical ? .red : .green
-                    )
-                    
-                    telemetryCard(
-                        icon: helperInstalled ? "bolt.shield.fill" : "lock.badge.clock",
-                        title: "Toggle Helper",
-                        value: helperInstalled ? "Active (Instant)" : "Standard (Prompt)",
-                        color: helperInstalled ? .green : .orange
-                    )
-                }
+                .padding(.horizontal, 12)
+                .padding(.vertical, 8)
+                .background((isErr ? Color.red : Color.orange).opacity(0.10))
+                .cornerRadius(8)
             }
-            .padding(16)
-            .background(Color.secondary.opacity(0.04))
-            .cornerRadius(10)
+            
+            Spacer(minLength: 0)
         }
-    }
-    
-    // MARK: - Controls Tab (Streamlined & Enhanced Battery Threshold)
-    private var controlsView: some View {
-        VStack(spacing: 14) {
-            // Instant Toggle Helper Control
-            actionCard(
-                icon: "bolt.badge.clock",
-                title: "Instant Toggle Helper",
-                desc: helperInstalled ? "Helper is active in /etc/sudoers.d/openlid. Toggles occur instantly with 0ms delay." : "Authorize once via Touch ID / admin password to enable instantaneous toggling without popups.",
-                actionTitle: helperInstalled ? "Uninstall Helper" : "Install Helper"
-            ) {
-                toggleHelper()
-            }
-            
-            if let msg = helperMessage {
-                Text(msg)
-                    .font(.caption)
-                    .foregroundColor(.secondary)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 4)
-            }
-            
-            // Refresh Hardware Monitor Action
-            actionCard(
-                icon: "arrow.clockwise",
-                title: "Refresh Hardware Monitors",
-                desc: "Queries IOKit, AppleClamshellState, and IOPS power source registers immediately.",
-                actionTitle: hardwareRefreshedJustNow ? "Refreshed" : "Sync Now"
-            ) {
-                refreshHardwareMonitors()
-            }
-            
-            // Reset System Power Assertions
-            actionCard(
-                icon: "arrow.counterclockwise.circle",
-                title: "Reset System Power Assertions",
-                desc: "Executes 'pmset -a disablesleep 0' and flushes any stuck or orphaned background sleep assertions.",
-                actionTitle: isResettingAssertions ? "Resetting..." : "Reset to Default"
-            ) {
-                resetSystemAssertions()
-            }
-            
-            if let msg = resetMessage {
-                Text(msg)
-                    .font(.caption)
-                    .foregroundColor(.green)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 4)
-            }
-            
-            // Thermal Overheating Guard
-            HStack(spacing: 14) {
-                Image(systemName: "flame.fill")
-                    .font(.system(size: 18))
-                    .foregroundColor(.red)
-                    .frame(width: 24)
-                
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Thermal Overheating Guard")
-                        .font(.system(size: 13, weight: .bold))
-                    Text("Terminates sleep prevention if CPU/GPU reaches critical thermal pressure")
-                        .font(.system(size: 11))
-                        .foregroundColor(.secondary)
-                }
-                
-                Spacer()
-                
-                Toggle("", isOn: Binding(
-                    get: { powerManager.thermal.thermalProtectionEnabled },
-                    set: { powerManager.thermal.thermalProtectionEnabled = $0 }
-                ))
-                .toggleStyle(.switch)
-                .labelsHidden()
-            }
-            .padding(14)
-            .background(Color.secondary.opacity(0.04))
-            .cornerRadius(10)
-            
-            // Tutorial & Permissions Setup
-            actionCard(
-                icon: "sparkles",
-                title: "Tutorial & Permissions Setup",
-                desc: "Step through the setup guide, system privileges, and presentation preferences.",
-                actionTitle: "Launch Wizard"
-            ) {
-                showOnboarding = true
-            }
-            
-            // CLI Copy
-            actionCard(
-                icon: "terminal.fill",
-                title: "Command-Line Interface (CLI)",
-                desc: "Run 'openlid on --duration 30m', 'openlid off', and 'openlid status' anywhere.",
-                actionTitle: "Copy CLI Command"
-            ) {
-                NSPasteboard.general.clearContents()
-                NSPasteboard.general.setString("openlid status", forType: .string)
-            }
-        }
+        .padding(20)
     }
     
     // MARK: - Settings Tab
-    private var settingsEmbeddedView: some View {
-        SettingsView(onDismiss: {
-            selectedTab = .dashboard
-        })
-    }
-    
-    // MARK: - UI Helpers
-    private func telemetryCard(icon: String, title: String, value: String, color: Color) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(color)
-                .frame(width: 28)
-            
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 11))
-                    .foregroundColor(.secondary)
-                Text(value)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.primary)
+    private var settingsTab: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 16) {
+                // Presentation Mode
+                VStack(alignment: .leading, spacing: 8) {
+                    sectionLabel("APPEARANCE")
+                    HStack(spacing: 6) {
+                        ForEach(AppPresentationMode.allCases) { mode in
+                            let active = preferences.presentationMode == mode
+                            Button(action: { preferences.presentationMode = mode }) {
+                                Text(shortModeTitle(mode))
+                                    .font(.system(size: 12, weight: active ? .semibold : .medium))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 8)
+                                    .background(active ? emerald : Color.white.opacity(0.04))
+                                    .foregroundColor(active ? .black : Color.white.opacity(0.75))
+                                    .cornerRadius(8)
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .stroke(active ? Color.clear : cardBorder, lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+                
+                // Behavior Toggles
+                VStack(alignment: .leading, spacing: 8) {
+                    sectionLabel("BEHAVIOR")
+                    VStack(spacing: 0) {
+                        toggleRow(
+                            title: "Launch at Login",
+                            subtitle: "Start OpenLid automatically when you sign in",
+                            isOn: Binding(
+                                get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
+                                set: { try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: $0) }
+                            )
+                        )
+                        rowDivider
+                        toggleRow(
+                            title: "Auto-Awake on Login",
+                            subtitle: "Enable closed-lid wake mode right at startup",
+                            isOn: Binding(
+                                get: { LaunchAtLoginManager.shared.awakeOnLogin },
+                                set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
+                            )
+                        )
+                        rowDivider
+                        toggleRow(
+                            title: "Thermal Protection",
+                            subtitle: "Restore sleep automatically on critical temperatures",
+                            isOn: Binding(
+                                get: { powerManager.thermal.thermalProtectionEnabled },
+                                set: { powerManager.thermal.thermalProtectionEnabled = $0 }
+                            )
+                        )
+                    }
+                    .background(cardBg)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(cardBorder, lineWidth: 1))
+                }
+                
+                // System Rows
+                VStack(alignment: .leading, spacing: 8) {
+                    sectionLabel("SYSTEM")
+                    VStack(spacing: 0) {
+                        actionRow(
+                            title: "Instant Toggle Helper",
+                            subtitle: helperInstalled ? "Active — no password prompts" : "Authorize once for instant toggling",
+                            buttonTitle: isProcessingHelper ? "Working..." : (helperInstalled ? "Remove" : "Enable"),
+                            accent: !helperInstalled,
+                            disabled: isProcessingHelper,
+                            action: toggleHelper
+                        )
+                        rowDivider
+                        actionRow(
+                            title: "Reset Power Assertions",
+                            subtitle: "Restore default macOS sleep settings",
+                            buttonTitle: isResettingAssertions ? "Resetting..." : "Reset",
+                            accent: false,
+                            disabled: isResettingAssertions,
+                            action: resetSystemAssertions
+                        )
+                        rowDivider
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Applications Folder")
+                                    .font(.system(size: 12.5, weight: .medium))
+                                    .foregroundColor(.white)
+                                Text(ApplicationMover.isInstalledInApplications() ? "Installed in /Applications" : "Running from \(ApplicationMover.currentLocationDescription())")
+                                    .font(.system(size: 11))
+                                    .foregroundColor(Color.white.opacity(0.48))
+                            }
+                            Spacer()
+                            if ApplicationMover.isInstalledInApplications() {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "checkmark.circle.fill")
+                                        .font(.system(size: 12))
+                                    Text("Installed")
+                                        .font(.system(size: 11.5, weight: .medium))
+                                }
+                                .foregroundColor(emerald)
+                            } else {
+                                Button("Move") {
+                                    MoveToApplicationsWindowManager.shared.showPrompt(force: true)
+                                }
+                                .font(.system(size: 11.5, weight: .semibold))
+                                .foregroundColor(.black)
+                                .padding(.horizontal, 11)
+                                .padding(.vertical, 5)
+                                .background(emerald)
+                                .cornerRadius(6)
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .padding(.horizontal, 14)
+                        .padding(.vertical, 11)
+                        rowDivider
+                        actionRow(
+                            title: "Welcome Guide",
+                            subtitle: "Re-open onboarding & permissions setup",
+                            buttonTitle: "Open",
+                            accent: false,
+                            disabled: false,
+                            action: { showOnboarding = true }
+                        )
+                    }
+                    .background(cardBg)
+                    .cornerRadius(12)
+                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(cardBorder, lineWidth: 1))
+                }
+                
+                if let msg = statusBanner {
+                    Text(msg)
+                        .font(.system(size: 11.5))
+                        .foregroundColor(emerald)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                }
+                
+                // Minimal Footer Links
+                HStack(spacing: 14) {
+                    Text("v1.0.0")
+                        .font(.system(size: 11, design: .monospaced))
+                        .foregroundColor(Color.white.opacity(0.35))
+                    Spacer()
+                    Link("Website", destination: URL(string: "https://openlid.devs.li")!)
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.55))
+                    Link("GitHub", destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!)
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(Color.white.opacity(0.55))
+                    Link("Report Issue", destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20(macOS)")!)
+                        .font(.system(size: 11.5, weight: .medium))
+                        .foregroundColor(emerald)
+                }
+                .padding(.top, 4)
             }
-            
-            Spacer()
+            .padding(20)
         }
-        .padding(12)
-        .background(Color.secondary.opacity(0.06))
-        .cornerRadius(8)
     }
     
-    private func actionCard(icon: String, title: String, desc: String, actionTitle: String, action: @escaping () -> Void) -> some View {
-        HStack(spacing: 14) {
-            Image(systemName: icon)
-                .font(.system(size: 20))
-                .foregroundColor(.green)
-                .frame(width: 24)
-            
+    // MARK: - Components
+    private func sectionLabel(_ title: String) -> some View {
+        Text(title)
+            .font(.system(size: 10, weight: .semibold, design: .monospaced))
+            .tracking(0.8)
+            .foregroundColor(Color.white.opacity(0.40))
+    }
+    
+    private var rowDivider: some View {
+        Divider()
+            .background(Color.white.opacity(0.06))
+            .padding(.leading, 14)
+    }
+    
+    private func statColumn(icon: String, label: String, value: String, tint: Color) -> some View {
+        VStack(spacing: 4) {
+            HStack(spacing: 5) {
+                Image(systemName: icon)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(tint)
+                Text(label)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.48))
+            }
+            Text(value)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundColor(.white)
+        }
+        .frame(maxWidth: .infinity)
+    }
+    
+    private func toggleRow(title: String, subtitle: String, isOn: Binding<Bool>) -> some View {
+        HStack {
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundColor(.primary)
-                Text(desc)
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundColor(.white)
+                Text(subtitle)
                     .font(.system(size: 11))
-                    .foregroundColor(.secondary)
+                    .foregroundColor(Color.white.opacity(0.48))
             }
-            
             Spacer()
-            
+            Toggle("", isOn: isOn)
+                .toggleStyle(.switch)
+                .controlSize(.small)
+                .labelsHidden()
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+    
+    private func actionRow(title: String, subtitle: String, buttonTitle: String, accent: Bool, disabled: Bool, action: @escaping () -> Void) -> some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 12.5, weight: .medium))
+                    .foregroundColor(.white)
+                Text(subtitle)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.48))
+            }
+            Spacer()
             Button(action: action) {
-                Text(actionTitle)
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundColor(.primary)
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 6)
-                    .background(Color.secondary.opacity(0.12))
+                Text(buttonTitle)
+                    .font(.system(size: 11.5, weight: .semibold))
+                    .foregroundColor(accent ? .black : Color.white.opacity(0.85))
+                    .padding(.horizontal, 11)
+                    .padding(.vertical, 5)
+                    .background(accent ? emerald : Color.white.opacity(0.08))
                     .cornerRadius(6)
             }
             .buttonStyle(.plain)
+            .disabled(disabled)
         }
-        .padding(14)
-        .background(Color.secondary.opacity(0.04))
-        .cornerRadius(10)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 11)
+    }
+    
+    private func shortLabel(_ preset: SessionPreset) -> String {
+        switch preset {
+        case .indefinite: return "Always"
+        case .min15: return "15m"
+        case .min30: return "30m"
+        case .hour1: return "1h"
+        case .hour2: return "2h"
+        }
+    }
+    
+    private func shortModeTitle(_ mode: AppPresentationMode) -> String {
+        switch mode {
+        case .menuBarOnly: return "Menu Bar"
+        case .windowedApp: return "Window"
+        case .both: return "Both"
+        }
+    }
+    
+    private func shortThermal(_ state: ProcessInfo.ThermalState) -> String {
+        switch state {
+        case .nominal: return "Nominal"
+        case .fair: return "Fair"
+        case .serious: return "Warm"
+        case .critical: return "Hot"
+        @unknown default: return "OK"
+        }
     }
     
     // MARK: - Actions
     private func refreshHardwareMonitors() {
         isRefreshingHardware = true
-        hardwareRefreshedJustNow = false
-        
         DispatchQueue.global(qos: .userInitiated).async {
             self.powerManager.clamshell.updateLidState()
             self.powerManager.battery.updateBatteryState()
             self.powerManager.thermal.updateThermalState()
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.35) {
                 self.isRefreshingHardware = false
-                self.hardwareRefreshedJustNow = true
-                DispatchQueue.main.asyncAfter(deadline: .now() + 2.0) {
-                    self.hardwareRefreshedJustNow = false
-                }
             }
         }
     }
     
     private func toggleHelper() {
         isProcessingHelper = true
-        helperMessage = nil
+        statusBanner = nil
         DispatchQueue.global(qos: .userInitiated).async {
             do {
                 if helperInstalled {
                     try PrivilegeManager.shared.uninstallHelper()
                     DispatchQueue.main.async {
                         self.helperInstalled = false
-                        self.helperMessage = "Helper uninstalled successfully."
+                        self.statusBanner = "Instant toggle helper removed."
                         self.isProcessingHelper = false
                     }
                 } else {
                     try PrivilegeManager.shared.installHelper()
                     DispatchQueue.main.async {
                         self.helperInstalled = true
-                        self.helperMessage = "Helper installed! Instant toggles are active."
+                        self.statusBanner = "Instant toggle helper enabled."
                         self.isProcessingHelper = false
                     }
                 }
             } catch {
                 DispatchQueue.main.async {
-                    self.helperMessage = "Failed: \(error.localizedDescription)"
+                    self.statusBanner = error.localizedDescription
                     self.isProcessingHelper = false
                 }
             }
@@ -519,16 +679,15 @@ public struct MainWindowView: View {
     
     private func resetSystemAssertions() {
         isResettingAssertions = true
-        resetMessage = nil
+        statusBanner = nil
         DispatchQueue.global(qos: .userInitiated).async {
-            self.powerManager.disable(reason: "System assertions reset by user")
+            self.powerManager.disable(reason: nil)
             try? PrivilegeManager.shared.setDisableSleep(enabled: false)
-            
             DispatchQueue.main.async {
                 self.isResettingAssertions = false
-                self.resetMessage = "System power settings restored to default (disablesleep 0)."
+                self.statusBanner = "System sleep settings restored to default."
                 DispatchQueue.main.asyncAfter(deadline: .now() + 3.0) {
-                    self.resetMessage = nil
+                    self.statusBanner = nil
                 }
             }
         }

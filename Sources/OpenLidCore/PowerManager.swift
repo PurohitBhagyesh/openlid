@@ -7,6 +7,7 @@ public final class PowerManager: ObservableObject {
     
     @Published public private(set) var isEnabled: Bool = false
     @Published public private(set) var isBusy: Bool = false
+    @Published public var selectedPreset: SessionPreset = .indefinite
     @Published public var lastError: String? = nil
     @Published public var stopReason: String? = nil
     
@@ -21,17 +22,38 @@ public final class PowerManager: ObservableObject {
     
     public init() {
         setupSafetyHooks()
-        // Forward timer ticks in real time to PowerManager subscribers
+        // Forward timer and hardware monitor updates in real time to subscribers
         timer.objectWillChange
             .receive(on: RunLoop.main)
-            .sink { [weak self] _ in
-                self?.objectWillChange.send()
-            }
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        clamshell.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        battery.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
+            .store(in: &cancellables)
+        thermal.objectWillChange
+            .receive(on: RunLoop.main)
+            .sink { [weak self] _ in self?.objectWillChange.send() }
             .store(in: &cancellables)
         
         // Check if sleep is already disabled at system level on startup
         let liveState = checkLiveSystemSleepDisabled()
         self.isEnabled = liveState
+        if liveState {
+            self.timer.start(preset: .indefinite)
+        }
+    }
+    
+    /// Updates the selected duration preset across all views and restarts the timer if currently active.
+    public func selectPreset(_ preset: SessionPreset) {
+        selectedPreset = preset
+        if isEnabled {
+            timer.start(preset: preset)
+        }
     }
     
     deinit {

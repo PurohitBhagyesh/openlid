@@ -39,19 +39,21 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
         let hostingController = NSHostingController(rootView: mainView)
         
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 580, height: 680),
-            styleMask: [.titled, .closable, .miniaturizable],
+            contentRect: NSRect(x: 0, y: 0, width: 480, height: 560),
+            styleMask: [.titled, .closable, .miniaturizable, .fullSizeContentView],
             backing: .buffered,
             defer: false
         )
         
         window.title = "OpenLid"
-        window.titleVisibility = .visible
-        window.titlebarAppearsTransparent = false
+        window.titleVisibility = .hidden
+        window.titlebarAppearsTransparent = true
+        window.isMovableByWindowBackground = true
+        window.appearance = NSAppearance(named: .darkAqua)
+        window.backgroundColor = NSColor(red: 0.047, green: 0.055, blue: 0.071, alpha: 1.0)
         window.contentViewController = hostingController
         window.isReleasedWhenClosed = false
         window.showsResizeIndicator = false
-        // Strictly disable macOS fullscreen space & zoom
         window.collectionBehavior = [.fullScreenNone]
         window.standardWindowButton(.zoomButton)?.isEnabled = false
         window.delegate = self
@@ -70,6 +72,6 @@ public final class MainWindowManager: NSObject, NSWindowDelegate {
     }
     
     public func windowWillClose(_ notification: Notification) {
-        // Window closed
+        // Keep window controller available
     }
 }
