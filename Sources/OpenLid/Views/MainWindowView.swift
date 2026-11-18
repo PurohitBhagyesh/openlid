@@ -321,17 +321,6 @@ public struct MainWindowView: View {
     private var settingsTab: some View {
         ScrollView(showsIndicators: false) {
             VStack(spacing: 12) {
-                // Fluid Sliding Display Mode Capsule
-                LiquidSegmentedControl(
-                    options: AppPresentationMode.allCases,
-                    selection: preferences.presentationMode,
-                    height: 36,
-                    fontSize: 11.5,
-                    label: shortModeTitle
-                ) { mode in
-                    preferences.presentationMode = mode
-                }
-                
                 // Switches Card
                 VStack(spacing: 0) {
                     toggleRow("Launch at Login", isOn: Binding(
@@ -516,14 +505,6 @@ public struct MainWindowView: View {
         case .min30: return "30m"
         case .hour1: return "1h"
         case .hour2: return "2h"
-        }
-    }
-    
-    private func shortModeTitle(_ mode: AppPresentationMode) -> String {
-        switch mode {
-        case .menuBarOnly: return "Menu Bar"
-        case .windowedApp: return "Window"
-        case .both: return "Both"
         }
     }
     

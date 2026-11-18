@@ -7,7 +7,6 @@ struct SettingsView: View {
     var onDismiss: (() -> Void)? = nil
     
     @ObservedObject var powerManager = PowerManager.shared
-    @ObservedObject var preferences = AppPreferences.shared
     @State private var helperInstalled: Bool = PrivilegeManager.shared.isHelperInstalled()
     @State private var toastMessage: String? = nil
     @State private var isProcessingHelper: Bool = false
@@ -50,17 +49,6 @@ struct SettingsView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 12) {
-                        // Fluid Sliding Display Mode Capsule
-                        LiquidSegmentedControl(
-                            options: AppPresentationMode.allCases,
-                            selection: preferences.presentationMode,
-                            height: 36,
-                            fontSize: 11.5,
-                            label: shortModeTitle
-                        ) { mode in
-                            preferences.presentationMode = mode
-                        }
-                        
                         // Switches Card
                         VStack(spacing: 0) {
                             toggleRow("Launch at Login", isOn: Binding(
@@ -187,7 +175,7 @@ struct SettingsView: View {
                 }
             }
         }
-        .frame(width: 420, height: 440)
+        .frame(width: 420, height: 396)
         .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
@@ -215,14 +203,6 @@ struct SettingsView: View {
         }
         .padding(.horizontal, 14)
         .frame(height: 40)
-    }
-    
-    private func shortModeTitle(_ mode: AppPresentationMode) -> String {
-        switch mode {
-        case .menuBarOnly: return "Menu Bar"
-        case .windowedApp: return "Window"
-        case .both: return "Both"
-        }
     }
     
     private func toggleHelper() {
