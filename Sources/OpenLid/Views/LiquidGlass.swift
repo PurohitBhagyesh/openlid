@@ -30,16 +30,16 @@ public struct LiquidGlassBackdrop: NSViewRepresentable {
     }
 }
 
-/// Full-window Liquid Glass canvas: real behind-window blur + subtle obsidian veil + top specular edge.
+/// Full-window Liquid Glass canvas: real behind-window blur + crisp translucent veil + specular rim.
 public struct LiquidGlassCanvas: View {
     public var body: some View {
         ZStack {
             LiquidGlassBackdrop(material: .hudWindow, blendingMode: .behindWindow)
-            Color.black.opacity(0.42)
+            Color.black.opacity(0.22)
             LinearGradient(
-                colors: [Color.white.opacity(0.06), Color.clear],
+                colors: [Color.white.opacity(0.08), Color.clear, Color.black.opacity(0.12)],
                 startPoint: .top,
-                endPoint: .center
+                endPoint: .bottom
             )
         }
         .ignoresSafeArea()
@@ -57,13 +57,13 @@ public struct LiquidGlassCardModifier: ViewModifier {
                 ZStack {
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(.ultraThinMaterial)
-                        .opacity(0.55)
+                        .opacity(0.45)
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                         .fill(
                             LinearGradient(
                                 colors: [
-                                    Color.white.opacity(elevated ? 0.11 : 0.065),
-                                    Color.white.opacity(elevated ? 0.04 : 0.025)
+                                    Color.white.opacity(elevated ? 0.12 : 0.07),
+                                    Color.white.opacity(elevated ? 0.04 : 0.02)
                                 ],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
@@ -76,9 +76,9 @@ public struct LiquidGlassCardModifier: ViewModifier {
                     .stroke(
                         LinearGradient(
                             colors: [
-                                Color.white.opacity(elevated ? 0.30 : 0.18),
-                                Color.white.opacity(0.05),
-                                Color.white.opacity(0.02)
+                                Color.white.opacity(elevated ? 0.34 : 0.22),
+                                Color.white.opacity(0.06),
+                                Color.white.opacity(0.03)
                             ],
                             startPoint: .topLeading,
                             endPoint: .bottomTrailing
@@ -87,12 +87,12 @@ public struct LiquidGlassCardModifier: ViewModifier {
                     )
             )
             .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-            .animation(.easeInOut(duration: 0.28), value: elevated)
+            .animation(.easeInOut(duration: 0.26), value: elevated)
     }
 }
 
 public extension View {
-    func liquidGlassCard(cornerRadius: CGFloat = 14, elevated: Bool = false) -> some View {
+    func liquidGlassCard(cornerRadius: CGFloat = 12, elevated: Bool = false) -> some View {
         modifier(LiquidGlassCardModifier(cornerRadius: cornerRadius, elevated: elevated))
     }
     
@@ -104,6 +104,39 @@ public extension View {
         } else {
             self.contentTransition(.numericText())
         }
+    }
+}
+
+/// Refined monochrome Black & White Liquid Glass switch pill.
+public struct LiquidToggle: View {
+    @Binding var isOn: Bool
+    
+    public init(isOn: Binding<Bool>) {
+        self._isOn = isOn
+    }
+    
+    public var body: some View {
+        Button(action: {
+            withAnimation(.spring(response: 0.28, dampingFraction: 0.78)) {
+                isOn.toggle()
+            }
+        }) {
+            ZStack {
+                Capsule()
+                    .fill(isOn ? Color.white : Color.white.opacity(0.12))
+                    .frame(width: 34, height: 19)
+                    .overlay(
+                        Capsule()
+                            .stroke(isOn ? Color.clear : Color.white.opacity(0.18), lineWidth: 0.75)
+                    )
+                Circle()
+                    .fill(isOn ? Color.black : Color.white.opacity(0.75))
+                    .frame(width: 13.5, height: 13.5)
+                    .offset(x: isOn ? 7.5 : -7.5)
+            }
+            .contentShape(Capsule())
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -122,7 +155,7 @@ public struct LiquidSegmentedControl<Option: Identifiable & Hashable>: View {
     public init(
         options: [Option],
         selection: Option,
-        height: CGFloat = 36,
+        height: CGFloat = 34,
         fontSize: CGFloat = 11.5,
         label: @escaping (Option) -> String,
         onSelect: @escaping (Option) -> Void
@@ -157,7 +190,7 @@ public struct LiquidSegmentedControl<Option: Identifiable & Hashable>: View {
                             if isSelected {
                                 Capsule()
                                     .fill(Color.white)
-                                    .shadow(color: Color.white.opacity(0.18), radius: 6, x: 0, y: 1)
+                                    .shadow(color: Color.white.opacity(0.16), radius: 5, x: 0, y: 1)
                                     .matchedGeometryEffect(id: "liquidActivePill", in: pillNamespace)
                             } else if isHovered {
                                 Capsule()
@@ -213,15 +246,15 @@ public struct LiquidIconDock: View {
                 Button(action: { onTrigger(item) }) {
                     Image(systemName: item.systemImage)
                         .font(.system(size: 13, weight: .medium))
-                        .foregroundColor(isHovered ? .white : Color.white.opacity(0.54))
+                        .foregroundColor(isHovered ? .white : Color.white.opacity(0.56))
                         .scaleEffect(isHovered ? 1.08 : 1.0)
                         .frame(width: 38, height: 28)
                         .background {
                             if isHovered {
                                 Capsule()
-                                    .fill(Color.white.opacity(0.14))
+                                    .fill(Color.white.opacity(0.15))
                                     .overlay(
-                                        Capsule().stroke(Color.white.opacity(0.24), lineWidth: 0.75)
+                                        Capsule().stroke(Color.white.opacity(0.26), lineWidth: 0.75)
                                     )
                                     .matchedGeometryEffect(id: "dockHighlight", in: dockNamespace)
                             }

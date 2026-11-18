@@ -136,6 +136,7 @@ public struct MoveToApplicationsView: View {
                 .padding(.horizontal, 22)
                 .padding(.bottom, 18)
             }
+            .ignoresSafeArea(.container, edges: .top)
         }
         .frame(width: 380, height: 300)
         .preferredColorScheme(.dark)

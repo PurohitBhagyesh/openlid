@@ -39,7 +39,7 @@ public struct MainWindowView: View {
                     .transition(.opacity)
             }
         }
-        .frame(width: 420, height: 440)
+        .frame(width: 380, height: 396)
         .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
@@ -52,22 +52,22 @@ public struct MainWindowView: View {
             LiquidGlassCanvas()
             
             VStack(spacing: 0) {
-                // Single unified translucent top bar aligned with traffic lights
+                // Single translucent titlebar directly on the traffic-light row (ZERO extra forehead)
                 HStack(spacing: 8) {
                     Spacer().frame(width: 64)
                     
                     Text("OpenLid")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(.system(size: 12.5, weight: .semibold))
                         .foregroundColor(.white)
                     
                     if !ApplicationMover.isInstalledInApplications() && !ApplicationMover.isDevOrBuildEnvironment() {
                         Button("Install") {
                             MoveToApplicationsWindowManager.shared.showPrompt(force: true)
                         }
-                        .font(.system(size: 10.5, weight: .semibold))
+                        .font(.system(size: 10, weight: .semibold))
                         .foregroundColor(.black)
-                        .padding(.horizontal, 8)
-                        .padding(.vertical, 3)
+                        .padding(.horizontal, 7)
+                        .padding(.vertical, 2.5)
                         .background(Color.white)
                         .clipShape(Capsule())
                         .buttonStyle(.plain)
@@ -85,10 +85,10 @@ public struct MainWindowView: View {
                                 }
                             }) {
                                 Text(tab.rawValue)
-                                    .font(.system(size: 11.5, weight: active ? .semibold : .regular))
+                                    .font(.system(size: 11, weight: active ? .semibold : .regular))
                                     .foregroundColor(active ? .black : Color.white.opacity(0.62))
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 4)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 3.5)
                                     .background {
                                         if active {
                                             Capsule()
@@ -101,15 +101,15 @@ public struct MainWindowView: View {
                             .buttonStyle(.plain)
                         }
                     }
-                    .padding(2.5)
+                    .padding(2)
                     .background(Color.white.opacity(0.06))
                     .clipShape(Capsule())
                     .overlay(
-                        Capsule().stroke(Color.white.opacity(0.14), lineWidth: 0.75)
+                        Capsule().stroke(Color.white.opacity(0.16), lineWidth: 0.75)
                     )
                 }
-                .padding(.horizontal, 16)
-                .frame(height: 48)
+                .padding(.horizontal, 14)
+                .frame(height: 38)
                 
                 Rectangle()
                     .fill(Color.white.opacity(0.08))
@@ -131,9 +131,11 @@ public struct MainWindowView: View {
                             ))
                     }
                 }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .clipped()
                 .animation(.spring(response: 0.34, dampingFraction: 0.84), value: selectedTab)
             }
+            .ignoresSafeArea(.container, edges: .top)
             
             // Non-shifting floating glass toast for errors / notices
             if let notice = powerManager.lastError ?? powerManager.stopReason ?? toastMessage {
@@ -141,7 +143,7 @@ public struct MainWindowView: View {
                     Spacer()
                     HStack(spacing: 8) {
                         Text(notice)
-                            .font(.system(size: 11.5, weight: .medium))
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(.white)
                             .lineLimit(2)
                         Spacer(minLength: 4)
@@ -153,16 +155,16 @@ public struct MainWindowView: View {
                             }
                         }) {
                             Image(systemName: "xmark")
-                                .font(.system(size: 9.5, weight: .semibold))
+                                .font(.system(size: 9, weight: .semibold))
                                 .foregroundColor(Color.white.opacity(0.6))
                         }
                         .buttonStyle(.plain)
                     }
                     .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .liquidGlassCard(cornerRadius: 10, elevated: true)
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 14)
+                    .padding(.vertical, 7)
+                    .liquidGlassCard(cornerRadius: 9, elevated: true)
+                    .padding(.horizontal, 14)
+                    .padding(.bottom, 12)
                 }
                 .transition(.opacity.combined(with: .move(edge: .bottom)))
             }
@@ -171,43 +173,43 @@ public struct MainWindowView: View {
     
     // MARK: - Home Tab (Zero layout shift, fluid spring motion)
     private var homeTab: some View {
-        VStack(spacing: 12) {
+        VStack(spacing: 10) {
             // Hero Liquid Glass Stage
             VStack(spacing: 0) {
                 Spacer(minLength: 0)
                 
-                AnimatedEyeView(size: 64, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
+                AnimatedEyeView(size: 60, isAwake: powerManager.isEnabled, isScanning: powerManager.isEnabled)
                 
-                Spacer().frame(height: 16)
+                Spacer().frame(height: 14)
                 
                 Text(powerManager.isEnabled ? "Awake" : "Standby")
-                    .font(.system(size: 21, weight: .semibold))
+                    .font(.system(size: 20, weight: .semibold))
                     .foregroundColor(.white)
-                    .frame(height: 26)
+                    .frame(height: 24)
                     .contentTransition(.interpolate)
                     .animation(.spring(response: 0.32, dampingFraction: 0.82), value: powerManager.isEnabled)
                 
                 Spacer().frame(height: 4)
                 
-                // Fixed-height 20pt rolling timer / status line -> ZERO jump on toggle
+                // Fixed-height 18pt rolling timer / status line -> ZERO jump on toggle
                 ZStack {
                     if powerManager.isEnabled {
                         if powerManager.timer.isTimerRunning {
                             HStack(spacing: 6) {
                                 Text(powerManager.timer.formattedRemainingTime)
-                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .font(.system(size: 11.5, weight: .medium, design: .monospaced))
                                     .foregroundColor(Color.white.opacity(0.88))
                                     .smoothNumericTransition(countsDown: true)
                                     .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.remainingSeconds)
                                 Text("remaining")
-                                    .font(.system(size: 12))
+                                    .font(.system(size: 11.5))
                                     .foregroundColor(Color.white.opacity(0.45))
                                 Button("Clear") {
                                     withAnimation(.spring(response: 0.32, dampingFraction: 0.80)) {
                                         powerManager.selectPreset(.indefinite)
                                     }
                                 }
-                                .font(.system(size: 11, weight: .medium))
+                                .font(.system(size: 10.5, weight: .medium))
                                 .foregroundColor(Color.white.opacity(0.68))
                                 .buttonStyle(.plain)
                             }
@@ -215,32 +217,32 @@ public struct MainWindowView: View {
                         } else {
                             HStack(spacing: 6) {
                                 Text(powerManager.timer.formattedElapsedTime)
-                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .font(.system(size: 11.5, weight: .medium, design: .monospaced))
                                     .foregroundColor(Color.white.opacity(0.84))
                                     .smoothNumericTransition(countsDown: false)
                                     .animation(.spring(response: 0.30, dampingFraction: 0.85), value: powerManager.timer.elapsedSeconds)
                                 Text("·")
                                     .foregroundColor(Color.white.opacity(0.35))
                                 Text("Lid sleep disabled")
-                                    .font(.system(size: 12))
+                                    .font(.system(size: 11.5))
                                     .foregroundColor(Color.white.opacity(0.48))
                             }
                             .transition(.opacity.combined(with: .scale(scale: 0.94)))
                         }
                     } else {
                         Text("Normal macOS sleep behavior")
-                            .font(.system(size: 12))
+                            .font(.system(size: 11.5))
                             .foregroundColor(Color.white.opacity(0.42))
                             .transition(.opacity.combined(with: .scale(scale: 0.94)))
                     }
                 }
-                .frame(height: 20)
+                .frame(height: 18)
                 .animation(.spring(response: 0.32, dampingFraction: 0.84), value: powerManager.isEnabled)
                 .animation(.spring(response: 0.32, dampingFraction: 0.84), value: powerManager.timer.isTimerRunning)
                 
-                Spacer().frame(height: 18)
+                Spacer().frame(height: 16)
                 
-                // Monochrome Primary Action Pill (smoothly morphs between Solid White and Frosted Glass)
+                // Monochrome Primary Action Pill
                 Button(action: {
                     withAnimation(.spring(response: 0.32, dampingFraction: 0.80)) {
                         powerManager.toggle(preset: powerManager.selectedPreset)
@@ -249,17 +251,17 @@ public struct MainWindowView: View {
                     HStack(spacing: 7) {
                         if powerManager.isBusy {
                             ProgressView()
-                                .scaleEffect(0.58)
+                                .scaleEffect(0.55)
                                 .colorInvert()
                             Text("Updating")
-                                .font(.system(size: 13, weight: .medium))
+                                .font(.system(size: 12.5, weight: .medium))
                         } else {
                             Text(powerManager.isEnabled ? "Restore Sleep" : "Keep Awake")
-                                .font(.system(size: 13, weight: .semibold))
+                                .font(.system(size: 12.5, weight: .semibold))
                         }
                     }
                     .foregroundColor(powerManager.isEnabled ? .white : .black)
-                    .frame(width: 196, height: 38)
+                    .frame(width: 184, height: 36)
                     .background(
                         Capsule()
                             .fill(powerManager.isEnabled ? Color.white.opacity(0.11) : Color.white)
@@ -279,20 +281,20 @@ public struct MainWindowView: View {
                 Spacer(minLength: 0)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .liquidGlassCard(cornerRadius: 16, elevated: powerManager.isEnabled)
+            .liquidGlassCard(cornerRadius: 15, elevated: powerManager.isEnabled)
             
             // Fluid Sliding Duration Liquid Glass Capsule
             LiquidSegmentedControl(
                 options: SessionPreset.allCases,
                 selection: powerManager.selectedPreset,
-                height: 38,
-                fontSize: 11.5,
+                height: 34,
+                fontSize: 11,
                 label: shortLabel
             ) { preset in
                 powerManager.selectPreset(preset)
             }
             
-            // Minimal 3-Column Monochrome Telemetry Bar with smooth numeric rolling
+            // Minimal 3-Column Monochrome Telemetry Bar
             HStack(spacing: 0) {
                 statCell(label: "Lid", value: powerManager.clamshell.isLidClosed ? "Closed" : "Open", numeric: false)
                 glassDivider
@@ -306,149 +308,163 @@ public struct MainWindowView: View {
                         .foregroundColor(Color.white.opacity(0.55))
                         .rotationEffect(.degrees(isRefreshingHardware ? 360 : 0))
                         .animation(isRefreshingHardware ? .linear(duration: 0.6).repeatForever(autoreverses: false) : .default, value: isRefreshingHardware)
-                        .frame(width: 40, height: 54)
+                        .frame(width: 36, height: 48)
                 }
                 .buttonStyle(.plain)
                 .help("Refresh hardware monitors")
             }
-            .frame(height: 54)
-            .liquidGlassCard(cornerRadius: 14, elevated: false)
+            .frame(height: 48)
+            .liquidGlassCard(cornerRadius: 13, elevated: false)
         }
-        .padding(16)
+        .padding(14)
     }
     
-    // MARK: - Settings Tab
+    // MARK: - Settings Tab (Tight, balanced, zero unnecessary spacing)
     private var settingsTab: some View {
-        ScrollView(showsIndicators: false) {
-            VStack(spacing: 12) {
-                // Switches Card
-                VStack(spacing: 0) {
-                    toggleRow("Launch at Login", isOn: Binding(
-                        get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
-                        set: { try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: $0) }
-                    ))
-                    rowHairline
-                    toggleRow("Auto-Awake on Login", isOn: Binding(
-                        get: { LaunchAtLoginManager.shared.awakeOnLogin },
-                        set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
-                    ))
-                    rowHairline
-                    toggleRow("Thermal Protection", isOn: Binding(
-                        get: { powerManager.thermal.thermalProtectionEnabled },
-                        set: { powerManager.thermal.thermalProtectionEnabled = $0 }
-                    ))
-                }
-                .liquidGlassCard(cornerRadius: 14, elevated: false)
-                
-                // System Actions Card
-                VStack(spacing: 0) {
-                    actionRow(
-                        title: "Instant Toggle Helper",
-                        trailing: isProcessingHelper ? "Working..." : (helperInstalled ? "Remove" : "Enable"),
-                        primary: !helperInstalled,
-                        disabled: isProcessingHelper,
-                        action: toggleHelper
-                    )
-                    rowHairline
-                    actionRow(
-                        title: "Reset Sleep Settings",
-                        trailing: isResettingAssertions ? "Resetting..." : "Reset",
-                        primary: false,
-                        disabled: isResettingAssertions,
-                        action: resetSystemAssertions
-                    )
-                    rowHairline
-                    HStack {
-                        Text("Applications")
-                            .font(.system(size: 12.5, weight: .regular))
-                            .foregroundColor(.white)
-                        Spacer()
-                        if ApplicationMover.isInstalledInApplications() {
+        VStack(spacing: 10) {
+            // Toggles Glass Card
+            VStack(spacing: 0) {
+                toggleRow(icon: "arrow.up.right.circle", title: "Launch at Login", isOn: Binding(
+                    get: { LaunchAtLoginManager.shared.isLaunchAtLoginEnabled },
+                    set: { try? LaunchAtLoginManager.shared.setLaunchAtLogin(enabled: $0) }
+                ))
+                rowHairline
+                toggleRow(icon: "bolt", title: "Auto-Awake on Login", isOn: Binding(
+                    get: { LaunchAtLoginManager.shared.awakeOnLogin },
+                    set: { LaunchAtLoginManager.shared.awakeOnLogin = $0 }
+                ))
+                rowHairline
+                toggleRow(icon: "thermometer.medium", title: "Thermal Protection", isOn: Binding(
+                    get: { powerManager.thermal.thermalProtectionEnabled },
+                    set: { powerManager.thermal.thermalProtectionEnabled = $0 }
+                ))
+            }
+            .liquidGlassCard(cornerRadius: 12, elevated: false)
+            
+            // System Actions Glass Card
+            VStack(spacing: 0) {
+                actionRow(
+                    icon: "lock.open",
+                    title: "Instant Toggle Helper",
+                    trailing: isProcessingHelper ? "Working..." : (helperInstalled ? "Remove" : "Enable"),
+                    primary: !helperInstalled,
+                    disabled: isProcessingHelper,
+                    action: toggleHelper
+                )
+                rowHairline
+                actionRow(
+                    icon: "arrow.counterclockwise",
+                    title: "Reset Sleep Settings",
+                    trailing: isResettingAssertions ? "Resetting..." : "Reset",
+                    primary: false,
+                    disabled: isResettingAssertions,
+                    action: resetSystemAssertions
+                )
+                rowHairline
+                HStack(spacing: 9) {
+                    rowIcon("folder")
+                    Text("Applications")
+                        .font(.system(size: 12.5))
+                        .foregroundColor(.white)
+                    Spacer()
+                    if ApplicationMover.isInstalledInApplications() {
+                        HStack(spacing: 4) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 9.5, weight: .semibold))
                             Text("Installed")
-                                .font(.system(size: 11.5))
-                                .foregroundColor(Color.white.opacity(0.45))
-                        } else {
-                            Button("Move") {
-                                MoveToApplicationsWindowManager.shared.showPrompt(force: true)
-                            }
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(.black)
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(Color.white)
-                            .clipShape(Capsule())
-                            .buttonStyle(.plain)
+                                .font(.system(size: 11))
+                        }
+                        .foregroundColor(Color.white.opacity(0.48))
+                    } else {
+                        Button("Move") {
+                            MoveToApplicationsWindowManager.shared.showPrompt(force: true)
+                        }
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(.black)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 3.5)
+                        .background(Color.white)
+                        .clipShape(Capsule())
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 12)
+                .frame(height: 36)
+                rowHairline
+                actionRow(
+                    icon: "sparkles",
+                    title: "Welcome Guide",
+                    trailing: "Show",
+                    primary: false,
+                    disabled: false,
+                    action: {
+                        withAnimation(.spring(response: 0.34, dampingFraction: 0.85)) {
+                            showOnboarding = true
                         }
                     }
-                    .padding(.horizontal, 14)
-                    .frame(height: 40)
-                    rowHairline
-                    actionRow(
-                        title: "Welcome Guide",
-                        trailing: "Show",
-                        primary: false,
-                        disabled: false,
-                        action: {
-                            withAnimation(.spring(response: 0.34, dampingFraction: 0.85)) {
-                                showOnboarding = true
-                            }
-                        }
-                    )
-                }
-                .liquidGlassCard(cornerRadius: 14, elevated: false)
-                
-                // Quiet Monochrome Footer
-                HStack(spacing: 14) {
-                    Text("v1.0.0")
-                        .font(.system(size: 11, design: .monospaced))
-                        .foregroundColor(Color.white.opacity(0.32))
-                    Spacer()
-                    Link("Website", destination: URL(string: "https://openlid.devs.li")!)
-                        .font(.system(size: 11.5))
-                        .foregroundColor(Color.white.opacity(0.55))
-                    Link("GitHub", destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!)
-                        .font(.system(size: 11.5))
-                        .foregroundColor(Color.white.opacity(0.55))
-                    Link("Support", destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20(macOS)")!)
-                        .font(.system(size: 11.5))
-                        .foregroundColor(.white)
-                }
-                .padding(.horizontal, 4)
-                .padding(.top, 2)
+                )
             }
-            .padding(16)
+            .liquidGlassCard(cornerRadius: 12, elevated: false)
+            
+            Spacer(minLength: 0)
+            
+            // Quiet Monochrome Footer
+            HStack(spacing: 12) {
+                Text("v1.0.0")
+                    .font(.system(size: 10.5, design: .monospaced))
+                    .foregroundColor(Color.white.opacity(0.32))
+                Spacer()
+                Link("Website", destination: URL(string: "https://openlid.devs.li")!)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.54))
+                Link("GitHub", destination: URL(string: "https://github.com/PurohitBhagyesh/openlid")!)
+                    .font(.system(size: 11))
+                    .foregroundColor(Color.white.opacity(0.54))
+                Link("Support", destination: URL(string: "mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Support%20(macOS)")!)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(Color.white.opacity(0.86))
+            }
+            .padding(.horizontal, 4)
         }
+        .padding(14)
     }
     
     // MARK: - Components
+    private func rowIcon(_ name: String) -> some View {
+        Image(systemName: name)
+            .font(.system(size: 12, weight: .regular))
+            .foregroundColor(Color.white.opacity(0.52))
+            .frame(width: 16, alignment: .center)
+    }
+    
     private var glassDivider: some View {
         Rectangle()
             .fill(Color.white.opacity(0.08))
-            .frame(width: 0.75, height: 24)
+            .frame(width: 0.75, height: 22)
     }
     
     private var rowHairline: some View {
         Rectangle()
             .fill(Color.white.opacity(0.07))
             .frame(height: 0.5)
-            .padding(.leading, 14)
+            .padding(.leading, 37)
     }
     
     @ViewBuilder
     private func statCell(label: String, value: String, numeric: Bool) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 1.5) {
             Text(label)
-                .font(.system(size: 10.5))
+                .font(.system(size: 10))
                 .foregroundColor(Color.white.opacity(0.42))
             if numeric {
                 Text(value)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12.5, weight: .medium))
                     .foregroundColor(.white)
                     .smoothNumericTransition()
                     .animation(.spring(response: 0.30, dampingFraction: 0.84), value: value)
             } else {
                 Text(value)
-                    .font(.system(size: 13, weight: .medium))
+                    .font(.system(size: 12.5, weight: .medium))
                     .foregroundColor(.white)
                     .contentTransition(.interpolate)
                     .animation(.easeInOut(duration: 0.22), value: value)
@@ -457,45 +473,43 @@ public struct MainWindowView: View {
         .frame(maxWidth: .infinity)
     }
     
-    private func toggleRow(_ title: String, isOn: Binding<Bool>) -> some View {
-        HStack {
+    private func toggleRow(icon: String, title: String, isOn: Binding<Bool>) -> some View {
+        HStack(spacing: 9) {
+            rowIcon(icon)
             Text(title)
-                .font(.system(size: 12.5, weight: .regular))
+                .font(.system(size: 12.5))
                 .foregroundColor(.white)
             Spacer()
-            Toggle("", isOn: isOn)
-                .toggleStyle(.switch)
-                .controlSize(.small)
-                .tint(.white)
-                .labelsHidden()
+            LiquidToggle(isOn: isOn)
         }
-        .padding(.horizontal, 14)
-        .frame(height: 40)
+        .padding(.horizontal, 12)
+        .frame(height: 36)
     }
     
-    private func actionRow(title: String, trailing: String, primary: Bool, disabled: Bool, action: @escaping () -> Void) -> some View {
-        HStack {
+    private func actionRow(icon: String, title: String, trailing: String, primary: Bool, disabled: Bool, action: @escaping () -> Void) -> some View {
+        HStack(spacing: 9) {
+            rowIcon(icon)
             Text(title)
-                .font(.system(size: 12.5, weight: .regular))
+                .font(.system(size: 12.5))
                 .foregroundColor(.white)
             Spacer()
             Button(action: action) {
                 Text(trailing)
-                    .font(.system(size: 11, weight: .semibold))
-                    .foregroundColor(primary ? .black : Color.white.opacity(0.82))
+                    .font(.system(size: 11, weight: primary ? .semibold : .medium))
+                    .foregroundColor(primary ? .black : Color.white.opacity(0.84))
                     .padding(.horizontal, 10)
-                    .padding(.vertical, 4)
-                    .background(primary ? Color.white : Color.white.opacity(0.09))
+                    .padding(.vertical, 3.5)
+                    .background(primary ? Color.white : Color.white.opacity(0.10))
                     .clipShape(Capsule())
                     .overlay(
-                        Capsule().stroke(primary ? Color.clear : Color.white.opacity(0.14), lineWidth: 0.75)
+                        Capsule().stroke(primary ? Color.clear : Color.white.opacity(0.16), lineWidth: 0.75)
                     )
             }
             .buttonStyle(.plain)
             .disabled(disabled)
         }
-        .padding(.horizontal, 14)
-        .frame(height: 40)
+        .padding(.horizontal, 12)
+        .frame(height: 36)
     }
     
     private func shortLabel(_ preset: SessionPreset) -> String {

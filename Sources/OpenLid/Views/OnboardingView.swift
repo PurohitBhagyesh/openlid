@@ -43,8 +43,9 @@ public struct OnboardingView: View {
                 
                 Spacer(minLength: 0)
             }
+            .ignoresSafeArea(.container, edges: .top)
         }
-        .frame(width: 420, height: 440)
+        .frame(width: 380, height: 396)
         .preferredColorScheme(.dark)
         .onAppear {
             helperInstalled = PrivilegeManager.shared.isHelperInstalled()
