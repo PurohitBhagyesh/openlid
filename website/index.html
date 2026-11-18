@@ -91,7 +91,7 @@
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
   <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3' fill='%2310b981'/></svg>">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2'><path d='M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z'/><circle cx='12' cy='12' r='3' fill='%23ffffff'/></svg>">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -251,42 +251,71 @@
       </div>
     </div>
 
-    <div class="os-tabs">
-      <button class="os-btn active" id="btnTabMac">macOS</button>
-      <button class="os-btn" id="btnTabWin">Windows</button>
+    <div class="os-tabs-wrap">
+      <div class="os-tabs">
+        <button class="os-btn active" id="btnTabMac">macOS</button>
+        <button class="os-btn" id="btnTabWin">Windows</button>
+      </div>
     </div>
 
     <!-- macOS Downloads -->
     <div class="os-panel active" id="panelMac">
-      <div class="cards-grid">
+      <div class="cards-grid cards-grid-3">
         <div class="card card-featured">
-          <div class="card-badge">Apple Silicon</div>
-          <h3 class="card-title">Apple Silicon Mac</h3>
-          <p class="card-meta">arm64 • M1, M2, M3, M4 series</p>
-          <p class="card-desc">
-            Compiled natively for Apple Silicon efficiency cores. Instantaneous wake, negligible RAM overhead, and native power assertion handles.
-          </p>
+          <div>
+            <div class="card-badge">Recommended • Universal 2</div>
+            <h3 class="card-title">macOS Universal</h3>
+            <p class="card-meta">arm64 + x86_64 • 1.5 MB</p>
+            <p class="card-desc">
+              Single Universal 2 binary for every Mac. Monochrome Liquid Glass UI, smooth Move to Applications flow, and native CLI.
+            </p>
+          </div>
           <div class="card-actions">
-            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn btn-primary btn-block mac-download-btn">
+            <a href="downloads/OpenLid-Universal.zip" download class="btn btn-primary btn-block mac-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download ZIP (.zip)
+              Download Universal (.zip)
             </a>
-            <span class="card-note">Includes OpenLid.app + CLI binary</span>
+            <span class="card-note">OpenLid.app + openlid CLI + Applications link</span>
+            <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20macOS%20Support%20(Universal)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20macOS%20(Universal):%0D%0A-%20MacBook%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email macOS Support ↗</a>
+          </div>
+        </div>
+
+        <div class="card">
+          <div>
+            <div class="card-badge">Apple Silicon</div>
+            <h3 class="card-title">Apple Silicon Mac</h3>
+            <p class="card-meta">arm64 • M1–M4 • 1.0 MB</p>
+            <p class="card-desc">
+              Compiled natively for Apple Silicon efficiency cores. Instantaneous wake, minimal RAM footprint, and native power assertion handles.
+            </p>
+          </div>
+          <div class="card-actions">
+            <a href="downloads/OpenLid-AppleSilicon.zip" download class="btn btn-secondary btn-block mac-download-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="7 10 12 15 17 10"/>
+                <line x1="12" y1="15" x2="12" y2="3"/>
+              </svg>
+              Download Apple Silicon (.zip)
+            </a>
+            <span class="card-note">OpenLid.app + openlid CLI + Applications link</span>
             <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20macOS%20Support%20(Apple%20Silicon)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Apple%20Silicon%20(M1/M2/M3/M4):%0D%0A-%20MacBook%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email macOS Support ↗</a>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-badge">Intel</div>
-          <h3 class="card-title">Intel Processor Mac</h3>
-          <p class="card-meta">x86_64 • Core i5, i7, i9 MacBooks</p>
-          <p class="card-desc">
-            Optimized for legacy Intel MacBook Pro and MacBook Air hardware with direct SMC sleep modulation and thermal monitoring.
-          </p>
+          <div>
+            <div class="card-badge">Intel</div>
+            <h3 class="card-title">Intel Processor Mac</h3>
+            <p class="card-meta">x86_64 • Core i5–i9 • 1.0 MB</p>
+            <p class="card-desc">
+              Optimized for Intel MacBook Pro and MacBook Air hardware with direct SMC sleep modulation and thermal monitoring.
+            </p>
+          </div>
           <div class="card-actions">
             <a href="downloads/OpenLid-Intel.zip" download class="btn btn-secondary btn-block mac-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -294,9 +323,9 @@
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download ZIP (.zip)
+              Download Intel (.zip)
             </a>
-            <span class="card-note">Includes OpenLid.app + CLI binary</span>
+            <span class="card-note">OpenLid.app + openlid CLI + Applications link</span>
             <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20macOS%20Support%20(Intel)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Intel%20Mac:%0D%0A-%20MacBook%20Model:%20%0D%0A-%20macOS%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email macOS Support ↗</a>
           </div>
         </div>
@@ -313,12 +342,14 @@
     <div class="os-panel" id="panelWin">
       <div class="cards-grid">
         <div class="card card-featured">
-          <div class="card-badge">Windows x64</div>
-          <h3 class="card-title">Windows 11 / 10 (x64)</h3>
-          <p class="card-meta">64-bit • Intel Core & AMD Ryzen Laptops</p>
-          <p class="card-desc">
-            Manages Windows Power Schemes and engages Win32 SetThreadExecutionState AwayMode. Lives in the taskbar notification area.
-          </p>
+          <div>
+            <div class="card-badge">Windows x64</div>
+            <h3 class="card-title">Windows 11 / 10 (x64)</h3>
+            <p class="card-meta">64-bit • Intel Core &amp; AMD Ryzen • 75 KB</p>
+            <p class="card-desc">
+              Clean 4-file package with monochrome Win11 dark UI, Win32 AwayMode, native Move-to-Programs installer, and Start Menu &amp; Desktop shortcuts.
+            </p>
+          </div>
           <div class="card-actions">
             <a href="downloads/OpenLid-Windows-x64.zip" download class="btn btn-primary btn-block win-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -326,20 +357,22 @@
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download ZIP (.zip)
+              Download Windows x64 (.zip)
             </a>
-            <span class="card-note">Includes OpenLid.cmd + 1-click Installer + Dark UI</span>
+            <span class="card-note">OpenLid.cmd + Install OpenLid.cmd + Win11 Dark UI</span>
             <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Windows%20Support%20(x64)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Windows%20(x64):%0D%0A-%20Laptop%20Model:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email Windows Support ↗</a>
           </div>
         </div>
 
         <div class="card">
-          <div class="card-badge">Windows ARM64</div>
-          <h3 class="card-title">Windows ARM64</h3>
-          <p class="card-meta">Snapdragon X Elite, Surface Pro ARM</p>
-          <p class="card-desc">
-            Native compilation for modern ARM-based Windows devices. Direct power management with zero emulation layer.
-          </p>
+          <div>
+            <div class="card-badge">Windows ARM64</div>
+            <h3 class="card-title">Windows ARM64</h3>
+            <p class="card-meta">Snapdragon X Elite &amp; Surface ARM • 75 KB</p>
+            <p class="card-desc">
+              Zero-dependency native compilation for modern ARM64 Windows laptops. Direct Win32 power assertions, dark UI, and one-click Programs installer.
+            </p>
+          </div>
           <div class="card-actions">
             <a href="downloads/OpenLid-Windows-ARM64.zip" download class="btn btn-secondary btn-block win-download-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -347,18 +380,18 @@
                 <polyline points="7 10 12 15 17 10"/>
                 <line x1="12" y1="15" x2="12" y2="3"/>
               </svg>
-              Download ZIP (.zip)
+              Download Windows ARM64 (.zip)
             </a>
-            <span class="card-note">Native Snapdragon ARM64 binary</span>
+            <span class="card-note">OpenLid.cmd + Install OpenLid.cmd + Win11 Dark UI</span>
             <a href="mailto:purohitunofficialbhagyesh@gmail.com?subject=OpenLid%20Windows%20Support%20(ARM64)&body=Hi,%0D%0A%0D%0AI%20am%20using%20OpenLid%20for%20Windows%20(ARM64):%0D%0A-%20Device:%20%0D%0A-%20Windows%20Version:%20%0D%0A-%20Issue%20or%20Question:%20%0D%0A" class="card-support-mail">Email Windows Support ↗</a>
           </div>
         </div>
       </div>
 
       <div class="code-box">
-        <span class="code-label">PowerShell</span>
-        <code>powershell -ExecutionPolicy Bypass -File ".\app\OpenLid.ps1" -App</code>
-        <button class="code-copy" onclick="navigator.clipboard.writeText('powershell -ExecutionPolicy Bypass -File &quot;.\\app\\OpenLid.ps1&quot; -App'); this.innerText='Copied'">Copy</button>
+        <span class="code-label">PowerShell (One-Click Install)</span>
+        <code>powershell -ExecutionPolicy Bypass -File ".\app\OpenLid.ps1" -Install</code>
+        <button class="code-copy" onclick="navigator.clipboard.writeText('powershell -ExecutionPolicy Bypass -File &quot;.\\app\\OpenLid.ps1&quot; -Install'); this.innerText='Copied'">Copy</button>
       </div>
     </div>
   </section>
@@ -389,9 +422,9 @@
 
       <div class="spec-col">
         <div class="spec-num">03</div>
-        <h3 class="spec-heading">Vigilant Scanning Eye & Setup</h3>
+        <h3 class="spec-heading">Liquid Glass UI &amp; One-Click Setup</h3>
         <p class="spec-text">
-          An intuitive 3-step Welcome Onboarding flow with 3D animated vigilant eye (scanning left-to-right) walks you through instant passwordless Touch ID elevation and safety thresholds.
+          A minimal monochrome Liquid Glass interface with a smooth 3-step Start Guide, automatic Move-to-Applications/Programs relocation, and instant passwordless toggling.
         </p>
       </div>
     </div>
